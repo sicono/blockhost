@@ -2,6 +2,40 @@
 const yearEl = document.getElementById('year');
 if(yearEl) yearEl.textContent = new Date().getFullYear();
 
+/* Cookie banner logic */
+const COOKIE_KEY = 'blockhost_cookie_pref';
+const cookieBanner = document.getElementById('cookie-banner');
+function showCookieBanner(){
+  if(!cookieBanner) return;
+  cookieBanner.classList.add('show');
+}
+function hideCookieBanner(){
+  if(!cookieBanner) return;
+  cookieBanner.classList.remove('show');
+}
+function setCookiePref(value){
+  try{ localStorage.setItem(COOKIE_KEY, JSON.stringify(value)); }catch(e){}
+  hideCookieBanner();
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  try{
+    const pref = JSON.parse(localStorage.getItem(COOKIE_KEY));
+    if(!pref) showCookieBanner();
+  }catch(e){
+    showCookieBanner();
+  }
+
+  const btnAccept = document.getElementById('cookie-accept');
+  const btnDecline = document.getElementById('cookie-decline');
+  const btnManage = document.getElementById('cookie-manage');
+  if(btnAccept) btnAccept.addEventListener('click', ()=> setCookiePref({analytics:true, functional:true, accepted:true}));
+  if(btnDecline) btnDecline.addEventListener('click', ()=> setCookiePref({analytics:false, functional:false, accepted:false}));
+  if(btnManage) btnManage.addEventListener('click', ()=> {
+    // Simple manage action -> open políticas section
+    document.getElementById('politicas')?.scrollIntoView({behavior:'smooth'});
+  });
+});
+
 /* Simple subtle canvas animation using Three.js for a particle field */
 import * as THREE from 'three';
 
