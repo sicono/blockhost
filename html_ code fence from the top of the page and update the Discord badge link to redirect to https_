@@ -1,0 +1,105 @@
+
+```html
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BlockHost — Hosting Minecraft</title>
+  <link rel="icon" href="/favicon-32x32.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://esm.sh/three@0.158.0"
+    }
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img src="/logo.png" alt="Secure Cube — BlockHost logo" class="logo">
+      <div>
+        <h1>BlockHost</h1>
+        <p class="tag">Hosting profesional para servidores Minecraft</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <a class="btn translucent" href="nosotros.html">Acerca de BlockHost</a>
+      <a class="btn" href="sesion.html">Panel</a>
+      <a class="btn ghost" id="login-btn" href="sesion.html">Iniciar sesión</a>
+      <a class="btn primary highlight" id="register-btn" href="registro.html">Registrarte</a>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <div class="hero-inner">
+      <h2>Potencia. Simplicidad. Latencia baja.</h2>
+      <p class="lead">Despliega tu servidor de Minecraft en segundos con panel intuitivo, backups y protección DDoS incluida.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#comenzar">Comenzar</a>
+        <a class="btn translucent" href="#planes">Sobre Nosotros</a>
+      </div>
+      <ul class="features">
+        <li>Instalación en 30s</li>
+        <li>Backups automáticos</li>
+        <li>Ubicaciones globales</li>
+      </ul>
+    </div>
+
+    <!-- hero now uses fondo.png as decorative background (canvas moved to plans section) -->
+  </main>
+  
+  <section id="planes" class="plans">
+    <h3>Por que elegirnos a nosotros?</h3>
+    <div class="plans-message card">
+      <p>Nosotros ofrecemos distintos planes a un precio competente, cada plan se ajusta a una necesidad, puedes elegir desde un server para jugar con tus amigos o incluso hasta uno para tus eventos o servidores grandes para tu network, nuestros precios benefician mucho al consumidor, debido a que dejamos los precios bastante baratos para que puedas comenzar con tu servidor sin tener que invertir mucho en recursos, nuestra interfaz amigable y cómoda te permitirá manejarla de manera fácil sin necesidad de ser un experto, revisa nuestros planes ahora y encuentra el que mas se acomode a ti, recordamos que puedes unirte a nuestro programa de afiliados para obtener un servidor totalmente GRATUITO, empieza ahora y comienza a disfrutar de tu servidor.</p>
+    </div>
+    <!-- Pixel animation canvas lives here now -->
+    <div id="canvas-wrap" aria-hidden="true" class="plans-canvas"></div>
+  </section>
+
+  <section id="politicas" class="policies-section">
+    <div class="policies-inner">
+      <h3>Políticas y privacidad</h3>
+      <p>En BlockHost respetamos tu privacidad. Recopilamos datos mínimos necesarios para proveer nuestros servicios, usamos cookies para mejorar la experiencia y estadísticas anónimas. No compartimos datos con terceros salvo por requerimiento legal o proveedores necesarios para el servicio.</p>
+      <a class="btn ghost" href="politicas.html">Ver Detalles</a>
+    </div>
+  </section>
+
+  <!-- cookie banner -->
+  <div id="cookie-banner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Aviso de cookies">
+    <div class="cookie-content">
+      <strong>Usamos cookies</strong>
+      <p>Utilizamos cookies analíticas y funcionales para mejorar tu experiencia. Puedes aceptar o gestionar tus preferencias.</p>
+      <div class="cookie-actions">
+        <button id="cookie-manage" class="btn outline small">Gestionar</button>
+        <button id="cookie-decline" class="btn ghost small">Rechazar</button>
+        <button id="cookie-accept" class="btn primary small">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- removed built-in auth modal; login/register now go to sesion.html and registro.html -->
+
+  <footer class="site-footer">
+    <p> <span id="year"></span> BlockHost — Hecho para servidores Minecraft</p>
+  </footer>
+
+  <!-- Discord floating badge -->
+  <a class="discord-badge" href="https://discord.gg/GyxMQyCyvy" target="_blank" rel="noopener" aria-label="Únete a nuestro Discord">
+    <span class="discord-content">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-discord" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612" />
+      </svg>
+      <span class="discord-text">Únete a nuestro Discord</span>
+    </span>
+  </a>
+
+  <script src="script.js" type="module"></script>
+</body>
+</html>
