@@ -35,23 +35,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('politicas')?.scrollIntoView({behavior:'smooth'});
   });
 
-  // Auth modal handling
-  const authModal = document.getElementById('auth-modal');
-  const loginBtn = document.getElementById('login-btn');
-  const registerBtn = document.getElementById('register-btn');
-  const tabs = authModal?.querySelectorAll('.tab') || [];
-  function openAuth(target='login'){
-    if(!authModal) return;
-    authModal.setAttribute('aria-hidden','false');
-    tabs.forEach(t=> t.classList.toggle('active', t.dataset.target===target));
-    authModal.querySelectorAll('.auth-form').forEach(f=> f.classList.toggle('hidden', f.id!==target));
-    authModal.querySelector('#'+target+' input')?.focus();
-  }
-  function closeAuth(){ if(authModal) authModal.setAttribute('aria-hidden','true'); }
-  // Removed auto-opening behavior: keep buttons but do not open the modal on click
-  authModal?.addEventListener('click', (ev)=> { if(ev.target?.dataset?.action==='close') closeAuth(); });
-  authModal?.querySelectorAll('.tab').forEach(t=> t.addEventListener('click', ()=> openAuth(t.dataset.target)));
-  authModal?.querySelectorAll('.auth-form').forEach(f=> f.addEventListener('submit', (e)=> { e.preventDefault(); closeAuth(); }));
+  // Note: Built-in auth modal removed; header buttons link directly to sesion.html and registro.html
 });
 
 /* Simple subtle canvas animation using Three.js for a particle field */
