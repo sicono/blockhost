@@ -49,7 +49,7 @@ document.querySelectorAll('.btn').forEach(b=>{
 
 const registerBtn = document.getElementById('registerBtn');
 if(registerBtn){
-  registerBtn.addEventListener('click', ()=> location.href = '#register');
+  registerBtn.addEventListener('click', ()=> location.href = 'registro.html');
 }
 
 /* ...existing code... */
