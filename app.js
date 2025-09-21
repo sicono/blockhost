@@ -41,27 +41,67 @@ if(pw && confirmPw){
   confirmPw.addEventListener('input', checkMatch);
 }
 
+/* user storage: save users in localStorage under 'blockhost_users' */
+const STORAGE_KEY = 'blockhost_users';
+function loadUsers(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch(e){ return {}; }
+}
+function saveUsers(obj){ localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }
+
+/* prefill if there is exactly one saved user, or if a lastSelectedEmail is stored */
+const users = loadUsers();
+const lastEmail = localStorage.getItem('blockhost_last');
+if(lastEmail && users[lastEmail]){
+  const u = users[lastEmail];
+  if($('#first_name')) $('#first_name').value = u.first || '';
+  if($('#last_name')) $('#last_name').value = u.last || '';
+  if($('#login_email')) $('#login_email').value = u.email || '';
+}
+/* if only one user exists, prefill with that too */
+if(!lastEmail && Object.keys(users).length === 1){
+  const only = users[Object.keys(users)[0]];
+  if($('#first_name')) $('#first_name').value = only.first || '';
+  if($('#last_name')) $('#last_name').value = only.last || '';
+  if($('#login_email')) $('#login_email').value = only.email || '';
+}
+
 /* form validations (minimal, client-side) */
 loginForm.addEventListener('submit', (ev)=>{
   ev.preventDefault();
-  const first = loginForm.first_name.value.trim();
-  const last = loginForm.last_name.value.trim();
-  const email = loginForm.email.value.trim();
-  const pwVal = loginForm.password.value;
-  const confirmVal = loginForm.confirm_password.value;
+  const first = loginForm.first_name ? loginForm.first_name.value.trim() : '';
+  const last = loginForm.last_name ? loginForm.last_name.value.trim() : '';
+  const email = loginForm.email ? loginForm.email.value.trim() : '';
+  const pwVal = loginForm.password ? loginForm.password.value : '';
+  const confirmVal = loginForm.confirm_password ? loginForm.confirm_password.value : '';
   if(!first || !last || !email || !pwVal || !confirmVal){ alert('Completa todos los campos'); return; }
   if(pwVal !== confirmVal){ alert('Las contraseñas no coinciden'); return; }
-  // optional email check (kept simple)
-  // simulate server response (registration)
+
+  const all = loadUsers();
+  if(all[email]){
+    alert('Usuario ya registrado previamente');
+    // optionally prefill fields with stored data
+    const existing = all[email];
+    if($('#first_name')) $('#first_name').value = existing.first || '';
+    if($('#last_name')) $('#last_name').value = existing.last || '';
+    return;
+  }
+
+  // save new user
+  all[email] = { first, last, email, created: Date.now() };
+  saveUsers(all);
+  localStorage.setItem('blockhost_last', email);
+
   const btn = loginForm.querySelector('.btn');
   btn.disabled = true;
   btn.textContent = 'Registrando...';
   setTimeout(()=>{
     btn.disabled = false;
     btn.textContent = 'Registrarse';
-    console.log('Registro simulado:', {first,last,email});
+    console.log('Registro guardado:', {first,last,email});
     loginForm.reset();
-    pwHelp.textContent = '';
+    if(pwHelp) pwHelp.textContent = '';
+    alert('Registro completado y guardado localmente');
   },1000);
 });
 
