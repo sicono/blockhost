@@ -102,6 +102,12 @@ body::before{
 
 /* Plans */
 .plans{padding:40px 64px;background:linear-gradient(180deg, rgba(123,92,255,0.02), transparent)}
+.plans h3{font-size:28px;margin-bottom:12px;text-align:center}
+/* Desktop: aumentar tamaño del título */
+@media (min-width:900px){
+  .plans h3{font-size:36px}
+}
+.plans-message{max-width:980px;margin:12px auto 0 auto;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(15,14,18,0.06), rgba(123,92,255,0.01));color:var(--muted);line-height:1.6}
 .plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:18px}
 .card{background:linear-gradient(180deg, rgba(15,14,18,0.08), rgba(123,92,255,0.02));padding:18px;border-radius:12px;border:1px solid rgba(123,92,255,0.03)} /* make plan cards translucent */
 .price{font-weight:700;margin:8px 0 12px 0}
@@ -115,6 +121,8 @@ body::before{
 @media (max-width:900px){
   .hero{flex-direction:column;padding:28px;align-items:center;text-align:center}
   .hero-inner{max-width:100%;width:100%}
+  /* add breathing room and make hero content stack earlier on smaller widths */
+  .hero{gap:24px;padding:26px 20px}
   .visual{width:100%;order:2}
   .site-header{padding:14px 20px}
   .plans{padding:28px 20px}
@@ -132,12 +140,16 @@ body::before{
   .nav{width:100%;display:flex;gap:8px;justify-content:center}
   .brand{width:auto;justify-content:center;align-items:center}
   .hero{padding:20px 16px;gap:18px;align-items:center;text-align:center}
-  .hero h2{font-size:26px;margin:0 auto}
+  .hero h2{font-size:22px;margin:0 auto}
   #canvas-wrap{height:160px;border-radius:12px}
   .mockup{padding:10px}
   .visual{width:100%}
   .plan-grid{grid-template-columns:1fr;gap:12px}
   .popular{transform:none;outline:2px solid rgba(123,92,255,0.10)}
+  /* increase spacing for small screens to avoid crowded layout */
+  .hero-inner{padding:0 6px}
+  .plans{padding:18px 14px}
+  .plans-message{padding:14px;font-size:15px}
 }
 
 /* Ensure canvas container resizes smoothly */
@@ -179,3 +191,52 @@ body::before{
 .policies-inner{max-width:900px;margin:0 auto;text-align:left}
 .policies-inner h3{margin:0 0 8px 0;font-size:20px}
 .policies-inner p{color:var(--muted);margin:0 0 12px 0;line-height:1.5}
+
+/* Auth modal */
+.auth-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10000;pointer-events:none;opacity:0;transition:opacity .18s ease}
+.auth-modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
+.auth-backdrop{position:fixed;inset:0;background:rgba(5,4,8,0.6)}
+.auth-panel{position:relative;width:420px;max-width:calc(100% - 32px);background:linear-gradient(180deg, rgba(15,14,18,0.96), rgba(10,9,12,0.98));padding:18px;border-radius:12px;box-shadow:0 18px 50px rgba(2,2,10,0.6);border:1px solid rgba(123,92,255,0.04)}
+.auth-close{position:absolute;right:10px;top:8px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+.auth-tabs{display:flex;gap:8px;margin:8px 0 12px}
+.auth-tabs .tab{background:transparent;border:1px solid rgba(123,92,255,0.03);padding:8px 12px;border-radius:8px;color:var(--muted);cursor:pointer}
+.auth-tabs .tab.active{background:linear-gradient(90deg,var(--primary),#5f4bff);color:var(--bg);border:none}
+.auth-form{display:block}
+.auth-form.hidden{display:none}
+.auth-form label{display:block;font-size:13px;color:var(--muted);margin:8px 0}
+.auth-form input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:inherit}
+.auth-actions{display:flex;justify-content:flex-end;margin-top:12px}
+
+/* mobile tweak */
+@media (max-width:560px){.auth-panel{padding:14px}}
+
+/* Discord floating badge */
+.discord-badge{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  z-index:10001;
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+  background:linear-gradient(180deg, rgba(15,14,18,0.96), rgba(10,9,12,0.96));
+  color:var(--muted);
+  padding:10px 12px;
+  border-radius:999px;
+  box-shadow:0 10px 30px rgba(2,2,10,0.5);
+  text-decoration:none;
+  border:1px solid rgba(123,92,255,0.06);
+  transition:transform .14s ease, box-shadow .14s ease, opacity .14s ease;
+  backdrop-filter: blur(6px);
+}
+.discord-badge:hover{ transform:scale(1.02); box-shadow:0 14px 40px rgba(2,2,10,0.6) }
+.discord-host-logo{width:28px;height:28px;border-radius:6px;object-fit:cover;border:1px solid rgba(255,255,255,0.04)}
+.discord-content{display:inline-flex;align-items:center;gap:8px}
+.discord-content svg{color:#7289da}
+.discord-text{font-weight:700;color:var(--muted);font-size:14px;white-space:nowrap}
+/* mobile: compact the badge */
+@media (max-width:560px){
+  .discord-badge{right:12px;bottom:12px;padding:8px 10px}
+  .discord-text{display:none}
+  .discord-host-logo{width:24px;height:24px}
+}
