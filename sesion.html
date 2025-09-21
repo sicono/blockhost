@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blockhost — Iniciar sesión / Registrarse</title>
+
+  <!-- Import map & fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- ...existing head content... -->
+  <style>
+    /* minimal reset */
+    :root{
+      --bg1:#39276A; /* nuevo: base morada solicitada */
+      --bg2:#271a52; /* degradado secundario más oscuro */
+      --card: rgba(255,255,255,0.03);
+      --muted:#bfb9d6;
+      --accent1: linear-gradient(90deg,#6A4EFF 0%, #8d6bff 100%); /* botones primarios con #6A4EFF */
+      --accent2: linear-gradient(90deg,#6A4EFF 0%, #4f34d6 100%); /* variante secundaria usando mismo tono */
+      --glass: rgba(255,255,255,0.03);
+      --radius:14px;
+      font-family: "Noto Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0;}
+    body{
+      background:
+        linear-gradient(180deg, rgba(8,8,8,0.48), rgba(8,8,8,0.28)),
+        url("fondito.jpg") center/cover no-repeat,
+        radial-gradient(800px 400px at 10% 10%, rgba(120,60,200,0.12), transparent 10%),
+        radial-gradient(700px 350px at 85% 80%, rgba(90,30,140,0.12), transparent 10%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#eef0fb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-y:auto;
+    }
+
+    /* container */
+    .wrap{
+      width:100%;
+      max-width:940px;
+      margin:28px;
+      display:grid;
+      grid-template-columns: 1fr 380px;
+      gap:28px;
+      align-items:center;
+      justify-items:center;
+      /* ensure explicit row flow so hero can span full width */
+      grid-auto-rows: auto;
+    }
+
+    /* Left: marketing / hero */
+    .hero{
+      background: transparent;
+      border-radius:0;
+      padding:0;
+      box-shadow: none;
+      min-height: auto;
+      padding:36px 0 0 0;
+      /* keep hero in the left column so the card can be centered in the grid */
+      justify-self:start;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+    .logo{
+      width:64px;height:64px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      display:flex;align-items:center;justify-content:center;
+      font-weight:800;color:transparent;font-size:20px;
+      box-shadow: 0 6px 24px rgba(70,10,90,0.24);
+      position:relative;overflow:hidden;
+    }
+    .logo::after{
+      /* removed text fallback to use image logo */
+    }
+    h1{margin:0 0 8px 0;font-size:28px;}
+    p.lead{margin:0;color:var(--muted);line-height:1.5}
+
+    /* Right: card with tabs */
+    .card{
+      background: linear-gradient(180deg, rgba(0,0,0,0.62), rgba(0,0,0,0.56));
+      border-radius:14px;
+      padding:22px;
+      width:100%;
+      max-width:380px;
+      box-shadow: 0 18px 48px rgba(10,10,20,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+      backdrop-filter: blur(8px);
+      justify-self:center;
+    }
+    /* compact header inside card: logo + hero text aligned left above the form */
+    .card-header{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:12px;
+    }
+    .card-header .logo-sm{width:48px;height:48px;border-radius:10px;overflow:hidden;flex:0 0 48px;box-shadow:0 8px 20px rgba(60,20,120,0.18)}
+    .card-header .intro{line-height:1.12}
+    .card-header .intro .title{font-weight:700;font-size:15px;color:#fff;margin-top:6px;margin-bottom:4px}
+    .card-header .intro .sub{font-size:13px;color:var(--muted)}
+    .card .form-title{font-size:16px;font-weight:700;margin:14px 0 8px 0;color:var(--muted)}
+    .tabs{
+      display:flex;
+      gap:8px;
+      margin-bottom:16px;
+    }
+    .tab{
+      flex:1;
+      text-align:center;
+      padding:10px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      color:var(--muted);
+      transition:transform .18s ease, color .18s ease;
+      user-select:none;
+    }
+    .tab:hover{transform:translateY(-4px)}
+    .tab.active{
+      color:white;
+      background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      box-shadow: inset 0 -2px 0 rgba(255,255,255,0.02);
+    }
+
+    form{
+      display:flex;flex-direction:column;gap:12px;
+    }
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    .field{
+      display:flex;flex-direction:column;
+    }
+    input[type="text"],input[type="email"],input[type="password"]{
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,0.04);
+      color: #fff;
+      padding:12px 12px;
+      border-radius:10px;
+      outline:none;
+      transition:box-shadow .12s ease, transform .12s ease;
+      font-size:14px;
+    }
+    input:focus{
+      box-shadow: 0 6px 18px rgba(123,44,255,0.12);
+      transform:translateY(-2px);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .row{display:flex;gap:10px}
+    .row .col{flex:1}
+
+    .actions{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+    .btn{
+      border:0;padding:12px 14px;border-radius:12px;color:white;font-weight:700;cursor:pointer;
+      background: var(--accent1);
+      box-shadow: 0 10px 30px rgba(95,30,150,0.28);
+      transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    }
+    .btn.secondary{
+      background: var(--accent2);
+      color:#041018;
+      box-shadow: 0 8px 24px rgba(45,150,190,0.14);
+    }
+    .btn:active{transform:translateY(1px)}
+    .meta{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
+
+    .pw-toggle{background:none;border:0;color:var(--muted);cursor:pointer;font-weight:600;padding:6px 8px;border-radius:8px}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* subtle floating cubes background inside hero */
+    .hero{position:relative}
+    .hero .grid{
+      position:absolute;right:8px;top:20px;width:220px;height:160px;pointer-events:none;opacity:0.18;
+      display:grid;grid-template-columns:repeat(11,1fr);gap:6px;
+      transform:translateZ(0);
+    }
+    .cube{
+      height:10px;border-radius:3px;background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+      animation: scatter 6s linear infinite;
+      filter: drop-shadow(0 6px 18px rgba(120,40,200,0.12));
+      opacity:.9;
+    }
+    .cube:nth-child(odd){animation-duration:5.6s}
+    .cube:nth-child(3n){animation-duration:4.8s}
+    @keyframes scatter{
+      0%{transform: translateY(0) translateX(0) rotate(0deg) scale(1)}
+      30%{transform: translateY(-14px) translateX(6px) rotate(6deg) scale(.98)}
+      60%{transform: translateY(-6px) translateX(-8px) rotate(-4deg) scale(1.02)}
+      100%{transform: translateY(0) translateX(0) rotate(0deg) scale(1)}
+    }
+
+    @keyframes float{
+      0%{transform: translateY(0) rotate(0deg)}
+      50%{transform: translateY(-8px) rotate(6deg)}
+      100%{transform: translateY(0) rotate(0deg)}
+    }
+
+    /* responsiveness */
+    @media (max-width:880px){
+      .wrap{
+        grid-template-columns:1fr;
+        padding:18px;
+        max-width:640px;
+        margin:18px auto;
+        gap:18px;
+      }
+      /* make the card more compact on small screens so it doesn't appear too large */
+      .card{
+        order:2;padding:10px;max-width:320px;width:94%;margin:0 auto;border-radius:12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+      }
+      /* put hero above the card on small screens and improve spacing */
+      .hero{order:1;padding:8px 0 0 0}
+      /* ...existing styles... */
+
+      /* make cubes smaller and less intrusive on mobile */
+      .hero .grid{right:8px;top:8px;width:160px;height:110px;opacity:0.12}
+      .cube{height:8px;border-radius:2px}
+    }
+
+    /* Centrar el login en pantallas grandes */
+    @media (min-width: 1024px) {
+      .wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+      }
+      .hero { display: none; }
+      .card { margin: 0 auto; }
+    }
+
+    /* Discord badge in top-left */
+    .discord-badge{
+      position:fixed;
+      left:12px;
+      top:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      /* remove surrounding translucent box so icon isn't clipped */
+      padding:0;
+      background:none;
+      color:#fff;
+      text-decoration:none;
+      border-radius:0;
+      font-weight:700;
+      font-size:13px;
+      backdrop-filter:none;
+      box-shadow:none;
+      z-index:60;
+    }
+    .discord-badge svg{width:18px;height:18px;flex:0 0 18px;display:block}
+  </style>
+</head>
+<body>
+  <!-- Discord badge added near top-left -->
+  <a class="discord-badge" href="https://discord.com" target="_blank" rel="noopener">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-discord" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+    </svg>
+    <span>Discord</span>
+  </a>
+
+  <div class="wrap">
+    <section class="hero" aria-hidden="false">
+      <div class="brand">
+        <!-- hero logo removed as requested -->
+      </div>
+      <!-- removed main H1 'Blockhost' per request -->
+      <p class="lead"></p>
+
+      <div class="grid" aria-hidden="true">
+        <div class="cube"></div><div class="cube"></div><div class="cube"></div><div class="cube"></div><div class="cube"></div><div class="cube"></div>
+      </div>
+    </section>
+
+    <aside class="card" aria-label="Iniciar sesión o registrarse">
+      <div class="card-header" aria-hidden="false">
+        <div class="logo-sm"><img src="logo.png" alt="Blockhost" style="width:100%;height:100%;object-fit:cover"></div>
+        <div class="intro">
+          <div class="title">BlockHost</div>
+          <div class="sub"></div>
+        </div>
+      </div>
+      <div class="form-title">Iniciar sesión</div>
+
+      <!-- Login form -->
+      <form id="loginForm" autocomplete="on">
+        <div class="field">
+          <label for="login_email">Correo o usuario</label>
+          <input id="login_email" name="email" type="text" placeholder="tucorreo@gmail.com" required>
+        </div>
+
+        <div class="field">
+          <label for="login_pw">Contraseña</label>
+          <div style="display:flex;gap:8px">
+            <input id="login_pw" name="password" type="password" placeholder="Contraseña" required>
+            <button type="button" class="pw-toggle" data-for="login_pw" aria-label="Mostrar contraseña">Mostrar</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="submit">Entrar a Blockhost</button>
+          <button type="button" id="registerBtn" class="btn secondary">¿No te has registrado?</button>
+        </div>
+
+        <div class="meta">
+          <a href="#" id="forgotLink" class="small" style="color:var(--muted);text-decoration:none">¿Olvidaste la contraseña?</a>
+        </div>
+      </form>
+
+      <!-- register removed -->
+    </aside>
+  </div>
+
+  <script type="module" src="sesion.js"></script>
+  <!-- ...existing body content... -->
+</body>
+</html>
