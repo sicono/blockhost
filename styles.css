@@ -77,14 +77,42 @@ body::before{
 .btn.outline{background:transparent;color:var(--primary);border:1px solid rgba(123,92,255,0.18);backdrop-filter:blur(4px)}
 .btn.small{padding:8px 10px;font-size:13px;border-radius:8px}
 
+/* make register button more eye-catching */
+.btn.highlight{
+    background: linear-gradient(90deg, #ff6b6b 0%, #ff4d94 50%, #ff6b6b 100%);
+    color: #fff;
+    box-shadow: 0 12px 36px rgba(255,77,148,0.18), 0 4px 10px rgba(255,107,107,0.08);
+    border: 1px solid rgba(255,255,255,0.06);
+    transform: none;
+    padding: 10px 16px;
+    font-weight:700;
+}
+/* subtle hover for highlight */
+.btn.highlight:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 18px 48px rgba(255,77,148,0.22), 0 6px 18px rgba(255,107,107,0.10);
+}
+
+/* ensure header translucent variant looks correct in nav */
+.nav .btn.translucent{
+    background: rgba(0,0,0,0.54);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.36);
+}
+
 /* Hero */
 .hero{
   display:flex;
   gap:40px;
   align-items:center;
   justify-content:space-between;
-  padding:48px 64px;
+  padding:64px 64px; /* increased vertical padding for more space */
+  min-height:60vh; /* ensure hero is taller so background has vertical room */
   flex:1;
+  background:
+    linear-gradient(90deg, rgba(10,9,12,0.65) 0%, rgba(10,9,12,0.25) 40%),
+    url('/fondo.png') left center / cover no-repeat;
 }
 .hero-inner{max-width:640px}
 .hero h2{font-size:42px;margin:0 0 12px 0;line-height:1.02}
@@ -101,7 +129,18 @@ body::before{
 .chip{background:var(--glass);padding:8px 10px;border-radius:8px;color:var(--muted);font-size:13px;display:inline-block;margin-bottom:6px}
 
 /* Plans */
-.plans{padding:40px 64px;background:linear-gradient(180deg, rgba(123,92,255,0.02), transparent)}
+.plans{
+  padding:56px 64px; /* more vertical spacing */
+  min-height:56vh; /* ensure plans section has vertical space for background */
+  background:
+    linear-gradient(90deg, rgba(7,6,10,0.82) 0%, rgba(7,6,10,0.55) 30%, rgba(7,6,10,0.25) 60%, rgba(7,6,10,0.06) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(123,92,255,0.01));
+  position:relative;
+  overflow:hidden;
+  border-radius:12px;
+  display:flex;              /* ensure content + canvas stack nicely */
+  flex-direction:column;
+}
 .plans h3{font-size:28px;margin-bottom:12px;text-align:center}
 /* Desktop: aumentar tamaño del título */
 @media (min-width:900px){
@@ -137,19 +176,22 @@ body::before{
 /* Header stacks on very small screens */
 @media (max-width:560px){
   .site-header{flex-direction:column;align-items:center;gap:8px;padding:14px;text-align:center}
-  .nav{width:100%;display:flex;gap:8px;justify-content:center}
+  .nav{width:100%;display:flex;gap:8px;justify-content:center;flex-wrap:wrap} /* allow buttons to wrap */
   .brand{width:auto;justify-content:center;align-items:center}
-  .hero{padding:20px 16px;gap:18px;align-items:center;text-align:center}
+  .hero{padding:24px 16px;gap:22px;align-items:center;text-align:center;min-height:60vh} /* more vertical space */
   .hero h2{font-size:22px;margin:0 auto}
-  #canvas-wrap{height:160px;border-radius:12px}
+  #canvas-wrap{height:320px;border-radius:12px} /* taller canvas so animation is visible */
   .mockup{padding:10px}
-  .visual{width:100%}
+  .visual{width:100%;order:2}
   .plan-grid{grid-template-columns:1fr;gap:12px}
   .popular{transform:none;outline:2px solid rgba(123,92,255,0.10)}
-  /* increase spacing for small screens to avoid crowded layout */
   .hero-inner{padding:0 6px}
-  .plans{padding:18px 14px}
-  .plans-message{padding:14px;font-size:15px}
+  .plans{padding:24px 16px;min-height:70vh} /* ensure plans section shows full text */
+  .plans-message{padding:18px;font-size:15px;line-height:1.6;max-width:100%;box-sizing:border-box}
+  .btn{max-width:100%;white-space:normal;padding:10px 12px} /* let buttons wrap and not be cut off */
+  .plans-canvas{height:360px;margin-top:18px} /* ensure canvas visible and comfortable */
+  .cookie-banner{left:14px;right:14px;bottom:14px;width:auto}
+  .policies-section{padding:20px}
 }
 
 /* Ensure canvas container resizes smoothly */
@@ -240,3 +282,131 @@ body::before{
   .discord-text{display:none}
   .discord-host-logo{width:24px;height:24px}
 }
+
+/* Header adjustments: larger logo/title/subtitle on desktop and tighter button widths */
+.brand h1{margin:0;font-size:18px;letter-spacing:0.4px}
+.tag{margin:0;font-size:12px;color:var(--muted)}
+
+/* Increase sizes on wider screens */
+@media (min-width:900px){
+  .brand h1{font-size:22px}
+  .tag{font-size:13px}
+  .logo{width:72px;height:72px}
+  .hero h2{font-size:48px}
+  .lead{font-size:16px}
+}
+
+/* Constrain button widths and reduce very wide appearance */
+.btn{max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:10px 12px}
+.btn.primary{padding:10px 14px}
+
+/* Make the "Acerca de" button more prominent (ghost variant) */
+.nav .btn.ghost{border:1px solid rgba(123,92,255,0.12);color:var(--primary);background:linear-gradient(90deg, rgba(123,92,255,0.06), rgba(123,92,255,0.02))}
+
+/* Plans section now has a decorative background image (fondo.png) with left fog gradient and overlay to keep text readable */
+.plans{
+  padding:56px 64px; /* more vertical spacing */
+  min-height:56vh; /* ensure plans section has vertical space for background */
+  background:
+    linear-gradient(90deg, rgba(7,6,10,0.82) 0%, rgba(7,6,10,0.55) 30%, rgba(7,6,10,0.25) 60%, rgba(7,6,10,0.06) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(123,92,255,0.01));
+  position:relative;
+  overflow:hidden;
+  border-radius:12px;
+  display:flex;              /* ensure content + canvas stack nicely */
+  flex-direction:column;
+}
+
+/* new: make the plans canvas fully integrated and flexible within .plans */
+.plans-canvas{
+  width:100%;
+  flex:1 1 auto;
+  min-height:360px; /* ensure visible height on desktop */
+  border-radius:12px;
+  overflow:hidden;
+  margin-top:18px;
+  box-shadow:0 10px 30px rgba(3,2,7,0.18);
+  background:transparent;
+  position:relative; /* keep it within the plans stacking context */
+}
+/* mobile adjustments to keep canvas visible and not cut off */
+@media (max-width:900px){
+  .plans-canvas{min-height:320px}
+}
+@media (max-width:560px){
+  .plans-canvas{min-height:300px;margin-top:14px}
+}
+
+/* subtle left fog gradient overlay (soft fog at start/left) */
+.plans::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:34%;
+  pointer-events:none;
+  background:linear-gradient(90deg, rgba(10,9,12,0.85), rgba(10,9,12,0.45) 40%, rgba(10,9,12,0.05) 100%);
+  mix-blend-mode:normal;
+  opacity:0.95;
+  transform:translateZ(0);
+}
+
+/* Make sure the plans text sits above overlays */
+.plans h3, .plans-message{position:relative;z-index:2}
+
+/* Slight animation for hero elements to feel alive */
+@keyframes floatUp {
+  0%{ transform: translateY(0); opacity:0.98;}
+  50%{ transform: translateY(-6px); }
+  100%{ transform: translateY(0); opacity:1;}
+}
+.hero-inner{animation:floatUp 6s ease-in-out infinite}
+
+/* visual canvas subtle bob */
+.visual{animation:floatUp 8s ease-in-out infinite; animation-delay:0.4s}
+
+/* Ensure plans message background is readable on mobile */
+@media (max-width:900px){
+  .hero{flex-direction:column;padding:36px 20px;min-height:50vh}
+  .plans{
+    background-image: linear-gradient(180deg, rgba(7,6,10,0.92), rgba(7,6,10,0.9)), url('/fondo.png');
+    background-position: center top;
+    background-size: cover;
+    padding:36px 20px;
+    border-radius:10px;
+    min-height:50vh;
+  }
+  .plans::before{width:48%;opacity:0.98}
+  #canvas-wrap{height:280px;border-radius:12px} /* scale canvas on smaller screens */
+  .brand h1{font-size:20px}
+  .logo{width:56px;height:56px}
+  .hero h2{font-size:28px}
+  .lead{font-size:14px}
+}
+
+/* tighten cookie banner on small screens and reduce width of buttons overall */
+@media (max-width:560px){
+  .btn{max-width:160px;padding:8px 10px;font-size:14px}
+  .plans h3{font-size:20px}
+  .plans-message{font-size:15px;padding:14px}
+}
+
+/* ensure text in plans card remains clear above background image */
+.plans-message.card{
+  background: linear-gradient(180deg, rgba(3,3,6,0.72), rgba(3,3,6,0.6));
+  border:1px solid rgba(255,255,255,0.04);
+}
+
+/* Make hero lead and feature items white for better contrast */
+.lead{color:#ffffff}
+.features{color:#ffffff}
+
+/* Translucent black button for "Sobre Nosotros" with white text */
+.btn.translucent{
+  background: rgba(0,0,0,0.48);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+}
+.btn.translucent:hover{ transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,0.5) }
