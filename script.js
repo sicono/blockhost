@@ -35,13 +35,44 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('politicas')?.scrollIntoView({behavior:'smooth'});
   });
 
+  // Smooth scroll for in-page anchors (gentle offset to account for header)
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      const targetId = a.getAttribute('href').slice(1);
+      const target = document.getElementById(targetId);
+      if(target){
+        e.preventDefault();
+        const headerOffset = Math.min(document.querySelector('.site-header')?.offsetHeight || 76, 120);
+        const rect = target.getBoundingClientRect();
+        const top = window.scrollY + rect.top - headerOffset - 12; // small breathing space
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Subtle parallax on mousemove for the plans background (desktop only)
+  const plans = document.querySelector('.plans');
+  if(plans && window.matchMedia('(pointer:fine)').matches){
+    window.addEventListener('mousemove', (e)=>{
+      const rect = plans.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width; // 0 - 1
+      const y = (e.clientY - rect.top) / rect.height;
+      // gentle parallax transform on background-position
+      const px = 50 + (x - 0.5) * 6; // small shift
+      const py = 35 + (y - 0.5) * 3;
+      plans.style.backgroundPosition = `${px}% ${py}%`;
+    });
+    // return to center on leave
+    plans.addEventListener('mouseleave', ()=> { plans.style.backgroundPosition = 'center right'; });
+  }
+
   // Note: Built-in auth modal removed; header buttons link directly to sesion.html and registro.html
 });
 
 /* Simple subtle canvas animation using Three.js for a particle field */
 import * as THREE from 'three';
 
-const wrap = document.getElementById('canvas-wrap');
+const wrap = document.getElementById('canvas-wrap'); // now located inside the plans section
 if (wrap) {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(50, wrap.clientWidth / Math.max(wrap.clientHeight,1), 0.1, 1000);
