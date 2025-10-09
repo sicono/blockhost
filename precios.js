@@ -51,21 +51,64 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
 
   // Subtle parallax on mousemove for the plans background (desktop only)
-  const plans = document.querySelector('.plans');
-  if(plans && window.matchMedia('(pointer:fine)').matches){
-    window.addEventListener('mousemove', (e)=>{
-      const rect = plans.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width; // 0 - 1
-      const y = (e.clientY - rect.top) / rect.height;
-      // gentle transform on plans layer elements instead of background
-      const px = (x - 0.5) * 8; // small shift in px
-      const py = (y - 0.5) * 4;
-      plans.style.transform = `translate3d(${px}px, ${py}px, 0)`;
-    });
-    plans.addEventListener('mouseleave', ()=> { plans.style.transform = ''; });
-  }
+  // remove parallax mousemove behavior to prevent page shifting on mouse movement
+  // const plans = document.querySelector('.plans');
+  // if(plans && window.matchMedia('(pointer:fine)').matches){
+  //   window.addEventListener('mousemove', (e)=>{
+  //     const rect = plans.getBoundingClientRect();
+  //     const x = (e.clientX - rect.left) / rect.width; // 0 - 1
+  //     const y = (e.clientY - rect.top) / rect.height;
+  //     const px = (x - 0.5) * 8; // small shift in px
+  //     const py = (y - 0.5) * 4;
+  //     plans.style.transform = `translate3d(${px}px, ${py}px, 0)`;
+  //   });
+  //   plans.addEventListener('mouseleave', ()=> { plans.style.transform = ''; });
+  // }
 
   // Note: Built-in auth modal removed; header buttons link directly to sesion.html and registro.html
+
+  // Currency detection + selector
+  const CURRENCIES = {
+    USD: { rate: 1.08, locales: ['en-US','es-PA'], label: 'Dólares (USD)' }, // Panama uses USD
+    PEN: { rate: 4.04, locales: ['es-PE'], label: 'Perú — Soles (PEN)' },
+    MXN: { rate: 19.5, locales: ['es-MX'], label: 'México — Pesos (MXN)' },
+    COP: { rate: 4390, locales: ['es-CO'], label: 'Colombia — Pesos (COP)' },
+    ARS: { rate: 980, locales: ['es-AR'], label: 'Argentina — Pesos (ARS)' },
+    VES: { rate: 39, locales: ['es-VE'], label: 'Venezuela — Bolívar (VES)' },
+    BOB: { rate: 7.4, locales: ['es-BO'], label: 'Bolivia — Boliviano (BOB)' },
+    EUR: { rate: 1, locales: ['es-ES'], label: 'Europa — Euros (EUR)' },
+  };
+  const currencySelect = document.getElementById('currency-select');
+  const amounts = Array.from(document.querySelectorAll('.amount[data-eur]'));
+
+  function guessCurrency(){
+    const lang = navigator.language || 'es-ES';
+    const match = Object.entries(CURRENCIES).find(([,v])=> v.locales.some(l=> lang.startsWith(l)));
+    return match ? match[0] : 'USD';
+  }
+  function formatCurrency(valueEur, code){
+    const { rate } = CURRENCIES[code] || CURRENCIES.USD;
+    const converted = valueEur * rate;
+    return new Intl.NumberFormat(undefined, { style:'currency', currency: code, maximumFractionDigits: code==='COP'||code==='ARS'||code==='VES'?0:2 }).format(converted);
+  }
+  function updatePrices(code){
+    amounts.forEach(el=>{
+      const eur = parseFloat(el.dataset.eur);
+      el.textContent = formatCurrency(eur, code);
+    });
+  }
+  if(currencySelect){
+    currencySelect.innerHTML = ""; // ensure options are created via JS
+    Object.entries(CURRENCIES).forEach(([code, meta])=>{
+      const opt = document.createElement('option');
+      opt.value = code; opt.textContent = meta.label;
+      currencySelect.appendChild(opt);
+    });
+    const initial = guessCurrency();
+    currencySelect.value = initial;
+    updatePrices(initial);
+    currencySelect.addEventListener('change', ()=> updatePrices(currencySelect.value));
+  }
 });
 
 /* Removed Three.js particle/canvas block because the plans section and canvas were deleted.
