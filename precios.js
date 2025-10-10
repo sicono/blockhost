@@ -1,8 +1,8 @@
-// --- Currency detection + selector ---
+// --- Conversión de Monedas: EUR ↔ USD ---
 document.addEventListener('DOMContentLoaded', () => {
   const CURRENCIES = {
     EUR: { rate: 1, label: 'Euros (€)' },
-    USD: { rate: 1.08, label: 'Dólares (USD)' }
+    USD: { rate: 1.08, label: 'Dólares (USD)' } // 1 EUR ≈ 1.08 USD
   };
 
   const currencySelect = document.getElementById('currency-select');
@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function formatCurrency(valueEur, code) {
     const { rate } = CURRENCIES[code] || CURRENCIES.USD;
-    // Multiplicamos porque el rate indica cuántas unidades de esa moneda vale 1 EUR
     const converted = valueEur * rate;
     return new Intl.NumberFormat(undefined, {
       style: 'currency',
@@ -33,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (currencySelect) {
-    currencySelect.innerHTML = ""; // limpia el selector
+    currencySelect.innerHTML = '';
 
     Object.entries(CURRENCIES).forEach(([code, meta]) => {
       const opt = document.createElement('option');
