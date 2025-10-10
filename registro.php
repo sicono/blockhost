@@ -3,9 +3,9 @@ header('Content-Type: application/json');
 
 // Datos de conexión (ajusta según tu servidor)
 $host = "localhost";
-$user = "TU_USUARIO_MYSQL";
-$pass = "TU_PASSWORD_MYSQL";
-$db   = "panel_1";
+$user = "support";
+$pass = "Bhs05122007@";
+$db   = "panel_db"; // <- cambiado
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
