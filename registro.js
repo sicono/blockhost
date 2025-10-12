@@ -1,119 +1,121 @@
 /* ...existing code... */
-const $ = sel =&gt; document.querySelector(sel);
-const $$ = sel =&gt; Array.from(document.querySelectorAll(sel));
+// Prevent pinch and double-tap zoom on mobile
+window.addEventListener('gesturestart', (e)=> e.preventDefault(), {passive:false});
+window.addEventListener('gesturechange', (e)=> e.preventDefault(), {passive:false});
+document.addEventListener('dblclick', (e)=> {
+  if (matchMedia('(pointer:coarse)').matches) e.preventDefault();
+}, {passive:false});
 
-// removed tab interactivity: login is the only available action
-const loginForm = $('#loginForm');
+const yearEl = document.getElementById('year');
+if(yearEl) yearEl.textContent = new Date().getFullYear();
 
-/* password toggle */
-$$('.pw-toggle').forEach(btn=&gt;{
-  btn.addEventListener('click', ()=&gt;{
-    const id = btn.dataset.for;
-    const inp = document.getElementById(id);
-    if(!inp) return;
-    if(inp.type === 'password'){
-      inp.type = 'text';
-      btn.textContent = 'Ocultar';
-    } else {
-      inp.type = 'password';
-      btn.textContent = 'Mostrar';
-    }
+/* Cookie banner logic */
+const COOKIE_KEY = 'blockhost_cookie_pref';
+const cookieBanner = document.getElementById('cookie-banner');
+function showCookieBanner(){
+  if(!cookieBanner) return;
+  cookieBanner.classList.add('show');
+}
+function hideCookieBanner(){
+  if(!cookieBanner) return;
+  cookieBanner.classList.remove('show');
+}
+function setCookiePref(value){
+  try{ localStorage.setItem(COOKIE_KEY, JSON.stringify(value)); }catch(e){}
+  hideCookieBanner();
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  try{
+    const pref = JSON.parse(localStorage.getItem(COOKIE_KEY));
+    if(!pref) showCookieBanner();
+  }catch(e){
+    showCookieBanner();
+  }
+
+  const btnAccept = document.getElementById('cookie-accept');
+  const btnDecline = document.getElementById('cookie-decline');
+  const btnManage = document.getElementById('cookie-manage');
+  if(btnAccept) btnAccept.addEventListener('click', ()=> setCookiePref({analytics:true, functional:true, accepted:true}));
+  if(btnDecline) btnDecline.addEventListener('click', ()=> setCookiePref({analytics:false, functional:false, accepted:false}));
+  if(btnManage) btnManage.addEventListener('click', ()=> {
+    // Simple manage action -> open políticas section
+    document.getElementById('politicas')?.scrollIntoView({behavior:'smooth'});
   });
-});
 
-/* live password match indicator */
-const pw = document.getElementById('login_pw');
-const confirmPw = document.getElementById('confirm_pw');
-const pwHelp = document.getElementById('pwHelp');
-function checkMatch(){
-  if(!pw || !confirmPw || !pwHelp) return;
-  if(confirmPw.value === '') { pwHelp.textContent = ''; return; }
-  if(pw.value === confirmPw.value){
-    pwHelp.style.color = '#8ef5a1';
-    pwHelp.textContent = 'Las contraseñas coinciden';
-  } else {
-    pwHelp.style.color = '#ff9b9b';
-    pwHelp.textContent = 'No coinciden';
+  // Smooth scroll for in-page anchors (gentle offset to account for header)
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      const targetId = a.getAttribute('href').slice(1);
+      const target = document.getElementById(targetId);
+      if(target){
+        e.preventDefault();
+        const headerOffset = Math.min(document.querySelector('.site-header')?.offsetHeight || 76, 120);
+        const rect = target.getBoundingClientRect();
+        const top = window.scrollY + rect.top - headerOffset - 12; // small breathing space
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Subtle parallax on mousemove for the plans background (desktop only)
+  // remove parallax mousemove behavior to prevent page shifting on mouse movement
+  // const plans = document.querySelector('.plans');
+  // if(plans && window.matchMedia('(pointer:fine)').matches){
+  //   window.addEventListener('mousemove', (e)=>{
+  //     const rect = plans.getBoundingClientRect();
+  //     const x = (e.clientX - rect.left) / rect.width; // 0 - 1
+  //     const y = (e.clientY - rect.top) / rect.height;
+  //     const px = (x - 0.5) * 8; // small shift in px
+  //     const py = (y - 0.5) * 4;
+  //     plans.style.transform = `translate3d(${px}px, ${py}px, 0)`;
+  //   });
+  //   plans.addEventListener('mouseleave', ()=> { plans.style.transform = ''; });
+  // }
+
+  // Note: Built-in auth modal removed; header buttons link directly to sesion.html and registro.html
+
+  // Currency detection + selector
+  const CURRENCIES = {
+    USD: { rate: 1.08, locales: ['en-US','es-PA'], label: 'Dólares (USD)' }, // Panama uses USD
+    PEN: { rate: 4.04, locales: ['es-PE'], label: 'Perú — Soles (PEN)' },
+    MXN: { rate: 19.5, locales: ['es-MX'], label: 'México — Pesos (MXN)' },
+    COP: { rate: 4390, locales: ['es-CO'], label: 'Colombia — Pesos (COP)' },
+    ARS: { rate: 980, locales: ['es-AR'], label: 'Argentina — Pesos (ARS)' },
+    VES: { rate: 39, locales: ['es-VE'], label: 'Venezuela — Bolívar (VES)' },
+    BOB: { rate: 7.4, locales: ['es-BO'], label: 'Bolivia — Boliviano (BOB)' },
+    EUR: { rate: 1, locales: ['es-ES'], label: 'Europa — Euros (EUR)' },
+  };
+  const currencySelect = document.getElementById('currency-select');
+  const amounts = Array.from(document.querySelectorAll('.amount[data-eur]'));
+
+  function guessCurrency(){
+    const lang = navigator.language || 'es-ES';
+    const match = Object.entries(CURRENCIES).find(([,v])=> v.locales.some(l=> lang.startsWith(l)));
+    return match ? match[0] : 'USD';
   }
-}
-if(pw &amp;&amp; confirmPw){
-  pw.addEventListener('input', checkMatch);
-  confirmPw.addEventListener('input', checkMatch);
-}
-
-/* user storage: save users in localStorage under 'blockhost_users' */
-const STORAGE_KEY = 'blockhost_users';
-function loadUsers(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
-  catch(e){ return {}; }
-}
-function saveUsers(obj){ localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }
-
-/* prefill if there is exactly one saved user, or if a lastSelectedEmail is stored */
-const users = loadUsers();
-const lastEmail = localStorage.getItem('blockhost_last');
-if(lastEmail &amp;&amp; users[lastEmail]){
-  const u = users[lastEmail];
-  if($('#first_name')) $('#first_name').value = u.first || '';
-  if($('#last_name')) $('#last_name').value = u.last || '';
-  if($('#login_email')) $('#login_email').value = u.email || '';
-}
-/* if only one user exists, prefill with that too */
-if(!lastEmail &amp;&amp; Object.keys(users).length === 1){
-  const only = users[Object.keys(users)[0]];
-  if($('#first_name')) $('#first_name').value = only.first || '';
-  if($('#last_name')) $('#last_name').value = only.last || '';
-  if($('#login_email')) $('#login_email').value = only.email || '';
-}
-
-/* form validations (minimal, client-side) */
-loginForm.addEventListener('submit', (ev)=&gt;{
-  ev.preventDefault();
-  const first = loginForm.first_name ? loginForm.first_name.value.trim() : '';
-  const last = loginForm.last_name ? loginForm.last_name.value.trim() : '';
-  const email = loginForm.email ? loginForm.email.value.trim() : '';
-  const pwVal = loginForm.password ? loginForm.password.value : '';
-  const confirmVal = loginForm.confirm_password ? loginForm.confirm_password.value : '';
-  if(!first || !last || !email || !pwVal || !confirmVal){ alert('Completa todos los campos'); return; }
-  if(pwVal !== confirmVal){ alert('Las contraseñas no coinciden'); return; }
-
-  const all = loadUsers();
-  if(all[email]){
-    alert('Usuario ya registrado previamente');
-    // optionally prefill fields with stored data
-    const existing = all[email];
-    if($('#first_name')) $('#first_name').value = existing.first || '';
-    if($('#last_name')) $('#last_name').value = existing.last || '';
-    return;
+  function formatCurrency(valueEur, code){
+    const { rate } = CURRENCIES[code] || CURRENCIES.USD;
+    const converted = valueEur * rate;
+    return new Intl.NumberFormat(undefined, { style:'currency', currency: code, maximumFractionDigits: code==='COP'||code==='ARS'||code==='VES'?0:2 }).format(converted);
   }
+  function updatePrices(code){
+    amounts.forEach(el=>{
+      const eur = parseFloat(el.dataset.eur);
+      el.textContent = formatCurrency(eur, code);
+    });
+  }
+  if(currencySelect){
+    // remove native <select> initialization (replaced by custom dropdown)
+    // currencySelect.innerHTML = "";
+    // Object.entries(CURRENCIES).forEach(([code, meta])=>{ /* ... */ });
+    // const initial = guessCurrency();
+    // currencySelect.value = initial;
+    // updatePrices(initial);
+    // currencySelect.addEventListener('change', ()=> updatePrices(currencySelect.value));
+  }
+  // expose currency helpers for the custom dropdown
+  window.BlockHostCurrency = { CURRENCIES, amounts, formatCurrency, updatePrices, guessCurrency };
 
-  // save new user
-  all[email] = { first, last, email, created: Date.now() };
-  saveUsers(all);
-  localStorage.setItem('blockhost_last', email);
-
-  const btn = loginForm.querySelector('.btn');
-  btn.disabled = true;
-  btn.textContent = 'Registrando...';
-  setTimeout(()=&gt;{
-    btn.disabled = false;
-    btn.textContent = 'Registrarse';
-    console.log('Registro guardado:', {first,last,email});
-    loginForm.reset();
-    if(pwHelp) pwHelp.textContent = '';
-    alert('Registro completado y guardado localmente');
-  },1000);
+  /* Removed Three.js particle/canvas block because the plans section and canvas were deleted.
+     If you later re-add a canvas container, reintroduce the Three.js code safely. */
 });
-
-/* add subtle hover glow on primary button for polish */
-document.querySelectorAll('.btn').forEach(b=&gt;{
-  b.addEventListener('mouseenter', ()=&gt; b.style.transform='translateY(-3px) scale(1.01)');
-  b.addEventListener('mouseleave', ()=&gt; b.style.transform='');
-});
-
-const registerBtn = document.getElementById('registerBtn');
-if(registerBtn){
-  registerBtn.addEventListener('click', ()=&gt; { location.href = 'sesion.html'; });
-}
-
-/* ...existing code... */</div>
