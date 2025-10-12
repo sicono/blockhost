@@ -1,106 +1,54 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BlockHost — Planes de Hosting</title>
-  <link rel="stylesheet" href="precios.css">
-  <link rel="stylesheet" href="overrides.css">
-  <link rel="icon" href="/favicon-32x32.png" sizes="32x32">
-</head>
-<body>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="overrides.css">
+<link rel="stylesheet" href="dropdown.css">
+<!-- ...existing content... -->
 
-  <!-- Encabezado -->
-  <header class="site-header">
-    <div class="brand">
-      <img src="/logo.png" alt="Secure Cube — BlockHost logo" class="logo">
-      <div>
-        <h1>BlockHost</h1>
-        <p class="tag">Hosting profesional para servidores Minecraft</p>
+<header class="site-header"><div class="brand"><img src="/logo.png" alt="Secure Cube — BlockHost logo" class="logo"><div><h1>BlockHost</h1><p class="tag">Hosting profesional para servidores Minecraft</p></div></div><nav class="nav"><a class="btn translucent" href="nosotros.html">Acerca de BlockHost</a><a class="btn" href="https://panel.blockhost.es/">Panel</a><a class="btn ghost" id="login-btn" href="https://panel.blockhost.es/">Iniciar sesión</a><a class="btn primary highlight" id="register-btn" href="registro.html">Registrarte</a></nav></header>
+
+<section id="planes" class="plans">
+  <div class="plans-box">
+    <div class="plans-header">
+      <h3>Nuestros Planes</h3>
+      <div class="currency-control">
+        <label>Moneda:</label>
+        <div id="currency-dropdown" class="currency-dropdown"></div>
       </div>
     </div>
-    <nav class="nav">
-      <a class="btn translucent" href="nosotros.html">Acerca de BlockHost</a>
-      <a class="btn" href="https://panel.blockhost.es/">Panel</a>
-      <a class="btn ghost" id="login-btn" href="https://panel.blockhost.es/">Iniciar sesión</a>
-      <a class="btn primary highlight" id="register-btn" href="registro.html">Registrarte</a>
-    </nav>
-  </header>
-
-  <!-- Sección de Planes -->
-  <section id="planes" class="plans">
-    <div class="plans-box">
-      <div class="plans-header">
-        <h3 style="text-align: center;">Nuestros Planes</h3>
-        <div class="currency-control">
-          <label for="currency-select">Moneda:</label>
-          <select id="currency-select" class="currency-select"></select>
-        </div>
-      </div>
-
-      <div class="plans-message">
-        <p>Nosotros ofrecemos distintos planes a un precio competente. Elige entre planes para jugar con amigos, eventos o grandes networks. Precios accesibles, interfaz amigable y soporte dedicado. Revisa nuestros planes y comienza ahora.</p>
-      </div>
-
-      <div class="plan-grid" style="margin-top:18px; z-index:2; position:relative;">
-        <div class="card">
-          <div class="ribbon">Mini</div>
-          <div class="price"><span class="amount" data-eur="3.5">3,50 €</span> / mes</div>
-          <p>25 GB SSD • 15-25 jugadores • 4GB Ram</p>
-          <a class="btn primary" href="registro.html">Contratar</a>
-        </div>
-
-        <div class="card">
-          <div class="ribbon">Básico</div>
-          <div class="price"><span class="amount" data-eur="5.5">5,50 €</span> / mes</div>
-          <p>50 GB SSD • 25-35 jugadores • 6GB Ram</p>
-          <a class="btn primary" href="registro.html">Contratar</a>
-        </div>
-
-        <div class="card">
-          <div class="ribbon">Estándar</div>
-          <div class="price"><span class="amount" data-eur="7.5">7,50 €</span> / mes</div>
-          <p>75 GB SSD • 35-50 jugadores • 8GB Ram</p>
-          <a class="btn primary" href="registro.html">Contratar</a>
-        </div>
-
-        <div class="card">
-          <div class="ribbon">Plus</div>
-          <div class="price"><span class="amount" data-eur="9.5">9,50 €</span> / mes</div>
-          <p>100 GB SSD • 50-70 jugadores • 10GB Ram</p>
-          <a class="btn primary" href="registro.html">Contratar</a>
-        </div>
-      </div>
-
-      <div class="plans-footer" style="text-align:center;margin-top:20px;z-index:2;position:relative;">
-        <a class="btn primary" href="https://blockhost.es">Volver</a>
-      </div>
+    <div class="plans-message"><p>Nosotros ofrecemos distintos planes a un precio competente. Elige entre planes para jugar con amigos, eventos o grandes networks. Precios accesibles, interfaz amigable y soporte dedicado. Revisa nuestros planes y comienza ahora.</p></div>
+    <div id="canvas-wrap" aria-hidden="true" class="plans-canvas"></div>
+    <div class="plan-grid" style="margin-top:18px; z-index:2; position:relative;">
+      <div class="card"><div class="ribbon">Mini</div><div class="price"><span class="amount" data-eur="3.5">3,50 €</span> / mes</div><p>25 GB SSD • 15-25 jugadores</p><a class="btn primary" href="registro.html">Contratar</a></div>
+      <div class="card"><div class="ribbon">Básico</div><div class="price"><span class="amount" data-eur="5.5">5,50 €</span> / mes</div><p>50 GB SSD • 25-35 jugadores</p><a class="btn primary" href="registro.html">Contratar</a></div>
+      <div class="card"><div class="ribbon">Estándar</div><div class="price"><span class="amount" data-eur="7.5">7,50 €</span> / mes</div><p>75 GB SSD • 35-50 jugadores</p><a class="btn primary" href="registro.html">Contratar</a></div>
+      <div class="card"><div class="ribbon">Plus</div><div class="price"><span class="amount" data-eur="9.5">9,50 €</span> / mes</div><p>100 GB SSD • 50-70 jugadores</p><a class="btn primary" href="registro.html">Contratar</a></div>
     </div>
-  </section>
+    <div class="plans-footer" style="text-align:center;margin-top:20px;z-index:2;position:relative;"><a class="btn primary" href="https://blockhost.es">Volver</a></div>
+  </div>
+</section>
 
-  <!-- Sección de Políticas -->
-  <section id="politicas" class="policies-section">
-    <div class="policies-inner">
-      <h3>Políticas y privacidad</h3>
-      <p>En BlockHost respetamos tu privacidad. Recopilamos datos mínimos necesarios para proveer nuestros servicios, usamos cookies para mejorar la experiencia y estadísticas anónimas. No compartimos datos con terceros salvo por requerimiento legal o proveedores necesarios para el servicio.</p>
-      <a class="btn translucent small" href="politicas.html">Ver Detalles</a>
-    </div>
-  </section>
+<section id="politicas" class="policies-section">
+  <div class="policies-inner">
+    <h3>Políticas y privacidad</h3>
+    <p>En BlockHost respetamos tu privacidad. Recopilamos datos mínimos necesarios para proveer nuestros servicios, usamos cookies para mejorar la experiencia y estadísticas anónimas. No compartimos datos con terceros salvo por requerimiento legal o proveedores necesarios para el servicio.</p>
+    <a class="btn translucent small" href="politicas.html">Ver Detalles</a>
+  </div>
+</section>
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <span class="copy">© 2025 BlockHost — Hecho para servidores Minecraft</span>
-      <a class="btn translucent discord-btn" href="https://discord.gg/blockhost">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-          <defs><linearGradient id="dgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7289da"/><stop offset="100%" stop-color="#5865F2"/></linearGradient></defs>
-          <path fill="url(#dgrad)" d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011c-.018-.003-.036.007-.045.024a7.7 7.7 0 0 0-.406.833 12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011A.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.003.022.021.037.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
-        </svg>
-        Únete a nuestro Discord
-      </a>
-    </div>
-  </footer>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="copy">© 2025 BlockHost — Hecho para servidores Minecraft</span>
+    <a class="btn translucent discord-btn" href="https://discord.gg/blockhost">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+        <defs><linearGradient id="dgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7289da"/><stop offset="100%" stop-color="#5865F2"/></linearGradient></defs>
+        <path fill="url(#dgrad)" d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+      </svg>
+      Únete a nuestro Discord
+    </a>
+  </div>
+</footer>
 
-  <script src="app.js" type="module"></script>
-</body>
-</html>
+<!-- ...existing content... -->
+<script src="app.js" type="module"></script>
+<script type="module" src="currency-dropdown.js"></script>
+<!-- ...existing content... -->
