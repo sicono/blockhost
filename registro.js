@@ -24,7 +24,10 @@ function setCookiePref(value){
   try{ localStorage.setItem(COOKIE_KEY, JSON.stringify(value)); }catch(e){}
   hideCookieBanner();
 }
+
 document.addEventListener('DOMContentLoaded', ()=>{
+
+  // --- EXISTING CODE ---
   try{
     const pref = JSON.parse(localStorage.getItem(COOKIE_KEY));
     if(!pref) showCookieBanner();
@@ -38,11 +41,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if(btnAccept) btnAccept.addEventListener('click', ()=> setCookiePref({analytics:true, functional:true, accepted:true}));
   if(btnDecline) btnDecline.addEventListener('click', ()=> setCookiePref({analytics:false, functional:false, accepted:false}));
   if(btnManage) btnManage.addEventListener('click', ()=> {
-    // Simple manage action -> open políticas section
     document.getElementById('politicas')?.scrollIntoView({behavior:'smooth'});
   });
 
-  // Smooth scroll for in-page anchors (gentle offset to account for header)
   document.querySelectorAll('a[href^="#"]').forEach(a=>{
     a.addEventListener('click', (e)=>{
       const targetId = a.getAttribute('href').slice(1);
@@ -51,32 +52,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
         e.preventDefault();
         const headerOffset = Math.min(document.querySelector('.site-header')?.offsetHeight || 76, 120);
         const rect = target.getBoundingClientRect();
-        const top = window.scrollY + rect.top - headerOffset - 12; // small breathing space
+        const top = window.scrollY + rect.top - headerOffset - 12;
         window.scrollTo({ top, behavior: 'smooth' });
       }
     });
   });
 
-  // Subtle parallax on mousemove for the plans background (desktop only)
-  // remove parallax mousemove behavior to prevent page shifting on mouse movement
-  // const plans = document.querySelector('.plans');
-  // if(plans && window.matchMedia('(pointer:fine)').matches){
-  //   window.addEventListener('mousemove', (e)=>{
-  //     const rect = plans.getBoundingClientRect();
-  //     const x = (e.clientX - rect.left) / rect.width; // 0 - 1
-  //     const y = (e.clientY - rect.top) / rect.height;
-  //     const px = (x - 0.5) * 8; // small shift in px
-  //     const py = (y - 0.5) * 4;
-  //     plans.style.transform = `translate3d(${px}px, ${py}px, 0)`;
-  //   });
-  //   plans.addEventListener('mouseleave', ()=> { plans.style.transform = ''; });
-  // }
-
-  // Note: Built-in auth modal removed; header buttons link directly to sesion.html and registro.html
-
-  // Currency detection + selector
+  // --- Currency & other existing code ---
   const CURRENCIES = {
-    USD: { rate: 1.08, locales: ['en-US','es-PA'], label: 'Dólares (USD)' }, // Panama uses USD
+    USD: { rate: 1.08, locales: ['en-US','es-PA'], label: 'Dólares (USD)' },
     PEN: { rate: 4.04, locales: ['es-PE'], label: 'Perú — Soles (PEN)' },
     MXN: { rate: 19.5, locales: ['es-MX'], label: 'México — Pesos (MXN)' },
     COP: { rate: 4390, locales: ['es-CO'], label: 'Colombia — Pesos (COP)' },
@@ -87,35 +71,56 @@ document.addEventListener('DOMContentLoaded', ()=>{
   };
   const currencySelect = document.getElementById('currency-select');
   const amounts = Array.from(document.querySelectorAll('.amount[data-eur]'));
-
-  function guessCurrency(){
-    const lang = navigator.language || 'es-ES';
-    const match = Object.entries(CURRENCIES).find(([,v])=> v.locales.some(l=> lang.startsWith(l)));
-    return match ? match[0] : 'USD';
-  }
-  function formatCurrency(valueEur, code){
-    const { rate } = CURRENCIES[code] || CURRENCIES.USD;
-    const converted = valueEur * rate;
-    return new Intl.NumberFormat(undefined, { style:'currency', currency: code, maximumFractionDigits: code==='COP'||code==='ARS'||code==='VES'?0:2 }).format(converted);
-  }
-  function updatePrices(code){
-    amounts.forEach(el=>{
-      const eur = parseFloat(el.dataset.eur);
-      el.textContent = formatCurrency(eur, code);
-    });
-  }
-  if(currencySelect){
-    // remove native <select> initialization (replaced by custom dropdown)
-    // currencySelect.innerHTML = "";
-    // Object.entries(CURRENCIES).forEach(([code, meta])=>{ /* ... */ });
-    // const initial = guessCurrency();
-    // currencySelect.value = initial;
-    // updatePrices(initial);
-    // currencySelect.addEventListener('change', ()=> updatePrices(currencySelect.value));
-  }
-  // expose currency helpers for the custom dropdown
+  function guessCurrency(){ const lang = navigator.language || 'es-ES'; const match = Object.entries(CURRENCIES).find(([,v])=> v.locales.some(l=> lang.startsWith(l))); return match ? match[0] : 'USD'; }
+  function formatCurrency(valueEur, code){ const { rate } = CURRENCIES[code] || CURRENCIES.USD; const converted = valueEur * rate; return new Intl.NumberFormat(undefined, { style:'currency', currency: code, maximumFractionDigits: code==='COP'||code==='ARS'||code==='VES'?0:2 }).format(converted); }
+  function updatePrices(code){ amounts.forEach(el=>{ const eur = parseFloat(el.dataset.eur); el.textContent = formatCurrency(eur, code); }); }
+  if(currencySelect){ /* removed native <select> initialization */ }
   window.BlockHostCurrency = { CURRENCIES, amounts, formatCurrency, updatePrices, guessCurrency };
 
-  /* Removed Three.js particle/canvas block because the plans section and canvas were deleted.
-     If you later re-add a canvas container, reintroduce the Three.js code safely. */
+  // --- REGISTER FORM LOGIC ---
+  const form = document.getElementById("loginForm");
+  if(form){
+    form.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const firstName = formData.get("first_name").trim();
+      const lastName = formData.get("last_name").trim();
+      const email = formData.get("email").trim();
+      const password = formData.get("password");
+      const confirmPassword = formData.get("confirm_password");
+
+      if(password !== confirmPassword){
+        alert("❌ Las contraseñas no coinciden");
+        return;
+      }
+      if(!firstName || !lastName || !email || !password){
+        alert("❌ Todos los campos son obligatorios");
+        return;
+      }
+
+      const username = (firstName + lastName).toLowerCase().replace(/\s+/g, "");
+
+      try{
+        const res = await fetch("https://api.panel.blockhost.es/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password }),
+        });
+        const data = await res.json();
+        if(res.ok){
+          alert(data.message || "✅ Usuario creado correctamente");
+          form.reset();
+        } else {
+          alert(data.error || JSON.stringify(data));
+        }
+        console.log("Respuesta API:", data);
+      } catch(err){
+        console.error("Error al conectar con la API:", err);
+        alert("❌ No se pudo conectar con la API. Intenta más tarde.");
+      }
+    });
+  }
+
+  /* Removed Three.js particle/canvas block */
 });
