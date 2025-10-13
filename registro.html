@@ -265,31 +265,7 @@
   </style>
 </head>
 <body>
-  <script>
-document.getElementById('registro').addEventListener('submit', async function(e) {
-  e.preventDefault();
-
-  const formData = new FormData(this);
-  const datos = Object.fromEntries(formData.entries());
-
-  try {
-    const res = await fetch('https://blockhost.es/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(datos)
-    });
-
-    const result = await res.json();
-    if (res.ok) {
-      alert('Cuenta creada correctamente en el panel');
-    } else {
-      alert('Error: ' + result.msg);
-    }
-  } catch (err) {
-    alert('Error de conexión con el servidor');
-  }
-});
-</script>
+ 
 
   <!-- Discord badge added near top-left -->
   <a class="discord-badge" href="https://discord.com" target="_blank" rel="noopener">
