@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="stylesheet" href="checkout.css">
   <link rel="stylesheet" href="overrides.css">
+  <script src="https://www.paypal.com/sdk/js?client-id=AVMCOVzTwRauV1kPTt9w6kZj_fTQVSlfLMlx7L39tiKDODGm5Eek-G6phL6kYc3EaCc5PcCJ5UKY4dmR&currency=EUR"></script>
 </head>
 <body>
   <header class="site-header">
@@ -119,11 +120,15 @@
             <button type="button" class="btn primary" id="btn-next">
               Siguiente →
             </button>
-            <button type="submit" class="btn primary" id="btn-submit" style="display: none;">
-              Procesar Pago
-            </button>
           </div>
         </form>
+
+        <div id="payment-section" style="display: none;">
+          <div class="payment-divider">
+            <span>Pago seguro con PayPal</span>
+          </div>
+          <div id="paypal-button-container"></div>
+        </div>
       </div>
 
       <div class="checkout-summary">

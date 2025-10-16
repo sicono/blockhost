@@ -4,6 +4,8 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+const PAYPAL_CLIENT_ID = 'AVMCOVzTwRauV1kPTt9w6kZj_fTQVSlfLMlx7L39tiKDODGm5Eek-G6phL6kYc3EaCc5PcCJ5UKY4dmR';
+
 const SOFTWARE_OPTIONS = {
   Java: [
     { value: 'Vanilla', label: 'Vanilla', desc: 'Minecraft puro sin modificaciones' },
@@ -54,6 +56,7 @@ const PLAN_DATA = {
 
 let currentStep = 1;
 let selectedPlan = PLAN_DATA.Mini;
+let currentOrderId = null;
 let formData = {
   version: null,
   software: null,
@@ -70,6 +73,13 @@ function getPlanFromURL() {
   return PLAN_DATA.Mini;
 }
 
+function calculateTotal() {
+  const subtotal = selectedPlan.price;
+  const tax = subtotal * 0.21;
+  const total = subtotal + tax;
+  return { subtotal, tax, total };
+}
+
 function updateSummary() {
   document.getElementById('plan-title').textContent = `Plan ${selectedPlan.name}`;
   document.getElementById('spec-ram').textContent = `${selectedPlan.ram}GB`;
@@ -81,9 +91,7 @@ function updateSummary() {
   document.getElementById('summary-region').textContent = formData.region || '-';
   document.getElementById('summary-email').textContent = formData.email || '-';
 
-  const subtotal = selectedPlan.price;
-  const tax = subtotal * 0.21;
-  const total = subtotal + tax;
+  const { subtotal, tax, total } = calculateTotal();
 
   document.getElementById('price-subtotal').textContent = `${subtotal.toFixed(2)} €`;
   document.getElementById('price-tax').textContent = `${tax.toFixed(2)} €`;
@@ -116,11 +124,11 @@ function showSection(stepNum) {
 
   const btnBack = document.getElementById('btn-back');
   const btnNext = document.getElementById('btn-next');
-  const btnSubmit = document.getElementById('btn-submit');
+  const paymentSection = document.getElementById('payment-section');
 
   btnBack.style.display = stepNum > 1 ? 'block' : 'none';
   btnNext.style.display = stepNum < 4 ? 'block' : 'none';
-  btnSubmit.style.display = stepNum === 4 ? 'block' : 'none';
+  paymentSection.style.display = stepNum === 4 ? 'block' : 'none';
 }
 
 function populateSoftwareOptions(version) {
@@ -165,9 +173,17 @@ function validateCurrentStep() {
   }
 }
 
-function nextStep() {
+async function nextStep() {
   if (!validateCurrentStep()) {
     alert('Por favor completa todos los campos requeridos.');
+    return;
+  }
+
+  if (currentStep === 4) {
+    const emailInput = document.getElementById('email');
+    formData.email = emailInput.value.trim();
+    await createPendingOrder();
+    initPayPal();
     return;
   }
 
@@ -186,21 +202,7 @@ function previousStep() {
   }
 }
 
-async function submitOrder(e) {
-  e.preventDefault();
-
-  const emailInput = document.getElementById('email');
-  formData.email = emailInput.value.trim();
-
-  if (!validateCurrentStep()) {
-    alert('Por favor completa todos los campos requeridos.');
-    return;
-  }
-
-  const btnSubmit = document.getElementById('btn-submit');
-  btnSubmit.disabled = true;
-  btnSubmit.textContent = 'Procesando...';
-
+async function createPendingOrder() {
   try {
     const orderData = {
       email: formData.email,
@@ -224,20 +226,106 @@ async function submitOrder(e) {
 
     if (error) {
       console.error('Error creating order:', error);
-      alert('Hubo un error al procesar tu pedido. Por favor intenta de nuevo.');
-      btnSubmit.disabled = false;
-      btnSubmit.textContent = 'Procesar Pago';
-      return;
+      alert('Hubo un error al crear el pedido. Por favor intenta de nuevo.');
+      return null;
     }
 
-    alert('¡Pedido creado exitosamente! Te contactaremos pronto para finalizar el pago.');
-    window.location.href = '/';
+    currentOrderId = data.id;
+    return data;
   } catch (err) {
     console.error('Unexpected error:', err);
     alert('Hubo un error inesperado. Por favor intenta de nuevo.');
-    btnSubmit.disabled = false;
-    btnSubmit.textContent = 'Procesar Pago';
+    return null;
   }
+}
+
+async function updateOrderPaymentStatus(orderId, status, paymentDetails = {}) {
+  try {
+    const { error } = await supabase
+      .from('orders')
+      .update({
+        payment_status: status,
+        status: status === 'completed' ? 'processing' : 'pending',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating order:', error);
+    }
+  } catch (err) {
+    console.error('Unexpected error updating order:', err);
+  }
+}
+
+function initPayPal() {
+  const container = document.getElementById('paypal-button-container');
+  container.innerHTML = '';
+
+  const { total } = calculateTotal();
+
+  paypal.Buttons({
+    style: {
+      layout: 'vertical',
+      color: 'blue',
+      shape: 'rect',
+      label: 'paypal'
+    },
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          description: `BlockHost - Plan ${selectedPlan.name}`,
+          amount: {
+            currency_code: 'EUR',
+            value: total.toFixed(2),
+            breakdown: {
+              item_total: {
+                currency_code: 'EUR',
+                value: selectedPlan.price.toFixed(2)
+              },
+              tax_total: {
+                currency_code: 'EUR',
+                value: (total - selectedPlan.price).toFixed(2)
+              }
+            }
+          }
+        }],
+        application_context: {
+          brand_name: 'BlockHost',
+          locale: 'es-ES',
+          shipping_preference: 'NO_SHIPPING'
+        }
+      });
+    },
+    onApprove: async function(data, actions) {
+      const order = await actions.order.capture();
+
+      if (currentOrderId) {
+        await updateOrderPaymentStatus(currentOrderId, 'completed', {
+          paypal_order_id: order.id,
+          payer_email: order.payer.email_address
+        });
+      }
+
+      alert('¡Pago completado exitosamente! Recibirás un correo con los detalles de tu servidor.');
+      window.location.href = '/';
+    },
+    onError: function(err) {
+      console.error('PayPal error:', err);
+      alert('Hubo un error al procesar el pago. Por favor intenta de nuevo.');
+
+      if (currentOrderId) {
+        updateOrderPaymentStatus(currentOrderId, 'failed');
+      }
+    },
+    onCancel: function(data) {
+      alert('Pago cancelado. Puedes intentar de nuevo cuando estés listo.');
+
+      if (currentOrderId) {
+        updateOrderPaymentStatus(currentOrderId, 'cancelled');
+      }
+    }
+  }).render('#paypal-button-container');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -269,5 +357,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-next').addEventListener('click', nextStep);
   document.getElementById('btn-back').addEventListener('click', previousStep);
-  document.getElementById('checkout-form').addEventListener('submit', submitOrder);
 });

@@ -389,6 +389,38 @@ main,
   min-width: 140px;
 }
 
+.payment-divider {
+  margin: 32px 0 24px 0;
+  text-align: center;
+  position: relative;
+}
+
+.payment-divider::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+}
+
+.payment-divider span {
+  background: var(--panel);
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+#paypal-button-container {
+  margin-top: 24px;
+  min-height: 150px;
+}
+
 .checkout-summary {
   background: var(--panel);
   border: 1px solid rgba(255, 255, 255, 0.08);
