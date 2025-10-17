@@ -4,8 +4,6 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const PAYPAL_CLIENT_ID = 'AVMCOVzTwRauV1kPTt9w6kZj_fTQVSlfLMlx7L39tiKDODGm5Eek-G6phL6kYc3EaCc5PcCJ5UKY4dmR';
-
 const SOFTWARE_OPTIONS = {
   Java: [
     { value: 'Vanilla', label: 'Vanilla', desc: 'Minecraft puro sin modificaciones' },
@@ -54,15 +52,43 @@ const PLAN_DATA = {
   }
 };
 
+const CURRENCIES = {
+  USD: { rate: 1.08, locales: ['en-US','es-PA'], label: 'USD', symbol: '$' },
+  PEN: { rate: 4.04, locales: ['es-PE'], label: 'PEN', symbol: 'S/' },
+  MXN: { rate: 19.5, locales: ['es-MX'], label: 'MXN', symbol: '$' },
+  COP: { rate: 4390, locales: ['es-CO'], label: 'COP', symbol: '$' },
+  ARS: { rate: 980, locales: ['es-AR'], label: 'ARS', symbol: '$' },
+  VES: { rate: 39, locales: ['es-VE'], label: 'VES', symbol: 'Bs' },
+  BOB: { rate: 7.4, locales: ['es-BO'], label: 'BOB', symbol: 'Bs' },
+  EUR: { rate: 1, locales: ['es-ES'], label: 'EUR', symbol: '€' },
+};
+
 let currentStep = 1;
 let selectedPlan = PLAN_DATA.Mini;
 let currentOrderId = null;
+let selectedCurrency = 'EUR';
 let formData = {
   version: null,
   software: null,
   region: null,
   email: null
 };
+
+function guessCurrency() {
+  const lang = navigator.language || 'es-ES';
+  const match = Object.entries(CURRENCIES).find(([,v]) => v.locales.some(l => lang.startsWith(l)));
+  return match ? match[0] : 'EUR';
+}
+
+function formatCurrency(valueEur, code) {
+  const { rate } = CURRENCIES[code] || CURRENCIES.EUR;
+  const converted = valueEur * rate;
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: code,
+    maximumFractionDigits: code === 'COP' || code === 'ARS' || code === 'VES' ? 0 : 2
+  }).format(converted);
+}
 
 function getPlanFromURL() {
   const params = new URLSearchParams(window.location.search);
@@ -93,9 +119,9 @@ function updateSummary() {
 
   const { subtotal, tax, total } = calculateTotal();
 
-  document.getElementById('price-subtotal').textContent = `${subtotal.toFixed(2)} €`;
-  document.getElementById('price-tax').textContent = `${tax.toFixed(2)} €`;
-  document.getElementById('price-total').textContent = `${total.toFixed(2)} €`;
+  document.getElementById('price-subtotal').textContent = formatCurrency(subtotal, selectedCurrency);
+  document.getElementById('price-tax').textContent = formatCurrency(tax, selectedCurrency);
+  document.getElementById('price-total').textContent = formatCurrency(total, selectedCurrency);
 }
 
 function updateStepIndicator() {
@@ -160,11 +186,14 @@ function populateSoftwareOptions(version) {
 function validateCurrentStep() {
   switch (currentStep) {
     case 1:
-      return formData.version !== null;
+      const versionRadio = document.querySelector('input[name="version"]:checked');
+      return versionRadio !== null;
     case 2:
-      return formData.software !== null;
+      const softwareRadio = document.querySelector('input[name="software"]:checked');
+      return softwareRadio !== null;
     case 3:
-      return formData.region !== null;
+      const regionRadio = document.querySelector('input[name="region"]:checked');
+      return regionRadio !== null;
     case 4:
       const emailInput = document.getElementById('email');
       return emailInput.value.trim() !== '' && emailInput.checkValidity();
@@ -182,8 +211,10 @@ async function nextStep() {
   if (currentStep === 4) {
     const emailInput = document.getElementById('email');
     formData.email = emailInput.value.trim();
-    await createPendingOrder();
-    initPayPal();
+    const order = await createPendingOrder();
+    if (order) {
+      initPayPal();
+    }
     return;
   }
 
@@ -204,6 +235,7 @@ function previousStep() {
 
 async function createPendingOrder() {
   try {
+    const { total } = calculateTotal();
     const orderData = {
       email: formData.email,
       plan_name: selectedPlan.name,
@@ -330,6 +362,7 @@ function initPayPal() {
 
 document.addEventListener('DOMContentLoaded', () => {
   selectedPlan = getPlanFromURL();
+  selectedCurrency = guessCurrency();
   updateSummary();
   showSection(currentStep);
   updateStepIndicator();
