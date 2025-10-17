@@ -1,8 +1,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { config } from './config.js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(config.supabase.url, config.supabase.anonKey);
 
 const SOFTWARE_OPTIONS = {
   Java: [
@@ -184,18 +183,23 @@ function populateSoftwareOptions(version) {
 }
 
 function validateCurrentStep() {
+  console.log('Validating step:', currentStep);
   switch (currentStep) {
     case 1:
       const versionRadio = document.querySelector('input[name="version"]:checked');
+      console.log('Version selected:', versionRadio ? versionRadio.value : 'none');
       return versionRadio !== null;
     case 2:
       const softwareRadio = document.querySelector('input[name="software"]:checked');
+      console.log('Software selected:', softwareRadio ? softwareRadio.value : 'none');
       return softwareRadio !== null;
     case 3:
       const regionRadio = document.querySelector('input[name="region"]:checked');
+      console.log('Region selected:', regionRadio ? regionRadio.value : 'none');
       return regionRadio !== null;
     case 4:
       const emailInput = document.getElementById('email');
+      console.log('Email entered:', emailInput.value);
       return emailInput.value.trim() !== '' && emailInput.checkValidity();
     default:
       return false;
@@ -203,6 +207,8 @@ function validateCurrentStep() {
 }
 
 async function nextStep() {
+  console.log('Next step clicked, current step:', currentStep);
+
   if (!validateCurrentStep()) {
     alert('Por favor completa todos los campos requeridos.');
     return;
@@ -213,13 +219,14 @@ async function nextStep() {
     formData.email = emailInput.value.trim();
     const order = await createPendingOrder();
     if (order) {
-      initPayPal();
+      await initPayPal();
     }
     return;
   }
 
   if (currentStep < 4) {
     currentStep++;
+    console.log('Moving to step:', currentStep);
     showSection(currentStep);
     updateStepIndicator();
   }
@@ -290,7 +297,30 @@ async function updateOrderPaymentStatus(orderId, status, paymentDetails = {}) {
   }
 }
 
-function initPayPal() {
+function loadPayPalScript() {
+  return new Promise((resolve, reject) => {
+    if (window.paypal) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${config.paypal.clientId}&currency=${config.paypal.currency}`;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+async function initPayPal() {
+  try {
+    await loadPayPalScript();
+  } catch (error) {
+    console.error('Error loading PayPal:', error);
+    alert('Error al cargar PayPal. Por favor recarga la página.');
+    return;
+  }
+
   const container = document.getElementById('paypal-button-container');
   container.innerHTML = '';
 
@@ -361,14 +391,21 @@ function initPayPal() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('Checkout page loaded');
+
   selectedPlan = getPlanFromURL();
   selectedCurrency = guessCurrency();
+
+  console.log('Selected plan:', selectedPlan);
+  console.log('Selected currency:', selectedCurrency);
+
   updateSummary();
   showSection(currentStep);
   updateStepIndicator();
 
   document.querySelectorAll('input[name="version"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
+      console.log('Version changed to:', e.target.value);
       formData.version = e.target.value;
       formData.software = null;
       populateSoftwareOptions(formData.version);
@@ -378,16 +415,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('input[name="region"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
+      console.log('Region changed to:', e.target.value);
       formData.region = e.target.value;
       updateSummary();
     });
   });
 
-  document.getElementById('email').addEventListener('input', (e) => {
-    formData.email = e.target.value.trim();
-    updateSummary();
-  });
+  const emailInput = document.getElementById('email');
+  if (emailInput) {
+    emailInput.addEventListener('input', (e) => {
+      formData.email = e.target.value.trim();
+      updateSummary();
+    });
+  }
 
-  document.getElementById('btn-next').addEventListener('click', nextStep);
-  document.getElementById('btn-back').addEventListener('click', previousStep);
+  const btnNext = document.getElementById('btn-next');
+  const btnBack = document.getElementById('btn-back');
+
+  console.log('Next button found:', btnNext !== null);
+  console.log('Back button found:', btnBack !== null);
+
+  if (btnNext) {
+    btnNext.addEventListener('click', (e) => {
+      console.log('Next button clicked!');
+      nextStep();
+    });
+  }
+
+  if (btnBack) {
+    btnBack.addEventListener('click', previousStep);
+  }
 });
