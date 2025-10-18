@@ -11,6 +11,6 @@ export const config = {
   stripe: {
     // Stripe Publishable Key (segura para uso público)
     // NOTA: Necesitas configurar tus productos en Stripe Dashboard y reemplazar los stripePriceId en checkout.js
-    publishableKey: 'pk_test_TuClavePublicaDeStripe'
+    publishableKey: 'pk_live_51SJCFYDQaOEVVvuYbj1Q7Pc53TwLnsLxRZOux0Fvb0xNGloXgaM4I2SMXjJMmI9rtLtcKVG7Y6ErX0UKD6PNZdIg00ReJSqwZZ'
   }
 };
