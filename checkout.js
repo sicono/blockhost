@@ -26,28 +26,32 @@ const PLAN_DATA = {
     price: 3.50,
     ram: 4,
     storage: 25,
-    players: '15-25'
+    players: '15-25',
+    stripePriceId: 'price_mini'
   },
   'Basico': {
     name: 'Básico',
     price: 5.50,
     ram: 6,
     storage: 50,
-    players: '25-35'
+    players: '25-35',
+    stripePriceId: 'price_basico'
   },
   'Estandar': {
     name: 'Estándar',
     price: 7.50,
     ram: 8,
     storage: 75,
-    players: '35-50'
+    players: '35-50',
+    stripePriceId: 'price_estandar'
   },
   'Plus': {
     name: 'Plus',
     price: 9.50,
     ram: 10,
     storage: 100,
-    players: '50-70'
+    players: '50-70',
+    stripePriceId: 'price_plus'
   }
 };
 
@@ -219,7 +223,7 @@ async function nextStep() {
     formData.email = emailInput.value.trim();
     const order = await createPendingOrder();
     if (order) {
-      await initPayPal();
+      await redirectToStripeCheckout(order.id);
     }
     return;
   }
@@ -278,116 +282,53 @@ async function createPendingOrder() {
   }
 }
 
-async function updateOrderPaymentStatus(orderId, status, paymentDetails = {}) {
+async function redirectToStripeCheckout(orderId) {
   try {
-    const { error } = await supabase
-      .from('orders')
-      .update({
-        payment_status: status,
-        status: status === 'completed' ? 'processing' : 'pending',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', orderId);
+    const paymentSection = document.getElementById('payment-section');
+    paymentSection.innerHTML = '<p style="text-align: center; color: var(--muted);">Redirigiendo a la pasarela de pago...</p>';
+
+    const stripe = window.Stripe(config.stripe.publishableKey);
+
+    const response = await fetch(`${config.supabase.url}/functions/v1/stripe-checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.supabase.anonKey}`,
+      },
+      body: JSON.stringify({
+        price_id: selectedPlan.stripePriceId,
+        mode: 'payment',
+        success_url: `${window.location.origin}/success.html?order_id=${orderId}`,
+        cancel_url: `${window.location.origin}/checkout.html?plan=${selectedPlan.name}`,
+        metadata: {
+          order_id: orderId
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al iniciar el pago');
+    }
+
+    const { sessionId } = await response.json();
+
+    const { error } = await stripe.redirectToCheckout({ sessionId });
 
     if (error) {
-      console.error('Error updating order:', error);
+      console.error('Stripe redirect error:', error);
+      alert('Error al redirigir al pago. Por favor intenta de nuevo.');
     }
-  } catch (err) {
-    console.error('Unexpected error updating order:', err);
-  }
-}
-
-function loadPayPalScript() {
-  return new Promise((resolve, reject) => {
-    if (window.paypal) {
-      resolve();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${config.paypal.clientId}&currency=${config.paypal.currency}`;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
-
-async function initPayPal() {
-  try {
-    await loadPayPalScript();
   } catch (error) {
-    console.error('Error loading PayPal:', error);
-    alert('Error al cargar PayPal. Por favor recarga la página.');
-    return;
+    console.error('Checkout error:', error);
+    alert('Error al procesar el pago: ' + error.message);
+
+    const paymentSection = document.getElementById('payment-section');
+    paymentSection.innerHTML = `
+      <p style="color: #ff4444; text-align: center;">Error: ${error.message}</p>
+      <button class="btn primary" onclick="location.reload()">Intentar de nuevo</button>
+    `;
   }
-
-  const container = document.getElementById('paypal-button-container');
-  container.innerHTML = '';
-
-  const { total } = calculateTotal();
-
-  paypal.Buttons({
-    style: {
-      layout: 'vertical',
-      color: 'blue',
-      shape: 'rect',
-      label: 'paypal'
-    },
-    createOrder: function(data, actions) {
-      return actions.order.create({
-        purchase_units: [{
-          description: `BlockHost - Plan ${selectedPlan.name}`,
-          amount: {
-            currency_code: 'EUR',
-            value: total.toFixed(2),
-            breakdown: {
-              item_total: {
-                currency_code: 'EUR',
-                value: selectedPlan.price.toFixed(2)
-              },
-              tax_total: {
-                currency_code: 'EUR',
-                value: (total - selectedPlan.price).toFixed(2)
-              }
-            }
-          }
-        }],
-        application_context: {
-          brand_name: 'BlockHost',
-          locale: 'es-ES',
-          shipping_preference: 'NO_SHIPPING'
-        }
-      });
-    },
-    onApprove: async function(data, actions) {
-      const order = await actions.order.capture();
-
-      if (currentOrderId) {
-        await updateOrderPaymentStatus(currentOrderId, 'completed', {
-          paypal_order_id: order.id,
-          payer_email: order.payer.email_address
-        });
-      }
-
-      alert('¡Pago completado exitosamente! Recibirás un correo con los detalles de tu servidor.');
-      window.location.href = '/';
-    },
-    onError: function(err) {
-      console.error('PayPal error:', err);
-      alert('Hubo un error al procesar el pago. Por favor intenta de nuevo.');
-
-      if (currentOrderId) {
-        updateOrderPaymentStatus(currentOrderId, 'failed');
-      }
-    },
-    onCancel: function(data) {
-      alert('Pago cancelado. Puedes intentar de nuevo cuando estés listo.');
-
-      if (currentOrderId) {
-        updateOrderPaymentStatus(currentOrderId, 'cancelled');
-      }
-    }
-  }).render('#paypal-button-container');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -445,4 +386,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnBack) {
     btnBack.addEventListener('click', previousStep);
   }
+
+  const stripeScript = document.createElement('script');
+  stripeScript.src = 'https://js.stripe.com/v3/';
+  stripeScript.async = true;
+  document.head.appendChild(stripeScript);
 });

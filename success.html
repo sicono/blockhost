@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Pago Exitoso — BlockHost</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="stylesheet" href="checkout.css">
+  <link rel="stylesheet" href="overrides.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img src="/logo.png" alt="BlockHost logo" class="logo">
+      <div>
+        <h1>BlockHost</h1>
+        <p class="tag">Hosting profesional para servidores Minecraft</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <a class="btn translucent" href="/">Inicio</a>
+      <a class="btn primary" href="https://panel.blockhost.es/">Acceder al Panel</a>
+    </nav>
+  </header>
+
+  <main class="checkout-container">
+    <div class="success-wrapper">
+      <div class="success-content">
+        <div class="success-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+        </div>
+
+        <h1>¡Pago Completado!</h1>
+        <p class="lead">Tu servidor de Minecraft está siendo configurado</p>
+
+        <div class="info-box">
+          <h3>¿Qué sigue ahora?</h3>
+          <ol>
+            <li>Recibirás un correo de confirmación en los próximos minutos</li>
+            <li>Tu servidor estará listo en aproximadamente 5-10 minutos</li>
+            <li>Podrás acceder a tu panel de control para gestionar el servidor</li>
+          </ol>
+        </div>
+
+        <div class="info-box" style="background: rgba(52, 152, 219, 0.1); border-color: #3498db;">
+          <h3 style="color: #3498db;">Información importante</h3>
+          <ul style="color: var(--text);">
+            <li>Tu servidor incluye backups automáticos diarios</li>
+            <li>Protección DDoS activa desde el primer momento</li>
+            <li>Soporte técnico disponible 24/7 por Discord y email</li>
+          </ul>
+        </div>
+
+        <div class="success-actions">
+          <a href="https://panel.blockhost.es/" class="btn primary">Ir al Panel de Control</a>
+          <a href="https://discord.gg/blockhost" class="btn translucent">Únete a Discord</a>
+        </div>
+
+        <div class="order-details" id="order-details" style="display: none;">
+          <h3>Detalles de tu pedido</h3>
+          <div id="order-info"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="copy">© 2025 BlockHost — Hecho para servidores Minecraft</span>
+      <a class="btn translucent discord-btn" href="https://discord.gg/blockhost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+          <defs><linearGradient id="dgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7289da"/><stop offset="100%" stop-color="#5865F2"/></linearGradient></defs>
+          <path fill="url(#dgrad)" d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+        </svg>
+        Únete a nuestro Discord
+      </a>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    import { config } from './config.js';
+
+    const supabase = createClient(config.supabase.url, config.supabase.anonKey);
+
+    async function loadOrderDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('order_id');
+
+      if (!orderId) {
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('id', orderId)
+          .maybeSingle();
+
+        if (error || !data) {
+          console.error('Error loading order:', error);
+          return;
+        }
+
+        const orderDetailsEl = document.getElementById('order-details');
+        const orderInfoEl = document.getElementById('order-info');
+
+        orderInfoEl.innerHTML = `
+          <p><strong>Plan:</strong> ${data.plan_name}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Versión:</strong> ${data.version}</p>
+          <p><strong>Software:</strong> ${data.software}</p>
+          <p><strong>Región:</strong> ${data.region}</p>
+          <p><strong>Estado:</strong> ${data.status === 'active' ? 'Activo' : 'Configurando...'}</p>
+        `;
+
+        orderDetailsEl.style.display = 'block';
+      } catch (err) {
+        console.error('Unexpected error:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadOrderDetails);
+  </script>
+
+  <style>
+    .success-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .success-content {
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      padding: 60px 40px;
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      color: #10b981;
+    }
+
+    .success-content h1 {
+      font-size: 2.5rem;
+      margin: 0 0 12px 0;
+      color: #fff;
+    }
+
+    .success-content .lead {
+      font-size: 1.2rem;
+      color: var(--muted);
+      margin: 0 0 40px 0;
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 24px;
+      margin: 24px 0;
+      text-align: left;
+    }
+
+    .info-box h3 {
+      margin: 0 0 16px 0;
+      color: #fff;
+      font-size: 1.2rem;
+    }
+
+    .info-box ol, .info-box ul {
+      margin: 0;
+      padding-left: 24px;
+      color: var(--text);
+    }
+
+    .info-box li {
+      margin: 12px 0;
+      line-height: 1.6;
+    }
+
+    .success-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin: 40px 0 24px 0;
+      flex-wrap: wrap;
+    }
+
+    .order-details {
+      margin-top: 40px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .order-details h3 {
+      margin: 0 0 16px 0;
+      color: #fff;
+    }
+
+    #order-info p {
+      margin: 8px 0;
+      color: var(--text);
+    }
+
+    @media (max-width: 640px) {
+      .success-content {
+        padding: 40px 24px;
+      }
+
+      .success-content h1 {
+        font-size: 2rem;
+      }
+
+      .success-actions {
+        flex-direction: column;
+      }
+
+      .success-actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</body>
+</html>

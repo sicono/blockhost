@@ -15,7 +15,6 @@ const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPAB
 
 Deno.serve(async (req) => {
   try {
-    // Handle OPTIONS request for CORS preflight
     if (req.method === 'OPTIONS') {
       return new Response(null, { status: 204 });
     }
@@ -24,17 +23,14 @@ Deno.serve(async (req) => {
       return new Response('Method not allowed', { status: 405 });
     }
 
-    // get the signature from the header
     const signature = req.headers.get('stripe-signature');
 
     if (!signature) {
       return new Response('No signature found', { status: 400 });
     }
 
-    // get the raw body
     const body = await req.text();
 
-    // verify the webhook signature
     let event: Stripe.Event;
 
     try {
@@ -64,7 +60,6 @@ async function handleEvent(event: Stripe.Event) {
     return;
   }
 
-  // for one time payments, we only listen for the checkout.session.completed event
   if (event.type === 'payment_intent.succeeded' && event.data.object.invoice === null) {
     return;
   }
@@ -91,16 +86,15 @@ async function handleEvent(event: Stripe.Event) {
       await syncCustomerFromStripe(customerId);
     } else if (mode === 'payment' && payment_status === 'paid') {
       try {
-        // Extract the necessary information from the session
         const {
           id: checkout_session_id,
           payment_intent,
           amount_subtotal,
           amount_total,
           currency,
+          metadata,
         } = stripeData as Stripe.Checkout.Session;
 
-        // Insert the order into the stripe_orders table
         const { error: orderError } = await supabase.from('stripe_orders').insert({
           checkout_session_id,
           payment_intent_id: payment_intent,
@@ -109,7 +103,7 @@ async function handleEvent(event: Stripe.Event) {
           amount_total,
           currency,
           payment_status,
-          status: 'completed', // assuming we want to mark it as completed since payment is successful
+          status: 'completed',
         });
 
         if (orderError) {
@@ -117,6 +111,45 @@ async function handleEvent(event: Stripe.Event) {
           return;
         }
         console.info(`Successfully processed one-time payment for session: ${checkout_session_id}`);
+
+        if (metadata && metadata.order_id) {
+          const { error: updateError } = await supabase
+            .from('orders')
+            .update({
+              payment_status: 'completed',
+              stripe_payment_intent: payment_intent,
+              stripe_session_id: checkout_session_id,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', metadata.order_id);
+
+          if (updateError) {
+            console.error('Error updating order:', updateError);
+          } else {
+            console.info(`Updated order ${metadata.order_id} with payment info`);
+
+            try {
+              const createServerUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/create-server`;
+              const response = await fetch(createServerUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+                },
+                body: JSON.stringify({ order_id: metadata.order_id }),
+              });
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Failed to create server:', errorText);
+              } else {
+                console.info(`Server creation initiated for order ${metadata.order_id}`);
+              }
+            } catch (serverError) {
+              console.error('Error calling create-server function:', serverError);
+            }
+          }
+        }
       } catch (error) {
         console.error('Error processing one-time payment:', error);
       }
@@ -124,10 +157,8 @@ async function handleEvent(event: Stripe.Event) {
   }
 }
 
-// based on the excellent https://github.com/t3dotgg/stripe-recommendations
 async function syncCustomerFromStripe(customerId: string) {
   try {
-    // fetch latest subscription data from Stripe
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       limit: 1,
@@ -135,7 +166,6 @@ async function syncCustomerFromStripe(customerId: string) {
       expand: ['data.default_payment_method'],
     });
 
-    // TODO verify if needed
     if (subscriptions.data.length === 0) {
       console.info(`No active subscriptions found for customer: ${customerId}`);
       const { error: noSubError } = await supabase.from('stripe_subscriptions').upsert(
@@ -154,10 +184,8 @@ async function syncCustomerFromStripe(customerId: string) {
       }
     }
 
-    // assumes that a customer can only have a single subscription
     const subscription = subscriptions.data[0];
 
-    // store subscription state
     const { error: subError } = await supabase.from('stripe_subscriptions').upsert(
       {
         customer_id: customerId,
