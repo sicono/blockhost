@@ -27,7 +27,7 @@ const PLAN_DATA = {
     ram: 4,
     storage: 25,
     players: '15-25',
-    stripePriceId: 'price_mini'
+    stripePriceId: 'price_1SJLIKDQaOEVVvuYAmHk3s4s'
   },
   'Basico': {
     name: 'Básico',
@@ -35,7 +35,7 @@ const PLAN_DATA = {
     ram: 6,
     storage: 50,
     players: '25-35',
-    stripePriceId: 'price_basico'
+    stripePriceId: 'price_1SJLJ0DQaOEVVvuYWgdpZ7Y7'
   },
   'Estandar': {
     name: 'Estándar',
@@ -43,7 +43,7 @@ const PLAN_DATA = {
     ram: 8,
     storage: 75,
     players: '35-50',
-    stripePriceId: 'price_estandar'
+    stripePriceId: 'price_1SJLJVDQaOEVVvuYJNoHVGPI'
   },
   'Plus': {
     name: 'Plus',
@@ -51,7 +51,7 @@ const PLAN_DATA = {
     ram: 10,
     storage: 100,
     players: '50-70',
-    stripePriceId: 'price_plus'
+    stripePriceId: 'price_1SJLJsDQaOEVVvuYyh4r2T6S'
   }
 };
 
