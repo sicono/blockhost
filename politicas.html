@@ -184,6 +184,18 @@
   <footer class="site-footer">
     <p>© 2025 BlockHost. Todos los derechos reservados.</p>
   </footer>
+  <script>
+  const reveals = document.querySelectorAll("section, .reveal");
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add("visible");
+    });
+  }, { threshold: 0.1 });
+
+  reveals.forEach(el => observer.observe(el));
+</script>
+
 </body>
 </html>
+
 
