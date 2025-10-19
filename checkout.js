@@ -17,15 +17,15 @@ const SOFTWARE_OPTIONS = {
 
 const PLAN_DATA = {
   'Mini': { name: 'Mini', price: 3.50, ram: 4, storage: 25, players: '15-25' },
-  'Básico': { name: 'Basico', price: 5.50, ram: 6, storage: 50, players: '25-35' },
-  'Estándar': { name: 'Estandar', price: 7.50, ram: 8, storage: 75, players: '35-50' },
+  'Basico': { name: 'Basico', price: 5.50, ram: 6, storage: 50, players: '25-35' },
+  'Estandar': { name: 'Estandar', price: 7.50, ram: 8, storage: 75, players: '35-50' },
   'Plus': { name: 'Plus', price: 9.50, ram: 10, storage: 100, players: '50-70' }
 };
 
 const PAY_LINKS = {
   'Mini': 'https://buy.stripe.com/28E8wP2gS3Hf8Lb6Dw4wM00',
-  'Básico': 'https://buy.stripe.com/8x2aEXbRs4Lj2mN8LE4wM01',
-  'Estándar': 'https://buy.stripe.com/dRm14ncVw6TraTj2ng4wM02',
+  'Báaico': 'https://buy.stripe.com/8x2aEXbRs4Lj2mN8LE4wM01',
+  'Estandar': 'https://buy.stripe.com/dRm14ncVw6TraTj2ng4wM02',
   'Plus': 'https://buy.stripe.com/5kQ28raNob9HaTjd1U4wM03'
 };
 
