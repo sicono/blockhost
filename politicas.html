@@ -25,7 +25,7 @@
 
     <section class="reveal">
       <h2>1. Privacidad y recopilación de datos</h2>
-      <p>En BlockHost nos comprometemos a manejar tus datos de forma segura, transparente y responsable. Solo recopilamos los datos estrictamente necesarios para brindar nuestros servicios de hosting.</p>
+      <p>En BlockHost manejamos tus datos de forma segura y transparente. Solo recopilamos información estrictamente necesaria para tu cuenta y el funcionamiento del servicio.</p>
       <h3>1.1 Datos de cuenta</h3>
       <ul>
         <li>Nombre de usuario</li>
@@ -37,7 +37,7 @@
       <h3>1.3 Datos de uso</h3>
       <p>Se recopilan logs de actividad y consumo de recursos solo para mejorar seguridad y estabilidad.</p>
       <h3>1.4 Datos técnicos</h3>
-      <p>Incluyen tipo de navegador, sistema operativo, dirección IP y configuración de servidor. No se usan para publicidad ni seguimiento comercial.</p>
+      <p>Incluyen tipo de navegador, sistema operativo, dirección IP y configuración del servidor. No se usan para publicidad ni seguimiento comercial.</p>
       <h3>1.5 Cookies y seguimiento</h3>
       <p>Solo usamos cookies esenciales y analíticas opcionales, agregadas y anónimas.</p>
     </section>
@@ -75,7 +75,7 @@
       <p>99.9% uptime estimado; mantenimientos programados notificados 48h antes.</p>
       <h3>4.4 Facturación y cancelación</h3>
       <ul>
-        <li>Pago mensual por adelantado via Stripe</li>
+        <li>Pago mensual por adelantado vía Stripe</li>
         <li>Cancelación desde el panel sin compromiso mínimo</li>
         <li>Datos de cuenta eliminados 30 días después de cancelación</li>
       </ul>
@@ -101,7 +101,24 @@
     </section>
 
     <section class="reveal">
-      <h2>8. Contacto</h2>
+      <h2>8. Registro de errores de despliegue</h2>
+      <div class="log-terminal">
+<pre>
+Run actions/upload-pages-artifact@v3
+Run echo ::group::Archive artifact
+Archive artifact
+Run actions/upload-artifact@v4
+With the provided path, there will be 1 file uploaded
+Artifact name is valid!
+Root directory input is valid!
+Beginning upload of artifact content to blob storage
+<b style="color:#ff5555;">Error: The operation was canceled.</b>
+</pre>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <h2>9. Contacto</h2>
       <p>Para dudas o solicitudes sobre tus datos: <strong>support@blockhost.es</strong></p>
     </section>
   </main>
