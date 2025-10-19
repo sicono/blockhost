@@ -24,7 +24,7 @@ const PLAN_DATA = {
 
 const PAY_LINKS = {
   'Mini': 'https://buy.stripe.com/28E8wP2gS3Hf8Lb6Dw4wM00',
-  'Básico': 'https://buy.stripe.com/8x2aEXbRs4Lj2mN8LE4wM01',
+  'Basico': 'https://buy.stripe.com/8x2aEXbRs4Lj2mN8LE4wM01',
   'Estandar': 'https://buy.stripe.com/dRm14ncVw6TraTj2ng4wM02',
   'Plus': 'https://buy.stripe.com/5kQ28raNob9HaTjd1U4wM03'
 };
