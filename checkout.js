@@ -1,8 +1,3 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { config } from './config.js';
-
-const supabase = createClient(config.supabase.url, config.supabase.anonKey);
-
 const SOFTWARE_OPTIONS = {
   Java: [
     { value: 'Vanilla', label: 'Vanilla', desc: 'Minecraft puro sin modificaciones' },
@@ -21,85 +16,27 @@ const SOFTWARE_OPTIONS = {
 };
 
 const PLAN_DATA = {
-  'Mini': {
-    name: 'Mini',
-    price: 3.50,
-    ram: 4,
-    storage: 25,
-    players: '15-25',
-    stripePriceId: 'price_1SJLIKDQaOEVVvuYAmHk3s4s'
-  },
-  'Basico': {
-    name: 'Básico',
-    price: 5.50,
-    ram: 6,
-    storage: 50,
-    players: '25-35',
-    stripePriceId: 'price_1SJLJ0DQaOEVVvuYWgdpZ7Y7'
-  },
-  'Estandar': {
-    name: 'Estándar',
-    price: 7.50,
-    ram: 8,
-    storage: 75,
-    players: '35-50',
-    stripePriceId: 'price_1SJLJVDQaOEVVvuYJNoHVGPI'
-  },
-  'Plus': {
-    name: 'Plus',
-    price: 9.50,
-    ram: 10,
-    storage: 100,
-    players: '50-70',
-    stripePriceId: 'price_1SJLJsDQaOEVVvuYyh4r2T6S'
-  }
+  'Mini': { name: 'Mini', price: 3.50, ram: 4, storage: 25, players: '15-25' },
+  'Básico': { name: 'Básico', price: 5.50, ram: 6, storage: 50, players: '25-35' },
+  'Estándar': { name: 'Estándar', price: 7.50, ram: 8, storage: 75, players: '35-50' },
+  'Plus': { name: 'Plus', price: 9.50, ram: 10, storage: 100, players: '50-70' }
 };
 
-const CURRENCIES = {
-  USD: { rate: 1.08, locales: ['en-US','es-PA'], label: 'USD', symbol: '$' },
-  PEN: { rate: 4.04, locales: ['es-PE'], label: 'PEN', symbol: 'S/' },
-  MXN: { rate: 19.5, locales: ['es-MX'], label: 'MXN', symbol: '$' },
-  COP: { rate: 4390, locales: ['es-CO'], label: 'COP', symbol: '$' },
-  ARS: { rate: 980, locales: ['es-AR'], label: 'ARS', symbol: '$' },
-  VES: { rate: 39, locales: ['es-VE'], label: 'VES', symbol: 'Bs' },
-  BOB: { rate: 7.4, locales: ['es-BO'], label: 'BOB', symbol: 'Bs' },
-  EUR: { rate: 1, locales: ['es-ES'], label: 'EUR', symbol: '€' },
+const PAY_LINKS = {
+  'Mini': 'https://buy.stripe.com/28E8wP2gS3Hf8Lb6Dw4wM00',
+  'Básico': 'https://buy.stripe.com/8x2aEXbRs4Lj2mN8LE4wM01',
+  'Estándar': 'https://buy.stripe.com/dRm14ncVw6TraTj2ng4wM02',
+  'Plus': 'https://buy.stripe.com/5kQ28raNob9HaTjd1U4wM03'
 };
 
 let currentStep = 1;
 let selectedPlan = PLAN_DATA.Mini;
-let currentOrderId = null;
-let selectedCurrency = 'EUR';
-let formData = {
-  version: null,
-  software: null,
-  region: null,
-  email: null
-};
-
-function guessCurrency() {
-  const lang = navigator.language || 'es-ES';
-  const match = Object.entries(CURRENCIES).find(([,v]) => v.locales.some(l => lang.startsWith(l)));
-  return match ? match[0] : 'EUR';
-}
-
-function formatCurrency(valueEur, code) {
-  const { rate } = CURRENCIES[code] || CURRENCIES.EUR;
-  const converted = valueEur * rate;
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: code,
-    maximumFractionDigits: code === 'COP' || code === 'ARS' || code === 'VES' ? 0 : 2
-  }).format(converted);
-}
+let formData = { version: null, software: null, region: null, email: null };
 
 function getPlanFromURL() {
   const params = new URLSearchParams(window.location.search);
   const planParam = params.get('plan');
-  if (planParam && PLAN_DATA[planParam]) {
-    return PLAN_DATA[planParam];
-  }
-  return PLAN_DATA.Mini;
+  return PLAN_DATA[planParam] || PLAN_DATA.Mini;
 }
 
 function calculateTotal() {
@@ -107,6 +44,13 @@ function calculateTotal() {
   const tax = subtotal * 0.21;
   const total = subtotal + tax;
   return { subtotal, tax, total };
+}
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'EUR'
+  }).format(value);
 }
 
 function updateSummary() {
@@ -121,35 +65,23 @@ function updateSummary() {
   document.getElementById('summary-email').textContent = formData.email || '-';
 
   const { subtotal, tax, total } = calculateTotal();
-
-  document.getElementById('price-subtotal').textContent = formatCurrency(subtotal, selectedCurrency);
-  document.getElementById('price-tax').textContent = formatCurrency(tax, selectedCurrency);
-  document.getElementById('price-total').textContent = formatCurrency(total, selectedCurrency);
+  document.getElementById('price-subtotal').textContent = formatCurrency(subtotal);
+  document.getElementById('price-tax').textContent = formatCurrency(tax);
+  document.getElementById('price-total').textContent = formatCurrency(total);
 }
 
 function updateStepIndicator() {
   document.querySelectorAll('.step').forEach((step, index) => {
     const stepNum = index + 1;
-    if (stepNum < currentStep) {
-      step.classList.add('completed');
-      step.classList.remove('active');
-    } else if (stepNum === currentStep) {
-      step.classList.add('active');
-      step.classList.remove('completed');
-    } else {
-      step.classList.remove('active', 'completed');
-    }
+    step.classList.toggle('active', stepNum === currentStep);
+    step.classList.toggle('completed', stepNum < currentStep);
   });
 }
 
 function showSection(stepNum) {
-  document.querySelectorAll('.form-section').forEach(section => {
-    section.classList.remove('active');
-  });
-  const targetSection = document.querySelector(`[data-section="${stepNum}"]`);
-  if (targetSection) {
-    targetSection.classList.add('active');
-  }
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  const section = document.querySelector(`[data-section="${stepNum}"]`);
+  if (section) section.classList.add('active');
 
   const btnBack = document.getElementById('btn-back');
   const btnNext = document.getElementById('btn-next');
@@ -157,13 +89,45 @@ function showSection(stepNum) {
 
   btnBack.style.display = stepNum > 1 ? 'block' : 'none';
   btnNext.style.display = stepNum < 4 ? 'block' : 'none';
-  paymentSection.style.display = stepNum === 4 ? 'block' : 'none';
+
+  if (stepNum === 4) {
+    paymentSection.style.display = 'block';
+    paymentSection.innerHTML = `
+      <div style="text-align:center; margin-top:1.5rem;">
+        <button id="btn-pay" class="btn highlight" disabled>Pagar ahora</button>
+        <p id="email-warning" style="color:#ff6666; font-size:0.9rem; margin-top:0.5rem; display:none;">
+          Ingresa un correo válido para continuar.
+        </p>
+      </div>
+    `;
+
+    const payBtn = document.getElementById('btn-pay');
+    const emailInput = document.getElementById('email');
+    const warning = document.getElementById('email-warning');
+
+    // Verifica validez del correo en tiempo real
+    function updatePayButtonState() {
+      const isValid = emailInput.checkValidity() && emailInput.value.trim() !== '';
+      payBtn.disabled = !isValid;
+      warning.style.display = isValid ? 'none' : 'block';
+    }
+
+    updatePayButtonState();
+    emailInput.addEventListener('input', updatePayButtonState);
+
+    // Redirección al pago
+    payBtn.addEventListener('click', () => {
+      const url = PAY_LINKS[selectedPlan.name] || PAY_LINKS['Mini'];
+      window.location.href = url;
+    });
+  } else {
+    paymentSection.style.display = 'none';
+  }
 }
 
 function populateSoftwareOptions(version) {
   const container = document.getElementById('software-options');
   container.innerHTML = '';
-
   const options = SOFTWARE_OPTIONS[version] || [];
   options.forEach(opt => {
     const label = document.createElement('label');
@@ -173,13 +137,12 @@ function populateSoftwareOptions(version) {
       <div class="option-content">
         <span class="option-title">${opt.label}</span>
         <span class="option-desc">${opt.desc}</span>
-      </div>
-    `;
+      </div>`;
     container.appendChild(label);
   });
 
   document.querySelectorAll('input[name="software"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
+    radio.addEventListener('change', e => {
       formData.software = e.target.value;
       updateSummary();
     });
@@ -187,52 +150,29 @@ function populateSoftwareOptions(version) {
 }
 
 function validateCurrentStep() {
-  console.log('Validating step:', currentStep);
   switch (currentStep) {
-    case 1:
-      const versionRadio = document.querySelector('input[name="version"]:checked');
-      console.log('Version selected:', versionRadio ? versionRadio.value : 'none');
-      return versionRadio !== null;
-    case 2:
-      const softwareRadio = document.querySelector('input[name="software"]:checked');
-      console.log('Software selected:', softwareRadio ? softwareRadio.value : 'none');
-      return softwareRadio !== null;
-    case 3:
-      const regionRadio = document.querySelector('input[name="region"]:checked');
-      console.log('Region selected:', regionRadio ? regionRadio.value : 'none');
-      return regionRadio !== null;
+    case 1: return !!document.querySelector('input[name="version"]:checked');
+    case 2: return !!document.querySelector('input[name="software"]:checked');
+    case 3: return !!document.querySelector('input[name="region"]:checked');
     case 4:
       const emailInput = document.getElementById('email');
-      console.log('Email entered:', emailInput.value);
       return emailInput.value.trim() !== '' && emailInput.checkValidity();
-    default:
-      return false;
+    default: return false;
   }
 }
 
-async function nextStep() {
-  console.log('Next step clicked, current step:', currentStep);
-
+function nextStep() {
   if (!validateCurrentStep()) {
     alert('Por favor completa todos los campos requeridos.');
     return;
   }
 
-  if (currentStep === 4) {
-    const emailInput = document.getElementById('email');
-    formData.email = emailInput.value.trim();
-    const order = await createPendingOrder();
-    if (order) {
-      await redirectToStripeCheckout(order.id);
-    }
-    return;
-  }
-
   if (currentStep < 4) {
     currentStep++;
-    console.log('Moving to step:', currentStep);
     showSection(currentStep);
     updateStepIndicator();
+  } else {
+    alert('Ya puedes proceder al pago.');
   }
 }
 
@@ -244,151 +184,34 @@ function previousStep() {
   }
 }
 
-async function createPendingOrder() {
-  try {
-    const { total } = calculateTotal();
-    const orderData = {
-      email: formData.email,
-      plan_name: selectedPlan.name,
-      price_eur: selectedPlan.price,
-      ram_gb: selectedPlan.ram,
-      storage_gb: selectedPlan.storage,
-      max_players: selectedPlan.players,
-      version: formData.version,
-      software: formData.software,
-      region: formData.region,
-      status: 'pending',
-      payment_status: 'pending'
-    };
-
-    const { data, error } = await supabase
-      .from('orders')
-      .insert([orderData])
-      .select()
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error creating order:', error);
-      alert('Hubo un error al crear el pedido. Por favor intenta de nuevo.');
-      return null;
-    }
-
-    currentOrderId = data.id;
-    return data;
-  } catch (err) {
-    console.error('Unexpected error:', err);
-    alert('Hubo un error inesperado. Por favor intenta de nuevo.');
-    return null;
-  }
-}
-
-async function redirectToStripeCheckout(orderId) {
-  try {
-    const paymentSection = document.getElementById('payment-section');
-    paymentSection.innerHTML = '<p style="text-align: center; color: var(--muted);">Redirigiendo a la pasarela de pago...</p>';
-
-    const stripe = window.Stripe(config.stripe.publishableKey);
-
-    const response = await fetch(`${config.supabase.url}/functions/v1/stripe-checkout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.supabase.anonKey}`,
-      },
-      body: JSON.stringify({
-        price_id: selectedPlan.stripePriceId,
-        mode: 'payment',
-        success_url: `${window.location.origin}/success.html?order_id=${orderId}`,
-        cancel_url: `${window.location.origin}/checkout.html?plan=${selectedPlan.name}`,
-        metadata: {
-          order_id: orderId
-        }
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al iniciar el pago');
-    }
-
-    const { sessionId } = await response.json();
-
-    const { error } = await stripe.redirectToCheckout({ sessionId });
-
-    if (error) {
-      console.error('Stripe redirect error:', error);
-      alert('Error al redirigir al pago. Por favor intenta de nuevo.');
-    }
-  } catch (error) {
-    console.error('Checkout error:', error);
-    alert('Error al procesar el pago: ' + error.message);
-
-    const paymentSection = document.getElementById('payment-section');
-    paymentSection.innerHTML = `
-      <p style="color: #ff4444; text-align: center;">Error: ${error.message}</p>
-      <button class="btn primary" onclick="location.reload()">Intentar de nuevo</button>
-    `;
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('Checkout page loaded');
-
   selectedPlan = getPlanFromURL();
-  selectedCurrency = guessCurrency();
-
-  console.log('Selected plan:', selectedPlan);
-  console.log('Selected currency:', selectedCurrency);
-
   updateSummary();
   showSection(currentStep);
   updateStepIndicator();
 
-  document.querySelectorAll('input[name="version"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      console.log('Version changed to:', e.target.value);
+  document.querySelectorAll('input[name="version"]').forEach(r => {
+    r.addEventListener('change', e => {
       formData.version = e.target.value;
       formData.software = null;
-      populateSoftwareOptions(formData.version);
+      populateSoftwareOptions(e.target.value);
       updateSummary();
     });
   });
 
-  document.querySelectorAll('input[name="region"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      console.log('Region changed to:', e.target.value);
+  document.querySelectorAll('input[name="region"]').forEach(r => {
+    r.addEventListener('change', e => {
       formData.region = e.target.value;
       updateSummary();
     });
   });
 
   const emailInput = document.getElementById('email');
-  if (emailInput) {
-    emailInput.addEventListener('input', (e) => {
-      formData.email = e.target.value.trim();
-      updateSummary();
-    });
-  }
+  emailInput.addEventListener('input', e => {
+    formData.email = e.target.value.trim();
+    updateSummary();
+  });
 
-  const btnNext = document.getElementById('btn-next');
-  const btnBack = document.getElementById('btn-back');
-
-  console.log('Next button found:', btnNext !== null);
-  console.log('Back button found:', btnBack !== null);
-
-  if (btnNext) {
-    btnNext.addEventListener('click', (e) => {
-      console.log('Next button clicked!');
-      nextStep();
-    });
-  }
-
-  if (btnBack) {
-    btnBack.addEventListener('click', previousStep);
-  }
-
-  const stripeScript = document.createElement('script');
-  stripeScript.src = 'https://js.stripe.com/v3/';
-  stripeScript.async = true;
-  document.head.appendChild(stripeScript);
+  document.getElementById('btn-next').addEventListener('click', nextStep);
+  document.getElementById('btn-back').addEventListener('click', previousStep);
 });
