@@ -1,341 +1,213 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Blockhost — Checkout</title>
-<link rel="stylesheet" href="style.css">
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { config } from './config.js';
-
-const supabase = createClient(config.supabase.url, config.supabase.anonKey);
-
-// --- Datos ---
-const SOFTWARE_OPTIONS = {
-  Java: [
-    { value: 'Vanilla', label: 'Vanilla', desc: 'Minecraft puro sin modificaciones' },
-    { value: 'Paper', label: 'Paper', desc: 'Optimizado para rendimiento' },
-    { value: 'Spigot', label: 'Spigot', desc: 'Compatible con plugins' },
-    { value: 'Fabric', label: 'Fabric', desc: 'Modding ligero y moderno' },
-    { value: 'Forge', label: 'Forge', desc: 'Mods completos y complejos' },
-    { value: 'Sponge', label: 'Sponge', desc: 'API avanzada para plugins' },
-    { value: 'Archlight', label: 'Archlight', desc: 'Forge + Bukkit híbrido' }
-  ],
-  Bedrock: [
-    { value: 'Vanilla', label: 'Vanilla', desc: 'Bedrock oficial' },
-    { value: 'Pocketmine', label: 'PocketMine-MP', desc: 'Servidor en PHP con plugins' },
-    { value: 'Nukkit', label: 'Nukkit', desc: 'Servidor en Java para Bedrock' }
-  ]
-};
-
-const PLAN_DATA = {
-  'Mini': { name: 'Mini', price: 3.50, ram: 4, storage: 25, players: '15-25', stripePriceId: 'price_1SJLIKDQaOEVVvuYAmHk3s4s' },
-  'Basico': { name: 'Básico', price: 5.50, ram: 6, storage: 50, players: '25-35', stripePriceId: 'price_1SJLJ0DQaOEVVvuYWgdpZ7Y7' },
-  'Estandar': { name: 'Estándar', price: 7.50, ram: 8, storage: 75, players: '35-50', stripePriceId: 'price_1SJLJVDQaOEVVvuYJNoHVGPI' },
-  'Plus': { name: 'Plus', price: 9.50, ram: 10, storage: 100, players: '50-70', stripePriceId: 'price_1SJLJsDQaOEVVvuYyh4r2T6S' }
-};
-
-const CURRENCIES = {
-  USD: { rate: 1.08, locales: ['en-US','es-PA'], label: 'USD', symbol: '$' },
-  EUR: { rate: 1, locales: ['es-ES'], label: 'EUR', symbol: '€' },
-};
-
-let currentStep = 1;
-let selectedPlan = PLAN_DATA.Mini;
-let currentOrderId = null;
-let selectedCurrency = 'EUR';
-let formData = { version: null, software: null, region: null, email: null };
-
-// --- Funciones ---
-function guessCurrency() {
-  const lang = navigator.language || 'es-ES';
-  const match = Object.entries(CURRENCIES).find(([,v]) => v.locales.some(l => lang.startsWith(l)));
-  return match ? match[0] : 'EUR';
-}
-
-function formatCurrency(valueEur, code) {
-  const { rate } = CURRENCIES[code] || CURRENCIES.EUR;
-  const converted = valueEur * rate;
-  return new Intl.NumberFormat(undefined, { style:'currency', currency:code, maximumFractionDigits:2 }).format(converted);
-}
-
-function getPlanFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  const planParam = params.get('plan');
-  return (planParam && PLAN_DATA[planParam]) ? PLAN_DATA[planParam] : PLAN_DATA.Mini;
-}
-
-function calculateTotal() {
-  const subtotal = selectedPlan.price;
-  const tax = subtotal * 0.21;
-  const total = subtotal + tax;
-  return { subtotal, tax, total };
-}
-
-function updateSummary() {
-  document.getElementById('plan-title').textContent = `Plan ${selectedPlan.name}`;
-  document.getElementById('spec-ram').textContent = `${selectedPlan.ram}GB`;
-  document.getElementById('spec-storage').textContent = `${selectedPlan.storage} GB SSD`;
-  document.getElementById('spec-players').textContent = selectedPlan.players;
-
-  document.getElementById('summary-version').textContent = formData.version || '-';
-  document.getElementById('summary-software').textContent = formData.software || '-';
-  document.getElementById('summary-region').textContent = formData.region || '-';
-  document.getElementById('summary-email').textContent = formData.email || '-';
-
-  const { subtotal, tax, total } = calculateTotal();
-  document.getElementById('price-subtotal').textContent = formatCurrency(subtotal, selectedCurrency);
-  document.getElementById('price-tax').textContent = formatCurrency(tax, selectedCurrency);
-  document.getElementById('price-total').textContent = formatCurrency(total, selectedCurrency);
-}
-
-function updateStepIndicator() {
-  document.querySelectorAll('.step').forEach((step, index) => {
-    const stepNum = index + 1;
-    step.classList.toggle('active', stepNum === currentStep);
-    step.classList.toggle('completed', stepNum < currentStep);
-  });
-}
-
-function showSection(stepNum) {
-  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-  const section = document.querySelector(`[data-section="${stepNum}"]`);
-  if (section) section.classList.add('active');
-
-  const btnBack = document.getElementById('btn-back');
-  const btnNext = document.getElementById('btn-next');
-  const paymentSection = document.getElementById('payment-section');
-
-  btnBack.style.display = stepNum > 1 ? 'block' : 'none';
-  btnNext.style.display = stepNum < 4 ? 'block' : 'none';
-  
-  // --- Paso 4: email + botón de pago ---
-  if (stepNum === 4) {
-    paymentSection.style.display = 'block';
-    paymentSection.innerHTML = `
-      <div style="text-align:center; margin-top:1.5rem;">
-        <input type="email" id="email" placeholder="Correo electrónico" required style="padding:10px; border-radius:5px; width:90%;">
-        <p id="email-warning" style="color:#ff6666; font-size:0.9rem; margin-top:0.5rem; display:none;">
-          Ingresa un correo válido para continuar.
-        </p>
-        <button id="btn-pay" class="btn highlight" disabled style="margin-top:1rem;">Continuar</button>
-      </div>
-    `;
-
-    const emailInput = document.getElementById('email');
-    const payBtn = document.getElementById('btn-pay');
-    const warning = document.getElementById('email-warning');
-
-    function updatePayState() {
-      const valid = emailInput.checkValidity() && emailInput.value.trim() !== '';
-      payBtn.disabled = !valid;
-      warning.style.display = valid ? 'none' : 'block';
-      formData.email = emailInput.value.trim();
-      updateSummary();
-    }
-
-    emailInput.addEventListener('input', updatePayState);
-    updatePayState();
-
-    payBtn.addEventListener('click', async () => {
-      const order = await createPendingOrder();
-      if (order) await redirectToStripeCheckout(order.id);
-    });
-  } else {
-    paymentSection.style.display = 'none';
-  }
-}
-
-function populateSoftwareOptions(version) {
-  const container = document.getElementById('software-options');
-  container.innerHTML = '';
-  const options = SOFTWARE_OPTIONS[version] || [];
-  options.forEach(opt => {
-    const label = document.createElement('label');
-    label.className = 'option-card';
-    label.innerHTML = `
-      <input type="radio" name="software" value="${opt.value}" required>
-      <div class="option-content">
-        <span class="option-title">${opt.label}</span>
-        <span class="option-desc">${opt.desc}</span>
-      </div>
-    `;
-    container.appendChild(label);
-  });
-
-  document.querySelectorAll('input[name="software"]').forEach(radio => {
-    radio.addEventListener('change', e => {
-      formData.software = e.target.value;
-      updateSummary();
-    });
-  });
-}
-
-function validateCurrentStep() {
-  switch (currentStep) {
-    case 1: return !!document.querySelector('input[name="version"]:checked');
-    case 2: return !!document.querySelector('input[name="software"]:checked');
-    case 3: return !!document.querySelector('input[name="region"]:checked');
-    case 4: 
-      const emailInput = document.getElementById('email');
-      return emailInput && emailInput.value.trim() !== '' && emailInput.checkValidity();
-    default: return false;
-  }
-}
-
-async function nextStep() {
-  if (!validateCurrentStep()) {
-    alert('Por favor completa todos los campos requeridos.');
-    return;
-  }
-
-  if (currentStep < 4) {
-    currentStep++;
-    showSection(currentStep);
-    updateStepIndicator();
-  }
-}
-
-function previousStep() {
-  if (currentStep > 1) {
-    currentStep--;
-    showSection(currentStep);
-    updateStepIndicator();
-  }
-}
-
-// --- Supabase / Stripe ---
-async function createPendingOrder() {
-  try {
-    const { total } = calculateTotal();
-    const orderData = {
-      email: formData.email,
-      plan_name: selectedPlan.name,
-      price_eur: selectedPlan.price,
-      ram_gb: selectedPlan.ram,
-      storage_gb: selectedPlan.storage,
-      max_players: selectedPlan.players,
-      version: formData.version,
-      software: formData.software,
-      region: formData.region,
-      status: 'pending',
-      payment_status: 'pending'
-    };
-    const { data, error } = await supabase.from('orders').insert([orderData]).select().maybeSingle();
-    if (error) { console.error(error); alert('Error al crear pedido'); return null; }
-    currentOrderId = data.id;
-    return data;
-  } catch(e) {
-    console.error(e);
-    alert('Error inesperado al crear pedido');
-    return null;
-  }
-}
-
-async function redirectToStripeCheckout(orderId) {
-  const stripe = Stripe(config.stripe.publishableKey);
-  const res = await fetch(`${config.supabase.url}/functions/v1/stripe-checkout`, {
-    method:'POST',
-    headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${config.supabase.anonKey}` },
-    body: JSON.stringify({
-      price_id: selectedPlan.stripePriceId,
-      mode:'payment',
-      success_url:`${window.location.origin}/success.html?order_id=${orderId}`,
-      cancel_url:`${window.location.origin}/checkout.html?plan=${selectedPlan.name}`,
-      metadata:{ order_id: orderId }
-    })
-  });
-  const { sessionId } = await res.json();
-  const { error } = await stripe.redirectToCheckout({ sessionId });
-  if (error) alert('Error al redirigir al pago: '+error.message);
-}
-
-// --- Inicialización ---
-document.addEventListener('DOMContentLoaded', () => {
-  selectedPlan = getPlanFromURL();
-  selectedCurrency = guessCurrency();
-
-  updateSummary();
-  showSection(currentStep);
-  updateStepIndicator();
-
-  document.querySelectorAll('input[name="version"]').forEach(r => {
-    r.addEventListener('change', e => {
-      formData.version = e.target.value;
-      formData.software = null;
-      populateSoftwareOptions(e.target.value);
-      updateSummary();
-    });
-  });
-
-  document.querySelectorAll('input[name="region"]').forEach(r => {
-    r.addEventListener('change', e => {
-      formData.region = e.target.value;
-      updateSummary();
-    });
-  });
-
-  document.getElementById('btn-next').addEventListener('click', nextStep);
-  document.getElementById('btn-back').addEventListener('click', previousStep);
-
-  const stripeScript = document.createElement('script');
-  stripeScript.src = 'https://js.stripe.com/v3/';
-  stripeScript.async = true;
-  document.head.appendChild(stripeScript);
-});
-</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Checkout — BlockHost</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="stylesheet" href="checkout.css">
+  <link rel="stylesheet" href="overrides.css">
 </head>
 <body>
-  <div class="checkout-container">
-    <div class="steps">
-      <span class="step">1</span>
-      <span class="step">2</span>
-      <span class="step">3</span>
-      <span class="step">4</span>
+  <header class="site-header">
+    <div class="brand">
+      <img src="/logo.png" alt="BlockHost logo" class="logo">
+      <div>
+        <h1>BlockHost</h1>
+        <p class="tag">Hosting profesional para servidores Minecraft</p>
+      </div>
     </div>
+    <nav class="nav">
+      <a class="btn translucent" href="/">Inicio</a>
+      <a class="btn translucent" href="precios.html">Precios</a>
+    </nav>
+  </header>
 
-    <div class="form-section" data-section="1">
-      <h2>Selecciona versión</h2>
-      <label><input type="radio" name="version" value="Java"> Java</label>
-      <label><input type="radio" name="version" value="Bedrock"> Bedrock</label>
-    </div>
+  <main class="checkout-container">
+    <div class="checkout-wrapper">
+      <div class="checkout-form">
+        <h2>Configurar tu Servidor</h2>
+        <p class="subtitle">Personaliza tu servidor Minecraft</p>
 
-    <div class="form-section" data-section="2">
-      <h2>Selecciona software</h2>
-      <div id="software-options"></div>
-    </div>
+        <div class="step-indicator">
+          <div class="step active" data-step="1">
+            <span class="step-number">1</span>
+            <span class="step-label">Versión</span>
+          </div>
+          <div class="step" data-step="2">
+            <span class="step-number">2</span>
+            <span class="step-label">Software</span>
+          </div>
+          <div class="step" data-step="3">
+            <span class="step-number">3</span>
+            <span class="step-label">Región</span>
+          </div>
+          <div class="step" data-step="4">
+            <span class="step-number">4</span>
+            <span class="step-label">Cuenta</span>
+          </div>
+        </div>
 
-    <div class="form-section" data-section="3">
-      <h2>Selecciona región</h2>
-      <label><input type="radio" name="region" value="EU"> Europa</label>
-      <label><input type="radio" name="region" value="US"> Estados Unidos</label>
-    </div>
+        <form id="checkout-form" novalidate>
+          <div class="form-section active" data-section="1">
+            <label class="form-label">Versión de Minecraft</label>
+            <div class="option-group">
+              <label class="option-card">
+                <input type="radio" name="version" value="Java" required>
+                <div class="option-content">
+                  <span class="option-title">Java Edition</span>
+                  <span class="option-desc">PC, Mac, Linux</span>
+                </div>
+              </label>
+              <label class="option-card">
+                <input type="radio" name="version" value="Bedrock" required>
+                <div class="option-content">
+                  <span class="option-title">Bedrock Edition</span>
+                  <span class="option-desc">Mobile, Console, Windows 10</span>
+                </div>
+              </label>
+            </div>
+          </div>
 
-    <div class="form-section" data-section="4">
-      <h2>Confirmar correo y pagar</h2>
-      <div id="payment-section"></div>
-    </div>
+          <div class="form-section" data-section="2">
+            <label class="form-label">Software / Núcleo</label>
+            <div class="option-group vertical" id="software-options">
+            </div>
+          </div>
 
-    <div class="navigation">
-      <button id="btn-back" class="btn">Atrás</button>
-      <button id="btn-next" class="btn highlight">Siguiente</button>
-    </div>
+          <div class="form-section" data-section="3">
+            <label class="form-label">Región del Servidor</label>
+            <div class="option-group">
+              <label class="option-card">
+                <input type="radio" name="region" value="Canada" required>
+                <div class="option-content">
+                  <span class="option-title">🇨🇦 Canadá</span>
+                  <span class="option-desc">Baja latencia para América</span>
+                </div>
+              </label>
+              <label class="option-card disabled">
+                <input type="radio" name="region" value="Europa" disabled>
+                <div class="option-content">
+                  <span class="option-title">🇪🇺 Europa</span>
+                  <span class="option-desc">Próximamente</span>
+                </div>
+              </label>
+            </div>
+          </div>
 
-    <div class="summary">
-      <h3>Resumen</h3>
-      <p id="plan-title"></p>
-      <p>RAM: <span id="spec-ram"></span></p>
-      <p>Almacenamiento: <span id="spec-storage"></span></p>
-      <p>Jugadores: <span id="spec-players"></span></p>
-      <p>Versión: <span id="summary-version"></span></p>
-      <p>Software: <span id="summary-software"></span></p>
-      <p>Región: <span id="summary-region"></span></p>
-      <p>Email: <span id="summary-email"></span></p>
-      <p>Subtotal: <span id="price-subtotal"></span></p>
-      <p>IVA: <span id="price-tax"></span></p>
-      <p>Total: <span id="price-total"></span></p>
+          <div class="form-section" data-section="4">
+            <label class="form-label" for="email">Correo Electrónico</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="tu@email.com"
+              required
+            >
+            <p class="form-hint">Tu servidor será asignado a esta cuenta. Si no tienes cuenta, créala primero.</p>
+            <div class="account-links">
+              <a href="registro.html" class="link">Crear cuenta</a>
+              <a href="sesion.html" class="link">Ya tengo cuenta</a>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn secondary" id="btn-back" style="display: none;">
+              ← Atrás
+            </button>
+            <button type="button" class="btn primary" id="btn-next">
+              Siguiente →
+            </button>
+          </div>
+        </form>
+
+        <div id="payment-section" style="display: none;">
+          <div class="payment-divider">
+            <span>Pago seguro con PayPal</span>
+          </div>
+          <div id="paypal-button-container"></div>
+        </div>
+      </div>
+
+      <div class="checkout-summary">
+        <h3>Resumen del Pedido</h3>
+
+        <div class="summary-section">
+          <h4 id="plan-title">Plan Mini</h4>
+          <div class="summary-specs">
+            <div class="spec-item">
+              <span class="spec-label">RAM:</span>
+              <span class="spec-value" id="spec-ram">4GB</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Almacenamiento:</span>
+              <span class="spec-value" id="spec-storage">25 GB SSD</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Jugadores:</span>
+              <span class="spec-value" id="spec-players">15-25</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-section">
+          <h4>Configuración</h4>
+          <div class="config-item">
+            <span class="config-label">Versión:</span>
+            <span class="config-value" id="summary-version">-</span>
+          </div>
+          <div class="config-item">
+            <span class="config-label">Software:</span>
+            <span class="config-value" id="summary-software">-</span>
+          </div>
+          <div class="config-item">
+            <span class="config-label">Región:</span>
+            <span class="config-value" id="summary-region">-</span>
+          </div>
+          <div class="config-item">
+            <span class="config-label">Email:</span>
+            <span class="config-value" id="summary-email">-</span>
+          </div>
+        </div>
+
+        <div class="summary-total">
+          <div class="total-row">
+            <span class="total-label">Subtotal:</span>
+            <span class="total-value" id="price-subtotal">3,50 €</span>
+          </div>
+          <div class="total-row">
+            <span class="total-label">IVA (21%):</span>
+            <span class="total-value" id="price-tax">0,74 €</span>
+          </div>
+          <div class="total-row total-final">
+            <span class="total-label">Total mensual:</span>
+            <span class="total-value" id="price-total">4,24 €</span>
+          </div>
+        </div>
+
+        <div class="summary-footer">
+          <p>✓ Sin compromiso de permanencia</p>
+          <p>✓ Cancela cuando quieras</p>
+          <p>✓ Soporte 24/7</p>
+        </div>
+      </div>
     </div>
-  </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="copy">© 2025 BlockHost — Hecho para servidores Minecraft</span>
+      <a class="btn translucent discord-btn" href="https://discord.gg/blockhost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+          <defs><linearGradient id="dgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7289da"/><stop offset="100%" stop-color="#5865F2"/></linearGradient></defs>
+          <path fill="url(#dgrad)" d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+        </svg>
+        Únete a nuestro Discord
+      </a>
+    </div>
+  </footer>
+
+  <script type="module" src="checkout.js"></script>
 </body>
 </html>
