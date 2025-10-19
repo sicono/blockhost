@@ -26,7 +26,7 @@ const PAY_LINKS = {
   'Mini': 'https://buy.stripe.com/14A5kD1cO0v38Lb2ng4wM04',
   'Basico': 'https://buy.stripe.com/9B6dR95t491z9Pf5zs4wM05',
   'Estandar': 'https://buy.stripe.com/28E00j8Fggu1bXn0f84wM06',
-  'Plus': 'https://buy.stripe.com/5kQ28raNob9HaTjd1U4wM03'
+  'Plus': 'https://buy.stripe.com/00w6oHg7IelT3qR7HA4wM07'
 };
 
 let currentStep = 1;
