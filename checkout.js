@@ -33,6 +33,22 @@ let currentStep = 1;
 let selectedPlan = PLAN_DATA.Mini;
 let formData = { version: null, software: null, region: null, email: null };
 
+// --- Función para verificar email en tu API de Pterodactyl ---
+async function checkUserEmail(email) {
+  try {
+    const res = await fetch('https://api-registro.mc-blockhost.workers.dev/verificar_usuario', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    return data.existe; // true si el usuario existe en Pterodactyl
+  } catch (err) {
+    console.error('Error al verificar email:', err);
+    return false;
+  }
+}
+
 function getPlanFromURL() {
   const params = new URLSearchParams(window.location.search);
   const planParam = params.get('plan');
@@ -95,31 +111,47 @@ function showSection(stepNum) {
     paymentSection.innerHTML = `
       <div style="text-align:center; margin-top:1.5rem;">
         <button id="btn-pay" class="btn highlight" disabled>Pagar ahora</button>
-        <p id="email-warning" style="color:#ff6666; font-size:0.9rem; margin-top:0.5rem; display:none;">
-          Ingresa un correo válido para continuar.
-        </p>
+        <p id="email-status" style="font-size:0.9rem; margin-top:0.5rem; display:none;"></p>
       </div>
     `;
 
     const payBtn = document.getElementById('btn-pay');
     const emailInput = document.getElementById('email');
-    const warning = document.getElementById('email-warning');
+    const statusMsg = document.getElementById('email-status');
 
-    // Verifica validez del correo en tiempo real
-    function updatePayButtonState() {
-      const isValid = emailInput.checkValidity() && emailInput.value.trim() !== '';
-      payBtn.disabled = !isValid;
-      warning.style.display = isValid ? 'none' : 'block';
+    async function updatePayButtonState() {
+      const email = emailInput.value.trim();
+      if (!emailInput.checkValidity() || email === '') {
+        payBtn.disabled = true;
+        statusMsg.style.display = 'none';
+        return;
+      }
+
+      statusMsg.textContent = 'Verificando usuario...';
+      statusMsg.style.color = '#999';
+      statusMsg.style.display = 'block';
+      const exists = await checkUserEmail(email);
+      if (exists) {
+        payBtn.disabled = false;
+        statusMsg.textContent = '✔ Usuario encontrado, puedes pagar.';
+        statusMsg.style.color = '#4caf50';
+      } else {
+        payBtn.disabled = true;
+        statusMsg.textContent = '✖ El correo no existe en nuestra base de usuarios.';
+        statusMsg.style.color = '#ff4444';
+      }
     }
 
-    updatePayButtonState();
-    emailInput.addEventListener('input', updatePayButtonState);
+    emailInput.addEventListener('input', () => {
+      updatePayButtonState();
+    });
 
-    // Redirección al pago
     payBtn.addEventListener('click', () => {
       const url = PAY_LINKS[selectedPlan.name] || PAY_LINKS['Mini'];
       window.location.href = url;
     });
+
+    updatePayButtonState(); // chequeo inicial
   } else {
     paymentSection.style.display = 'none';
   }
@@ -171,8 +203,6 @@ function nextStep() {
     currentStep++;
     showSection(currentStep);
     updateStepIndicator();
-  } else {
-    alert('Ya puedes proceder al pago.');
   }
 }
 
@@ -193,25 +223,4 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('input[name="version"]').forEach(r => {
     r.addEventListener('change', e => {
       formData.version = e.target.value;
-      formData.software = null;
-      populateSoftwareOptions(e.target.value);
-      updateSummary();
-    });
-  });
-
-  document.querySelectorAll('input[name="region"]').forEach(r => {
-    r.addEventListener('change', e => {
-      formData.region = e.target.value;
-      updateSummary();
-    });
-  });
-
-  const emailInput = document.getElementById('email');
-  emailInput.addEventListener('input', e => {
-    formData.email = e.target.value.trim();
-    updateSummary();
-  });
-
-  document.getElementById('btn-next').addEventListener('click', nextStep);
-  document.getElementById('btn-back').addEventListener('click', previousStep);
-});
+     
