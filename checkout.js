@@ -93,19 +93,37 @@ function showSection(stepNum) {
   if (stepNum === 4) {
     paymentSection.style.display = 'block';
     paymentSection.innerHTML = `
-      <div id="stripe-table-container" style="margin-top:2rem;">
-        <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
-        <stripe-pricing-table
-          pricing-table-id="prctbl_1SJubfDQaOEVVvuYrj5ZsfLA"
-          publishable-key="pk_live_51SJCFYDQaOEVVvuYbj1Q7Pc53TwLnsLxRZOux0Fvb0xNGloXgaM4I2SMXjJMmI9rtLtcKVG7Y6ErX0UKD6PNZdIg00ReJSqwZZ">
-        </stripe-pricing-table>
+      <div style="text-align:center; margin-top:1.5rem;">
+        <button id="btn-pay" class="btn highlight" disabled>Pagar ahora</button>
+        <p id="email-warning" style="color:#ff6666; font-size:0.9rem; margin-top:0.5rem; display:none;">
+          Ingresa un correo válido para continuar.
+        </p>
       </div>
     `;
+
+    const payBtn = document.getElementById('btn-pay');
+    const emailInput = document.getElementById('email');
+    const warning = document.getElementById('email-warning');
+
+    // Verifica validez del correo en tiempo real
+    function updatePayButtonState() {
+      const isValid = emailInput.checkValidity() && emailInput.value.trim() !== '';
+      payBtn.disabled = !isValid;
+      warning.style.display = isValid ? 'none' : 'block';
+    }
+
+    updatePayButtonState();
+    emailInput.addEventListener('input', updatePayButtonState);
+
+    // Redirección al pago
+    payBtn.addEventListener('click', () => {
+      const url = PAY_LINKS[selectedPlan.name] || PAY_LINKS['Mini'];
+      window.location.href = url;
+    });
   } else {
     paymentSection.style.display = 'none';
   }
 }
-
 
 function populateSoftwareOptions(version) {
   const container = document.getElementById('software-options');
@@ -182,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.querySelectorAll('input[name="region"]').forEach(r => {
-    r.addEventListener('change', e => {
+    r.addEventListener('change', e => {a
       formData.region = e.target.value;
       updateSummary();
     });
