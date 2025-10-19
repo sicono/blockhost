@@ -333,29 +333,7 @@ async function redirectToStripeCheckout(orderId) {
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Checkout page loaded');
-  
-const emailInput = document.getElementById('email');
-const btnNext = document.getElementById('btn-next');
 
-if (emailInput && btnNext) {
-  const warning = document.createElement('p');
-  warning.textContent = 'Ingresa un correo válido para continuar.';
-  warning.style.color = '#ff6666';
-  warning.style.fontSize = '0.9rem';
-  warning.style.marginTop = '0.5rem';
-  warning.style.display = 'none';
-  emailInput.insertAdjacentElement('afterend', warning);
-
-  function updateEmailState() {
-    const valid = emailInput.checkValidity() && emailInput.value.trim() !== '';
-    btnNext.disabled = !valid;
-    warning.style.display = valid ? 'none' : 'block';
-    formData.email = emailInput.value.trim();
-  }
-
-  emailInput.addEventListener('input', updateEmailState);
-  updateEmailState();
-}
   selectedPlan = getPlanFromURL();
   selectedCurrency = guessCurrency();
 
@@ -409,8 +387,43 @@ if (emailInput && btnNext) {
     btnBack.addEventListener('click', previousStep);
   }
 
+  // ----------- EMAIL VALIDATION SOLO EN PASO 4 -----------
+  if (emailInput && btnNext) {
+    const emailWarning = document.createElement('p');
+    emailWarning.textContent = 'Ingresa un correo válido para continuar.';
+    emailWarning.style.color = '#ff6666';
+    emailWarning.style.fontSize = '0.9rem';
+    emailWarning.style.marginTop = '0.5rem';
+    emailWarning.style.display = 'none';
+    emailInput.insertAdjacentElement('afterend', emailWarning);
+
+    function updateNextButtonState() {
+      if (currentStep === 4) {
+        const valid = emailInput.checkValidity() && emailInput.value.trim() !== '';
+        btnNext.disabled = !valid;
+        emailWarning.style.display = valid ? 'none' : 'block';
+      } else {
+        btnNext.disabled = false;
+        emailWarning.style.display = 'none';
+      }
+    }
+
+    emailInput.addEventListener('input', updateNextButtonState);
+
+    // Intercepta nextStep para actualizar el botón al cambiar de paso
+    const originalNextStep = nextStep;
+    nextStep = async function() {
+      await originalNextStep();
+      updateNextButtonState();
+    };
+
+    // Inicializa estado al cargar
+    updateNextButtonState();
+  }
+
   const stripeScript = document.createElement('script');
   stripeScript.src = 'https://js.stripe.com/v3/';
   stripeScript.async = true;
   document.head.appendChild(stripeScript);
 });
+
