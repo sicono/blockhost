@@ -333,7 +333,29 @@ async function redirectToStripeCheckout(orderId) {
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Checkout page loaded');
+  
+const emailInput = document.getElementById('email');
+const btnNext = document.getElementById('btn-next');
 
+if (emailInput && btnNext) {
+  const warning = document.createElement('p');
+  warning.textContent = 'Ingresa un correo válido para continuar.';
+  warning.style.color = '#ff6666';
+  warning.style.fontSize = '0.9rem';
+  warning.style.marginTop = '0.5rem';
+  warning.style.display = 'none';
+  emailInput.insertAdjacentElement('afterend', warning);
+
+  function updateEmailState() {
+    const valid = emailInput.checkValidity() && emailInput.value.trim() !== '';
+    btnNext.disabled = !valid;
+    warning.style.display = valid ? 'none' : 'block';
+    formData.email = emailInput.value.trim();
+  }
+
+  emailInput.addEventListener('input', updateEmailState);
+  updateEmailState();
+}
   selectedPlan = getPlanFromURL();
   selectedCurrency = guessCurrency();
 
