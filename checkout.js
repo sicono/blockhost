@@ -17,8 +17,8 @@ const SOFTWARE_OPTIONS = {
 
 const PLAN_DATA = {
   'Mini': { name: 'Mini', price: 3.50, ram: 4, storage: 25, players: '15-25' },
-  'Básico': { name: 'Básico', price: 5.50, ram: 6, storage: 50, players: '25-35' },
-  'Estándar': { name: 'Estándar', price: 7.50, ram: 8, storage: 75, players: '35-50' },
+  'Básico': { name: 'Basico', price: 5.50, ram: 6, storage: 50, players: '25-35' },
+  'Estándar': { name: 'Estandar', price: 7.50, ram: 8, storage: 75, players: '35-50' },
   'Plus': { name: 'Plus', price: 9.50, ram: 10, storage: 100, players: '50-70' }
 };
 
