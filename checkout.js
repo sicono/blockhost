@@ -21,38 +21,10 @@ const SOFTWARE_OPTIONS = {
 };
 
 const PLAN_DATA = {
-  'Mini': {
-    name: 'Mini',
-    price: 3.50,
-    ram: 4,
-    storage: 25,
-    players: '15-25',
-    stripePriceId: 'price_1SJLIKDQaOEVVvuYAmHk3s4s'
-  },
-  'Basico': {
-    name: 'Básico',
-    price: 5.50,
-    ram: 6,
-    storage: 50,
-    players: '25-35',
-    stripePriceId: 'price_1SJLJ0DQaOEVVvuYWgdpZ7Y7'
-  },
-  'Estandar': {
-    name: 'Estándar',
-    price: 7.50,
-    ram: 8,
-    storage: 75,
-    players: '35-50',
-    stripePriceId: 'price_1SJLJVDQaOEVVvuYJNoHVGPI'
-  },
-  'Plus': {
-    name: 'Plus',
-    price: 9.50,
-    ram: 10,
-    storage: 100,
-    players: '50-70',
-    stripePriceId: 'price_1SJLJsDQaOEVVvuYyh4r2T6S'
-  }
+  'Mini': { name: 'Mini', price: 3.50, ram: 4, storage: 25, players: '15-25', stripePriceId: 'price_1SJLIKDQaOEVVvuYAmHk3s4s' },
+  'Basico': { name: 'Básico', price: 5.50, ram: 6, storage: 50, players: '25-35', stripePriceId: 'price_1SJLJ0DQaOEVVvuYWgdpZ7Y7' },
+  'Estandar': { name: 'Estándar', price: 7.50, ram: 8, storage: 75, players: '35-50', stripePriceId: 'price_1SJLJVDQaOEVVvuYJNoHVGPI' },
+  'Plus': { name: 'Plus', price: 9.50, ram: 10, storage: 100, players: '50-70', stripePriceId: 'price_1SJLJsDQaOEVVvuYyh4r2T6S' }
 };
 
 const CURRENCIES = {
@@ -70,12 +42,7 @@ let currentStep = 1;
 let selectedPlan = PLAN_DATA.Mini;
 let currentOrderId = null;
 let selectedCurrency = 'EUR';
-let formData = {
-  version: null,
-  software: null,
-  region: null,
-  email: null
-};
+let formData = { version: null, software: null, region: null, email: null };
 
 function guessCurrency() {
   const lang = navigator.language || 'es-ES';
@@ -96,10 +63,7 @@ function formatCurrency(valueEur, code) {
 function getPlanFromURL() {
   const params = new URLSearchParams(window.location.search);
   const planParam = params.get('plan');
-  if (planParam && PLAN_DATA[planParam]) {
-    return PLAN_DATA[planParam];
-  }
-  return PLAN_DATA.Mini;
+  return planParam && PLAN_DATA[planParam] ? PLAN_DATA[planParam] : PLAN_DATA.Mini;
 }
 
 function calculateTotal() {
@@ -130,26 +94,16 @@ function updateSummary() {
 function updateStepIndicator() {
   document.querySelectorAll('.step').forEach((step, index) => {
     const stepNum = index + 1;
-    if (stepNum < currentStep) {
-      step.classList.add('completed');
-      step.classList.remove('active');
-    } else if (stepNum === currentStep) {
-      step.classList.add('active');
-      step.classList.remove('completed');
-    } else {
-      step.classList.remove('active', 'completed');
-    }
+    if (stepNum < currentStep) step.classList.add('completed'), step.classList.remove('active');
+    else if (stepNum === currentStep) step.classList.add('active'), step.classList.remove('completed');
+    else step.classList.remove('active', 'completed');
   });
 }
 
 function showSection(stepNum) {
-  document.querySelectorAll('.form-section').forEach(section => {
-    section.classList.remove('active');
-  });
-  const targetSection = document.querySelector(`[data-section="${stepNum}"]`);
-  if (targetSection) {
-    targetSection.classList.add('active');
-  }
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  const section = document.querySelector(`[data-section="${stepNum}"]`);
+  if (section) section.classList.add('active');
 
   const btnBack = document.getElementById('btn-back');
   const btnNext = document.getElementById('btn-next');
@@ -163,7 +117,6 @@ function showSection(stepNum) {
 function populateSoftwareOptions(version) {
   const container = document.getElementById('software-options');
   container.innerHTML = '';
-
   const options = SOFTWARE_OPTIONS[version] || [];
   options.forEach(opt => {
     const label = document.createElement('label');
@@ -173,13 +126,12 @@ function populateSoftwareOptions(version) {
       <div class="option-content">
         <span class="option-title">${opt.label}</span>
         <span class="option-desc">${opt.desc}</span>
-      </div>
-    `;
+      </div>`;
     container.appendChild(label);
   });
 
   document.querySelectorAll('input[name="software"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
+    radio.addEventListener('change', e => {
       formData.software = e.target.value;
       updateSummary();
     });
@@ -187,50 +139,30 @@ function populateSoftwareOptions(version) {
 }
 
 function validateCurrentStep() {
-  console.log('Validating step:', currentStep);
   switch (currentStep) {
-    case 1:
-      const versionRadio = document.querySelector('input[name="version"]:checked');
-      console.log('Version selected:', versionRadio ? versionRadio.value : 'none');
-      return versionRadio !== null;
-    case 2:
-      const softwareRadio = document.querySelector('input[name="software"]:checked');
-      console.log('Software selected:', softwareRadio ? softwareRadio.value : 'none');
-      return softwareRadio !== null;
-    case 3:
-      const regionRadio = document.querySelector('input[name="region"]:checked');
-      console.log('Region selected:', regionRadio ? regionRadio.value : 'none');
-      return regionRadio !== null;
+    case 1: return !!document.querySelector('input[name="version"]:checked');
+    case 2: return !!document.querySelector('input[name="software"]:checked');
+    case 3: return !!document.querySelector('input[name="region"]:checked');
     case 4:
       const emailInput = document.getElementById('email');
-      console.log('Email entered:', emailInput.value);
       return emailInput.value.trim() !== '' && emailInput.checkValidity();
-    default:
-      return false;
+    default: return false;
   }
 }
 
 async function nextStep() {
-  console.log('Next step clicked, current step:', currentStep);
-
-  if (!validateCurrentStep()) {
-    alert('Por favor completa todos los campos requeridos.');
-    return;
-  }
+  if (!validateCurrentStep()) { alert('Por favor completa todos los campos requeridos.'); return; }
 
   if (currentStep === 4) {
     const emailInput = document.getElementById('email');
     formData.email = emailInput.value.trim();
     const order = await createPendingOrder();
-    if (order) {
-      await redirectToStripeCheckout(order.id);
-    }
+    if (order) await redirectToStripeCheckout(order.id);
     return;
   }
 
   if (currentStep < 4) {
     currentStep++;
-    console.log('Moving to step:', currentStep);
     showSection(currentStep);
     updateStepIndicator();
   }
@@ -246,7 +178,6 @@ function previousStep() {
 
 async function createPendingOrder() {
   try {
-    const { total } = calculateTotal();
     const orderData = {
       email: formData.email,
       plan_name: selectedPlan.name,
@@ -260,93 +191,52 @@ async function createPendingOrder() {
       status: 'pending',
       payment_status: 'pending'
     };
-
-    const { data, error } = await supabase
-      .from('orders')
-      .insert([orderData])
-      .select()
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error creating order:', error);
-      alert('Hubo un error al crear el pedido. Por favor intenta de nuevo.');
-      return null;
-    }
-
+    const { data, error } = await supabase.from('orders').insert([orderData]).select().maybeSingle();
+    if (error) { console.error(error); alert('Error al crear el pedido'); return null; }
     currentOrderId = data.id;
     return data;
   } catch (err) {
-    console.error('Unexpected error:', err);
-    alert('Hubo un error inesperado. Por favor intenta de nuevo.');
-    return null;
+    console.error(err); alert('Error inesperado'); return null;
   }
 }
 
 async function redirectToStripeCheckout(orderId) {
   try {
     const paymentSection = document.getElementById('payment-section');
-    paymentSection.innerHTML = '<p style="text-align: center; color: var(--muted);">Redirigiendo a la pasarela de pago...</p>';
-
+    paymentSection.innerHTML = '<p style="text-align:center;color:var(--muted)">Redirigiendo a la pasarela de pago...</p>';
     const stripe = window.Stripe(config.stripe.publishableKey);
-
     const response = await fetch(`${config.supabase.url}/functions/v1/stripe-checkout`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.supabase.anonKey}`,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.supabase.anonKey}` },
       body: JSON.stringify({
         price_id: selectedPlan.stripePriceId,
         mode: 'payment',
         success_url: `${window.location.origin}/success.html?order_id=${orderId}`,
         cancel_url: `${window.location.origin}/checkout.html?plan=${selectedPlan.name}`,
-        metadata: {
-          order_id: orderId
-        }
+        metadata: { order_id: orderId }
       }),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al iniciar el pago');
-    }
-
+    if (!response.ok) { const e = await response.json(); throw new Error(e.error || 'Error al iniciar el pago'); }
     const { sessionId } = await response.json();
-
     const { error } = await stripe.redirectToCheckout({ sessionId });
-
-    if (error) {
-      console.error('Stripe redirect error:', error);
-      alert('Error al redirigir al pago. Por favor intenta de nuevo.');
-    }
+    if (error) { console.error(error); alert('Error al redirigir al pago'); }
   } catch (error) {
-    console.error('Checkout error:', error);
-    alert('Error al procesar el pago: ' + error.message);
-
+    console.error(error); alert('Error al procesar el pago: ' + error.message);
     const paymentSection = document.getElementById('payment-section');
-    paymentSection.innerHTML = `
-      <p style="color: #ff4444; text-align: center;">Error: ${error.message}</p>
-      <button class="btn primary" onclick="location.reload()">Intentar de nuevo</button>
-    `;
+    paymentSection.innerHTML = `<p style="color:#ff4444;text-align:center;">Error: ${error.message}</p>
+    <button class="btn primary" onclick="location.reload()">Intentar de nuevo</button>`;
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('Checkout page loaded');
-
   selectedPlan = getPlanFromURL();
   selectedCurrency = guessCurrency();
-
-  console.log('Selected plan:', selectedPlan);
-  console.log('Selected currency:', selectedCurrency);
-
   updateSummary();
   showSection(currentStep);
   updateStepIndicator();
 
   document.querySelectorAll('input[name="version"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      console.log('Version changed to:', e.target.value);
+    radio.addEventListener('change', e => {
       formData.version = e.target.value;
       formData.software = null;
       populateSoftwareOptions(formData.version);
@@ -355,40 +245,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.querySelectorAll('input[name="region"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      console.log('Region changed to:', e.target.value);
-      formData.region = e.target.value;
-      updateSummary();
-    });
+    radio.addEventListener('change', e => { formData.region = e.target.value; updateSummary(); });
   });
 
+  // === VALIDACIÓN DEL EMAIL ===
   const emailInput = document.getElementById('email');
   if (emailInput) {
-    emailInput.addEventListener('input', (e) => {
-      formData.email = e.target.value.trim();
-      updateSummary();
-    });
-  }
-
-  const btnNext = document.getElementById('btn-next');
-  const btnBack = document.getElementById('btn-back');
-
-  console.log('Next button found:', btnNext !== null);
-  console.log('Back button found:', btnBack !== null);
-
-  if (btnNext) {
-    btnNext.addEventListener('click', (e) => {
-      console.log('Next button clicked!');
-      nextStep();
-    });
-  }
-
-  if (btnBack) {
-    btnBack.addEventListener('click', previousStep);
-  }
-
-  // ----------- EMAIL VALIDATION SOLO EN PASO 4 -----------
-  if (emailInput && btnNext) {
     const emailWarning = document.createElement('p');
     emailWarning.textContent = 'Ingresa un correo válido para continuar.';
     emailWarning.style.color = '#ff6666';
@@ -397,33 +259,22 @@ document.addEventListener('DOMContentLoaded', () => {
     emailWarning.style.display = 'none';
     emailInput.insertAdjacentElement('afterend', emailWarning);
 
-    function updateNextButtonState() {
-      if (currentStep === 4) {
-        const valid = emailInput.checkValidity() && emailInput.value.trim() !== '';
-        btnNext.disabled = !valid;
-        emailWarning.style.display = valid ? 'none' : 'block';
-      } else {
-        btnNext.disabled = false;
-        emailWarning.style.display = 'none';
-      }
-    }
-
-    emailInput.addEventListener('input', updateNextButtonState);
-
-    // Intercepta nextStep para actualizar el botón al cambiar de paso
-    const originalNextStep = nextStep;
-    nextStep = async function() {
-      await originalNextStep();
-      updateNextButtonState();
-    };
-
-    // Inicializa estado al cargar
-    updateNextButtonState();
+    emailInput.addEventListener('input', () => {
+      formData.email = emailInput.value.trim();
+      updateSummary();
+      const valid = emailInput.checkValidity() && emailInput.value.trim() !== '';
+      emailWarning.style.display = valid ? 'none' : 'block';
+    });
   }
+
+  const btnNext = document.getElementById('btn-next');
+  const btnBack = document.getElementById('btn-back');
+
+  if (btnNext) btnNext.addEventListener('click', nextStep);
+  if (btnBack) btnBack.addEventListener('click', previousStep);
 
   const stripeScript = document.createElement('script');
   stripeScript.src = 'https://js.stripe.com/v3/';
   stripeScript.async = true;
   document.head.appendChild(stripeScript);
 });
-
