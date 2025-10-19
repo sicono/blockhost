@@ -104,21 +104,3 @@ a { color:var(--primary); text-decoration:none; }
 a:hover { text-decoration:underline; }
 
 .site-footer { text-align:center; padding:20px; color:var(--muted); font-size:0.9rem; background: rgba(0,0,0,0.4); border-top:1px solid rgba(255,255,255,0.05); border-radius:0 0 var(--radius) var(--radius); }
-
-.log-terminal {
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  color: #c9cdd4;
-  font-family: "Fira Code", monospace;
-  font-size: 0.95rem;
-  padding: 20px;
-  border-radius: var(--radius);
-  overflow-x: auto;
-  box-shadow: 0 0 15px rgba(0,0,0,0.4);
-  margin-top: 20px;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-.log-terminal b {
-  color: #ff5555;
-}
