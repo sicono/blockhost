@@ -1,4 +1,4 @@
-:root{
+:root {
   --bg:#07060a;
   --panel:#0f0e12;
   --muted:#9aa0ab;
@@ -10,84 +10,181 @@
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial;
 }
 
-html,body{height:100%}
-body{
-  margin:0;
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
   background: transparent;
   position: relative;
   z-index: 0;
-  color:#e6e9ee;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
+  color: #e6e9ee;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* fondo gradiente */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  z-index:-1;
-  background:linear-gradient(180deg,var(--accent-start), var(--accent-end));
-  pointer-events:none;
+/* Fondo gradiente dinámico */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, var(--accent-start), var(--accent-end));
+  pointer-events: none;
+  animation: gradientMove 12s ease-in-out infinite alternate;
 }
 
-/* Header con logo */
-.site-header{
-  display:flex;
-  align-items:center;
-  padding:16px 28px;
-  position:relative;
-  z-index:1;
-}
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.logo{
-  width:42px;
-  height:42px;
-  object-fit:contain;
-  border-radius:6px;
-  background:transparent;
-}
-.brand h1{
-  font-size:20px;
-  margin:0;
-  color:#fff;
+@keyframes gradientMove {
+  from { background-position: top; }
+  to { background-position: bottom; }
 }
 
-/* Página de políticas */
-.policies-page{
-  max-width:800px;
-  margin:40px auto;
-  padding:40px 20px;
-  background:var(--glass);
-  border-radius:var(--radius);
+/* Header */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  background: rgba(15,14,18,0.6);
   backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.policies-page h2{
-  font-size:1.8rem;
-  margin-bottom:24px;
-  text-align:center;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.policies-page section{
-  margin-bottom:28px;
+.logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 6px;
 }
 
-.policies-page h3{
-  font-size:1.3rem;
-  margin-bottom:12px;
-  color:var(--primary);
+.brand h1 {
+  font-size: 20px;
+  margin: 0;
+  color: #fff;
+  font-weight: 600;
 }
 
-.policies-page p{
-  line-height:1.6;
-  color:var(--muted);
-  margin:0;
+.btn {
+  color: #e6e9ee;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* Contenido */
+.policies-page {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 40px 32px;
+  background: var(--glass);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+.policies-page h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.last-updated {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 40px;
+}
+
+section {
+  margin-bottom: 48px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 32px;
+}
+
+section:last-child {
+  border: none;
+}
+
+h2 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: var(--primary);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+h3 {
+  font-size: 1.2rem;
+  color: #e6e9ee;
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+
+p {
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 6px 0 12px;
+}
+
+ul {
+  list-style: none;
+  padding-left: 20px;
+  margin: 10px 0 20px;
+}
+
+ul li {
+  position: relative;
+  margin-bottom: 10px;
+  padding-left: 18px;
+  color: #c9cdd4;
+}
+
+ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
+.site-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  background: rgba(0,0,0,0.4);
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
