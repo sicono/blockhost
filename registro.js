@@ -1,121 +1,172 @@
 /* ...existing code... */
-// Prevent pinch and double-tap zoom on mobile
-window.addEventListener('gesturestart', (e)=> e.preventDefault(), {passive:false});
-window.addEventListener('gesturechange', (e)=> e.preventDefault(), {passive:false});
-document.addEventListener('dblclick', (e)=> {
-  if (matchMedia('(pointer:coarse)').matches) e.preventDefault();
-}, {passive:false});
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
 
-const yearEl = document.getElementById('year');
-if(yearEl) yearEl.textContent = new Date().getFullYear();
+/* Add audio assets for error and success feedback */
+const errorSnd = new Audio('/error_sound.mp3');
+errorSnd.preload = 'auto';
+errorSnd.volume = 0.9;
+const successSnd = new Audio('/success_sound.mp3');
+successSnd.preload = 'auto';
+successSnd.volume = 0.9;
 
-/* Cookie banner logic */
-const COOKIE_KEY = 'blockhost_cookie_pref';
-const cookieBanner = document.getElementById('cookie-banner');
-function showCookieBanner(){
-  if(!cookieBanner) return;
-  cookieBanner.classList.add('show');
-}
-function hideCookieBanner(){
-  if(!cookieBanner) return;
-  cookieBanner.classList.remove('show');
-}
-function setCookiePref(value){
-  try{ localStorage.setItem(COOKIE_KEY, JSON.stringify(value)); }catch(e){}
-  hideCookieBanner();
-}
-document.addEventListener('DOMContentLoaded', ()=>{
-  try{
-    const pref = JSON.parse(localStorage.getItem(COOKIE_KEY));
-    if(!pref) showCookieBanner();
-  }catch(e){
-    showCookieBanner();
+// removed tab interactivity: login is the only available action
+const registroForm = document.getElementById('registroForm');
+// success banner (index page)
+const successBanner = document.getElementById('successBanner');
+
+/* password toggle */
+$$('.pw-toggle').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const id = btn.dataset.for;
+    const inp = document.getElementById(id);
+    if(!inp) return;
+    if(inp.type === 'password'){
+      inp.type = 'text';
+      btn.textContent = 'Ocultar';
+    } else {
+      inp.type = 'password';
+      btn.textContent = 'Mostrar';
+    }
+  });
+});
+
+/* Utility: show inline semi-transparent message near the confirm-password field.
+   Reuse existing #pwMismatch if present (registro.html), otherwise create a transient box. */
+function showPwMismatchMessage(form, message = 'Las contraseñas no coinciden'){
+  // try to find existing small inline element first
+  let inline = form.querySelector('#pwMismatch');
+  if(inline){
+    inline.textContent = message;
+    inline.style.display = 'block';
+    inline.classList.remove('shake');
+    void inline.offsetWidth;
+    inline.classList.add('shake');
+    return;
   }
 
-  const btnAccept = document.getElementById('cookie-accept');
-  const btnDecline = document.getElementById('cookie-decline');
-  const btnManage = document.getElementById('cookie-manage');
-  if(btnAccept) btnAccept.addEventListener('click', ()=> setCookiePref({analytics:true, functional:true, accepted:true}));
-  if(btnDecline) btnDecline.addEventListener('click', ()=> setCookiePref({analytics:false, functional:false, accepted:false}));
-  if(btnManage) btnManage.addEventListener('click', ()=> {
-    // Simple manage action -> open políticas section
-    document.getElementById('politicas')?.scrollIntoView({behavior:'smooth'});
-  });
+  // else check if a created helper already exists
+  let helper = form.querySelector('#pwMismatchBox');
+  if(!helper){
+    // try to find the confirm input to insert after it
+    const confirmInput = form.querySelector('#reg_pw_confirm') || form.querySelector('[name="password_confirm"]');
+    helper = document.createElement('div');
+    helper.id = 'pwMismatchBox';
+    helper.setAttribute('role','alert');
+    helper.setAttribute('aria-live','polite');
+    helper.style.display = 'none';
+    helper.style.marginTop = '10px';
+    helper.style.padding = '10px 12px';
+    helper.style.borderRadius = '10px';
+    helper.style.background = 'linear-gradient(135deg, rgba(255,120,120,0.12), rgba(255,80,80,0.10))';
+    helper.style.color = '#fff';
+    helper.style.fontWeight = '700';
+    helper.style.backdropFilter = 'blur(4px)';
+    helper.style.border = '1px solid rgba(255,90,90,0.12)';
+    helper.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
+    helper.style.transition = 'transform .12s ease, opacity .12s ease';
+    // simple shake animation via class
+    helper.classList.add('pw-mismatch-inline');
+    // minimal CSS for shake (inlined class animation)
+    const styleId = 'pwMismatchBox-styles';
+    if(!document.getElementById(styleId)){
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        @keyframes pwInlineShake { 0%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}100%{transform:translateX(0)} }
+        .pw-mismatch-inline.shake { animation: pwInlineShake .42s ease-in-out; }
+      `;
+      document.head.appendChild(style);
+    }
 
-  // Smooth scroll for in-page anchors (gentle offset to account for header)
-  document.querySelectorAll('a[href^="#"]').forEach(a=>{
-    a.addEventListener('click', (e)=>{
-      const targetId = a.getAttribute('href').slice(1);
-      const target = document.getElementById(targetId);
-      if(target){
-        e.preventDefault();
-        const headerOffset = Math.min(document.querySelector('.site-header')?.offsetHeight || 76, 120);
-        const rect = target.getBoundingClientRect();
-        const top = window.scrollY + rect.top - headerOffset - 12; // small breathing space
-        window.scrollTo({ top, behavior: 'smooth' });
+    if(confirmInput && confirmInput.parentElement){
+      // insert after the confirm input's wrapper if exists, otherwise after the input
+      const parent = confirmInput.parentElement;
+      // try to find an appropriate sibling spot (after the input element wrapper)
+      parent.insertAdjacentElement('afterend', helper);
+    } else {
+      // fallback: append to the form top
+      form.insertAdjacentElement('afterbegin', helper);
+    }
+  }
+
+  helper.textContent = message;
+  helper.style.display = 'block';
+  helper.classList.remove('shake');
+  void helper.offsetWidth;
+  helper.classList.add('shake');
+
+  // auto-hide after 4.2s
+  clearTimeout(helper._hideTimeout);
+  helper._hideTimeout = setTimeout(()=> {
+    helper.style.display = 'none';
+    helper.classList.remove('shake');
+  }, 4200);
+}
+
+// ensure registro behavior degrades gracefully if index contains registro form
+if(registroForm){
+  registroForm.addEventListener('submit', async (ev)=>{
+    ev.preventDefault();
+    if(!registroForm.checkValidity()){ registroForm.reportValidity(); return; }
+    const pw = document.getElementById('reg_pw')?.value;
+    const pwc = document.getElementById('reg_pw_confirm')?.value;
+    if(typeof pw !== 'undefined' && pw !== pwc){
+      // replace default alert with inline semi-transparent message box
+      showPwMismatchMessage(registroForm, 'Las contraseñas no coinciden');
+      // play error sound for feedback
+      try { errorSnd.currentTime = 0; errorSnd.play(); } catch(e){ /* ignore playback errors */ }
+      // focus the first password field for convenience
+      const firstPw = document.getElementById('reg_pw') || registroForm.querySelector('[name="password"]');
+      if(firstPw) firstPw.focus();
+      return;
+    }
+    const datos = Object.fromEntries(new FormData(registroForm));
+    const btn = document.getElementById('registroBtn') || registroForm.querySelector('.btn');
+    const dots = btn?.querySelector('.dots');
+    const successBanner = document.getElementById('successBanner');
+    try {
+      if(btn){ btn.disabled = true; btn.setAttribute('aria-busy','true'); if(dots) dots.style.display='inline-block'; }
+      const res = await fetch('https://api-registro.mc-blockhost.workers.dev/crear_usuario', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(datos)
+      });
+      const data = await res.json();
+      if(res.ok){
+        if(successBanner) successBanner.style.display='block';
+        // play success sound then redirect
+        try { successSnd.currentTime = 0; await successSnd.play(); } catch(e){ /* ignore autoplay restrictions */ }
+        setTimeout(()=> window.location.href = 'https://panel.blockhost.es', 1400);
+      } else {
+        // show API error inline if possible
+        try { errorSnd.currentTime = 0; errorSnd.play(); } catch(e){ /* ignore */ }
+        const formMsg = registroForm.querySelector('.msg-banner') || registroForm.querySelector('#formMessage');
+        if(formMsg){
+          formMsg.textContent = data.mensaje || 'Error en el registro.';
+          formMsg.classList.add('show','error');
+        } else {
+          alert(data.mensaje || 'Error en el registro.');
+        }
       }
-    });
+    } catch(err){
+      console.error(err);
+      try { errorSnd.currentTime = 0; errorSnd.play(); } catch(e){ /* ignore */ }
+      const formMsg = registroForm.querySelector('.msg-banner') || registroForm.querySelector('#formMessage');
+      if(formMsg){
+        formMsg.textContent = 'Error al conectar con el servidor';
+        formMsg.classList.add('show','error');
+      } else {
+        alert('Error al conectar con el servidor.');
+      }
+    } finally {
+      if(btn){ btn.disabled = false; btn.removeAttribute('aria-busy'); if(dots) dots.style.display='none'; }
+    }
   });
+}
 
-  // Subtle parallax on mousemove for the plans background (desktop only)
-  // remove parallax mousemove behavior to prevent page shifting on mouse movement
-  // const plans = document.querySelector('.plans');
-  // if(plans && window.matchMedia('(pointer:fine)').matches){
-  //   window.addEventListener('mousemove', (e)=>{
-  //     const rect = plans.getBoundingClientRect();
-  //     const x = (e.clientX - rect.left) / rect.width; // 0 - 1
-  //     const y = (e.clientY - rect.top) / rect.height;
-  //     const px = (x - 0.5) * 8; // small shift in px
-  //     const py = (y - 0.5) * 4;
-  //     plans.style.transform = `translate3d(${px}px, ${py}px, 0)`;
-  //   });
-  //   plans.addEventListener('mouseleave', ()=> { plans.style.transform = ''; });
-  // }
-
-  // Note: Built-in auth modal removed; header buttons link directly to sesion.html and registro.html
-
-  // Currency detection + selector
-  const CURRENCIES = {
-    USD: { rate: 1.08, locales: ['en-US','es-PA'], label: 'Dólares (USD)' }, // Panama uses USD
-    PEN: { rate: 4.04, locales: ['es-PE'], label: 'Perú — Soles (PEN)' },
-    MXN: { rate: 19.5, locales: ['es-MX'], label: 'México — Pesos (MXN)' },
-    COP: { rate: 4390, locales: ['es-CO'], label: 'Colombia — Pesos (COP)' },
-    ARS: { rate: 980, locales: ['es-AR'], label: 'Argentina — Pesos (ARS)' },
-    VES: { rate: 39, locales: ['es-VE'], label: 'Venezuela — Bolívar (VES)' },
-    BOB: { rate: 7.4, locales: ['es-BO'], label: 'Bolivia — Boliviano (BOB)' },
-    EUR: { rate: 1, locales: ['es-ES'], label: 'Europa — Euros (EUR)' },
-  };
-  const currencySelect = document.getElementById('currency-select');
-  const amounts = Array.from(document.querySelectorAll('.amount[data-eur]'));
-
-  function guessCurrency(){
-    const lang = navigator.language || 'es-ES';
-    const match = Object.entries(CURRENCIES).find(([,v])=> v.locales.some(l=> lang.startsWith(l)));
-    return match ? match[0] : 'USD';
-  }
-  function formatCurrency(valueEur, code){
-    const { rate } = CURRENCIES[code] || CURRENCIES.USD;
-    const converted = valueEur * rate;
-    return new Intl.NumberFormat(undefined, { style:'currency', currency: code, maximumFractionDigits: code==='COP'||code==='ARS'||code==='VES'?0:2 }).format(converted);
-  }
-  function updatePrices(code){
-    amounts.forEach(el=>{
-      const eur = parseFloat(el.dataset.eur);
-      el.textContent = formatCurrency(eur, code);
-    });
-  }
-  if(currencySelect){
-    // remove native <select> initialization (replaced by custom dropdown)
-    // currencySelect.innerHTML = "";
-    // Object.entries(CURRENCIES).forEach(([code, meta])=>{ /* ... */ });
-    // const initial = guessCurrency();
-    // currencySelect.value = initial;
-    // updatePrices(initial);
-    // currencySelect.addEventListener('change', ()=> updatePrices(currencySelect.value));
-  }
-  // expose currency helpers for the custom dropdown
-  window.BlockHostCurrency = { CURRENCIES, amounts, formatCurrency, updatePrices, guessCurrency };
-
-  /* Removed Three.js particle/canvas block because the plans section and canvas were deleted.
-     If you later re-add a canvas container, reintroduce the Three.js code safely. */
+/* add subtle hover glow on primary button for polish */
+document.querySelectorAll('.btn').forEach(b=>{
+  b.addEventListener('mouseenter', ()=> b.style.transform='translateY(-3px) scale(1.01)');
+  b.addEventListener('mouseleave', ()=> b.style.transform='');
 });
