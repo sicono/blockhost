@@ -1,57 +1,168 @@
-/* ...existing styles... */
-/* Center login card on desktop and tighten responsive sizing */
-html,body{height:100%;margin:0;padding:0;}
-body{
-  background: url("fondito.jpg") center/cover no-repeat fixed;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  color: #eef0fb;
+/* Styles specifically for registration UI and small animation/override helpers */
+
+/* Typography: force the "Registrarse" action to use Arial (Arial / Helvetica fallback) */
+.btn#registroBtn,
+.btn[data-role="registro"],
+button.registro-cta {
+  /* use the same font as the subtitle above (inherit from card/root) */
+  font-family: inherit;
+  font-weight: 400;
+  letter-spacing: 0.2px;
 }
 
-/* main layout: fixed two-column on wide screens, card column fixed 380px */
-.wrap{
-  width:100%;
-  max-width:1280px; /* increased overall max-width */
-  margin:28px;
-  display:grid;
-  grid-template-columns: 1fr 380px;
-  gap:28px;
-  align-items:center;
-  justify-items:center;
-  min-height: calc(100vh - 56px); /* ensure vertical centering area */
+/* Ensure general .btn also falls back to Arial for registration pages */
+.btn {
+  /* revert explicit Arial override so buttons inherit page typography */
+  font-family: inherit;
 }
 
-/* ensure the card sits centered in its column on desktop */
-.card{
-  justify-self:center;
-  align-self:center;
-  margin:0;
-  width:100%;
-  max-width:380px;
-  box-sizing:border-box;
+/* Button pulse + hover animation for emphasis */
+@keyframes pulse {
+  0% { box-shadow: 0 8px 30px rgba(106,78,255,0.14), 0 0 0 0 rgba(106,78,255,0.10); transform: translateY(0) }
+  50% { box-shadow: 0 14px 38px rgba(106,78,255,0.18), 0 0 18px 6px rgba(106,78,255,0.06); transform: translateY(-2px) }
+  100% { box-shadow: 0 8px 30px rgba(106,78,255,0.14), 0 0 0 0 rgba(106,78,255,0.00); transform: translateY(0) }
+}
+.btn#registroBtn {
+  animation: pulse 3.6s ease-in-out infinite;
+  transition: transform .16s ease, box-shadow .16s ease, opacity .12s ease;
 }
 
-/* compact and centered card for mobile */
+/* Hover micro-interaction */
+.btn#registroBtn:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 18px 48px rgba(106,78,255,0.18);
+}
+
+/* When loading, slow down pulse and hide animation flicker */
+.btn#registroBtn[aria-busy="true"] {
+  animation-play-state: paused;
+  opacity: 0.92;
+}
+
+/* Dots animation visibility and smoother motion */
+.btn .dots { display: inline-block; margin-left: 8px; vertical-align: middle; opacity: 0; transform: translateY(0); transition: opacity .18s ease, transform .18s ease; }
+.btn[aria-busy="true"] .dots { opacity: 1; transform: translateY(-2px); }
+
+/* Message banners inside the card (error / success) */
+.msg-banner{
+  display:none;
+  margin:12px 0;
+  padding:10px 12px;
+  border-radius:10px;
+  font-weight:700;
+  text-align:center;
+  box-shadow:0 8px 28px rgba(0,0,0,0.12);
+  transform-origin:top center;
+  animation-duration:.36s;
+  animation-fill-mode:forwards;
+}
+
+/* error (red) */
+.msg-banner.error{
+  background: linear-gradient(135deg,#ff6b6b,#ff4b4b);
+  color: #2b0b0b;
+  border:1px solid rgba(255,90,90,0.14);
+}
+
+/* success (green) - keep existing look but use banner class */
+.msg-banner.success{
+  background:linear-gradient(135deg,#0fdc82,#12b886);
+  color:#04251a;
+  border:1px solid rgba(6,120,70,0.08);
+}
+
+/* entrance/exit animations */
+@keyframes slideDownFade {
+  0% { opacity: 0; transform: translateY(-10px) scale(.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes shake {
+  0%{ transform: translateX(0) }
+  20%{ transform: translateX(-6px) }
+  40%{ transform: translateX(6px) }
+  60%{ transform: translateX(-4px) }
+  80%{ transform: translateX(4px) }
+  100%{ transform: translateX(0) }
+}
+.msg-banner.show { display:block; animation-name: slideDownFade; }
+
+/* quick shake for error emphasis */
+.msg-banner.shake { animation-name: shake; animation-duration: .42s; }
+
+/* ensure success banner uses same class if present */
+#successBanner { display:none; } /* keep default hidden; JS will toggle classes */
+
+/* Success banner entrance animation */
+@keyframes slideDownFade {
+  0% { opacity: 0; transform: translateY(-10px) scale(.98) }
+  100% { opacity: 1; transform: translateY(0) scale(1) }
+}
+#successBanner.show {
+  display: block !important;
+  animation: slideDownFade .34s cubic-bezier(.2,.9,.3,1);
+}
+
+/* Success modal pop is already present in markup; add subtle scale for polish */
+.success-modal .success-card {
+  transform-origin: center;
+  transition: transform .28s cubic-bezier(.2,.9,.3,1), opacity .28s ease;
+}
+.success-modal.show .success-card { transform: scale(1.01); }
+
+/* Small micro-interactions for inputs and card */
+input, .card {
+  transition: box-shadow .18s ease, transform .12s ease, background-color .18s ease;
+}
+input:focus { box-shadow: 0 10px 30px rgba(100,40,200,0.08); transform: translateY(-2px); }
+
+/* Improve mobile compactness slightly (overrides if present) */
 @media (max-width:880px){
-  body{align-items:flex-start;padding-top:28px;}
-  .wrap{
-    grid-template-columns:1fr;
-    padding:18px;
-    max-width:640px;
-    margin:18px auto;
-    gap:18px;
-  }
-  .card{
-    order:2;
-    padding:12px;
-    max-width:360px;
-    width:92%;
-    margin:0 auto;
-    border-radius:12px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
-  }
+  .card { padding: 10px !important; max-width: 360px !important; width: 94% !important; }
+  .btn#registroBtn { padding: 10px 12px; font-size: 15px; }
 }
-/* ...existing styles... */
+
+/* Utility: mark registration CTA if other pages need to target it */
+button.registro-cta, .btn#registroBtn { cursor: pointer; }
+
+/* Accessibility focus styles */
+.btn:focus, input:focus, .pw-toggle:focus {
+  outline: 3px solid rgba(106,78,255,0.16);
+  outline-offset: 2px;
+}
+
+/* Add a subtle entrance animation for the registration card */
+@keyframes cardEnter {
+  0% { opacity: 0; transform: translateY(8px) scale(.996) }
+  100% { opacity: 1; transform: translateY(0) scale(1) }
+}
+.card { animation: cardEnter .36s cubic-bezier(.2,.9,.3,1); }
+
+/* inline password mismatch small message under confirm field */
+.pw-error{
+  display:none;
+  color:#ffefef;
+  background: linear-gradient(135deg,#ff7b7b,#ff5b5b);
+  color:#2b0b0b;
+  padding:8px 10px;
+  border-radius:8px;
+  font-weight:700;
+  font-size:13px;
+  margin-top:6px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.12);
+}
+
+/* small shake animation for the inline message when triggered */
+@keyframes pwShake {
+  0%{ transform: translateX(0) }
+  20%{ transform: translateX(-6px) }
+  40%{ transform: translateX(6px) }
+  60%{ transform: translateX(-4px) }
+  80%{ transform: translateX(4px) }
+  100%{ transform: translateX(0) }
+}
+.pw-error.shake { animation: pwShake .42s ease-in-out; }
+
+/* keep font size compact on mobile */
+@media (max-width:880px){
+  .pw-error { font-size:13px; padding:8px; }
+}
