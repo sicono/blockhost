@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Blockhost — Registrarse</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600;700&display=swap">
+<link rel="stylesheet" href="/registro.css">
 <style>
 :root{
   --bg1:#39276A;
@@ -114,6 +115,20 @@ input:focus{
   transform:translateY(-2px);
 }
 
+/* inline messages */
+.pw-error{
+  display:none;
+  color:#2b0b0b;
+  background:linear-gradient(135deg,#ff7b7b,#ff5b5b);
+  padding:8px 10px;border-radius:8px;font-weight:700;font-size:13px;margin-top:6px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.12);
+}
+.msg-banner{
+  display:none;margin-top:12px;padding:12px;border-radius:10px;font-weight:700;text-align:center;
+}
+.msg-banner.error{ background: linear-gradient(135deg,#ff6b6b,#ff4b4b); color:#2b0b0b; }
+.msg-banner.success{ background: linear-gradient(135deg,#0fdc82,#12b886); color:#04251a; }
+
 /* Responsive */
 @media (max-width:880px){
   body{align-items:flex-start;padding-top:28px;}
@@ -138,41 +153,146 @@ input:focus{
 </head>
 <body>
 <div class="wrap">
-  <aside class="card">
+  <aside class="card" role="region" aria-labelledby="regTitle">
     <div class="card-header">
       <div class="logo-sm"><img src="logo.png" alt="Blockhost" style="width:100%;height:100%;object-fit:cover"></div>
       <div><strong>BlockHost</strong></div>
     </div>
-    <div class="form-title">Registrarse</div>
-    <form id="registroForm">
+    <div class="form-title" id="regTitle">Registrarse</div>
+    <form id="registroForm" novalidate>
       <input name="nombre" placeholder="Nombre" required>
       <input name="apellido" placeholder="Apellido" required>
       <input name="username" placeholder="Usuario" required>
       <input name="email" type="email" placeholder="Correo" required>
-      <input name="password" type="password" placeholder="Contraseña" required>
+      <input id="pw" name="password" type="password" placeholder="Contraseña" required>
+      <input id="pw_confirm" name="password_confirm" type="password" placeholder="Repetir contraseña" required>
+
+      <!-- inline password mismatch message (hidden by default) -->
+      <div id="pwMismatch" class="pw-error" role="alert" aria-live="polite">Las contraseñas no coinciden</div>
+
+      <!-- inline message banners (error / success) -->
+      <div id="formMessage" class="msg-banner" role="status" aria-live="polite"></div>
+
       <div class="actions">
-        <button type="submit" class="btn">Registrarse</button>
+        <button type="submit" class="btn" id="registroBtn" aria-role="registro" data-role="registro">
+          Registrarse
+          <span class="dots" aria-hidden="true" style="display:none;margin-left:10px"><span></span><span></span><span></span></span>
+        </button>
       </div>
     </form>
+
+    <div id="successBanner" role="status" aria-live="polite" class="msg-banner success" style="display:none;">
+      Registro completado — redirigiendo...
+    </div>
   </aside>
 </div>
 
 <script>
-document.getElementById('registroForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const datos = Object.fromEntries(new FormData(e.target));
-  try {
-    const res = await fetch('https://api-registro.mc-blockhost.workers.dev/crear_usuario', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(datos)
-    });
-    const data = await res.json();
-    alert(data.mensaje || JSON.stringify(data));
-  } catch (err) {
-    alert("Error al conectar con el servidor.");
+/* Enhance registro form to use the API, play sounds, show inline messages and redirect */
+(function(){
+  const form = document.getElementById('registroForm');
+  const btn = document.getElementById('registroBtn');
+  const dots = btn.querySelector('.dots');
+  const pw = document.getElementById('pw');
+  const pwc = document.getElementById('pw_confirm');
+  const pwMismatch = document.getElementById('pwMismatch');
+  const formMessage = document.getElementById('formMessage');
+  const successBanner = document.getElementById('successBanner');
+
+  const successSnd = new Audio('/success_sound.mp3'); successSnd.preload = 'auto'; successSnd.volume = 0.9;
+  const errorSnd = new Audio('/error_sound.mp3'); errorSnd.preload = 'auto'; errorSnd.volume = 0.9;
+
+  function showInlineError(text){
+    formMessage.className = 'msg-banner error';
+    formMessage.textContent = text;
+    formMessage.style.display = 'block';
+    formMessage.animate([{opacity:0, transform:'translateY(-6px)'},{opacity:1, transform:'translateY(0)'}], {duration:260, easing:'cubic-bezier(.2,.9,.3,1)'});
   }
-});
+  function showInlineSuccess(text){
+    formMessage.className = 'msg-banner success';
+    formMessage.textContent = text;
+    formMessage.style.display = 'block';
+  }
+  function hideInlineMessage(){
+    formMessage.style.display = 'none';
+    formMessage.textContent = '';
+  }
+
+  function updatePwMismatch(){
+    if(!pwc || !pwMismatch) return;
+    if(pwc.value.length === 0){
+      pwMismatch.style.display = 'none';
+      return;
+    }
+    if(pw.value !== pwc.value){
+      pwMismatch.style.display = 'block';
+    } else {
+      pwMismatch.style.display = 'none';
+    }
+  }
+  pw?.addEventListener('input', updatePwMismatch);
+  pwc?.addEventListener('input', updatePwMismatch);
+
+  async function handleSubmit(e){
+    e.preventDefault();
+    hideInlineMessage();
+
+    if(!form.checkValidity()){
+      form.reportValidity();
+      return;
+    }
+
+    if(pw && pwc && pw.value !== pwc.value){
+      pwMismatch.style.display = 'block';
+      pwMismatch.classList.remove('shake');
+      void pwMismatch.offsetWidth;
+      pwMismatch.classList.add('shake');
+      try { errorSnd.currentTime = 0; errorSnd.play(); } catch(_) {}
+      pw.focus();
+      return;
+    } else {
+      pwMismatch.style.display = 'none';
+    }
+
+    const datos = Object.fromEntries(new FormData(form));
+    try {
+      btn.disabled = true;
+      btn.setAttribute('aria-busy','true');
+      if(dots) dots.style.display = 'inline-block';
+      // call API
+      const res = await fetch('https://api-registro.mc-blockhost.workers.dev/crear_usuario', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(datos)
+      });
+      const data = await res.json();
+
+      if(res.ok){
+        // success UI
+        try { successSnd.currentTime = 0; await successSnd.play(); } catch(_) {}
+        showInlineSuccess('Registro correcto — redirigiendo...');
+        if(successBanner) successBanner.style.display = 'block';
+        setTimeout(()=> location.href = 'https://panel.blockhost.es', 1200);
+      } else {
+        // API error -> show message (no redirect)
+        try { errorSnd.currentTime = 0; errorSnd.play(); } catch(_) {}
+        showInlineError(data.mensaje || 'Error en el registro');
+      }
+    } catch (err) {
+      console.error(err);
+      try { errorSnd.currentTime = 0; errorSnd.play(); } catch(_) {}
+      showInlineError('Error al conectar con el servidor');
+    } finally {
+      btn.disabled = false;
+      btn.removeAttribute('aria-busy');
+      if(dots) dots.style.display = 'none';
+    }
+  }
+
+  form.addEventListener('submit', handleSubmit);
+
+  // small accessibility: press Enter on password confirm triggers submit naturally
+})();
 </script>
 </body>
 </html>
