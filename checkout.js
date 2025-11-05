@@ -222,7 +222,7 @@ async function nextStep() {
     return;
   }
 
-  if (currentStep === 5) {
+  if (currentStep === 4) {
     const emailInput = document.getElementById('email');
     formData.email = emailInput.value.trim();
     const order = await createPendingOrder();
