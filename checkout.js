@@ -1,9 +1,8 @@
-// checkout.js — versión final: redirige a Stripe según el plan elegido
+// checkout.js — versión final con detección de plan correcta
 const sections = document.querySelectorAll(".form-section");
 const steps = document.querySelectorAll(".step");
 const btnNext = document.getElementById("btn-next");
 const btnBack = document.getElementById("btn-back");
-const paymentSection = document.getElementById("payment-section");
 
 const summaryVersion = document.getElementById("summary-version");
 const summarySoftware = document.getElementById("summary-software");
@@ -26,6 +25,38 @@ function normalizePlanName(raw) {
   raw = raw.replace(/^Plan\s*/i, "").trim();
   raw = raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+}
+
+function getPlanFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const plan = params.get("plan");
+  if (!plan) return "Mini";
+  const fixed = plan.charAt(0).toUpperCase() + plan.slice(1).toLowerCase();
+  return ["Mini", "Basico", "Estandar", "Plus"].includes(fixed)
+    ? fixed
+    : "Mini";
+}
+
+let selectedPlan = getPlanFromURL();
+
+function updatePlanDisplay() {
+  const planTitle = document.getElementById("plan-title");
+  const specRam = document.getElementById("spec-ram");
+  const specStorage = document.getElementById("spec-storage");
+  const specPlayers = document.getElementById("spec-players");
+
+  const plans = {
+    Mini: { ram: 4, storage: 25, players: "15-25" },
+    Basico: { ram: 6, storage: 50, players: "25-35" },
+    Estandar: { ram: 8, storage: 75, players: "35-50" },
+    Plus: { ram: 10, storage: 100, players: "50-70" },
+  };
+
+  const planData = plans[selectedPlan] || plans.Mini;
+  planTitle.textContent = `Plan ${selectedPlan}`;
+  specRam.textContent = `${planData.ram}GB`;
+  specStorage.textContent = `${planData.storage} GB SSD`;
+  specPlayers.textContent = planData.players;
 }
 
 function goToStep(step) {
@@ -70,11 +101,8 @@ function updateSummary() {
 }
 
 function redirectToStripe() {
-  const rawPlanTitle =
-    document.getElementById("plan-title")?.textContent?.trim() || "Mini";
-  const planKey = normalizePlanName(rawPlanTitle);
-  const link = stripeLinks[planKey] || stripeLinks.Mini;
-  window.location.href = link; // Redirige directamente al enlace del plan
+  const link = stripeLinks[selectedPlan] || stripeLinks.Mini;
+  window.location.href = link;
 }
 
 // --- Botones de navegación ---
@@ -146,5 +174,6 @@ const emailInput = document.getElementById("email");
 if (emailInput) emailInput.addEventListener("input", updateSummary);
 
 // --- Inicialización ---
+updatePlanDisplay();
 goToStep(1);
 updateSummary();
