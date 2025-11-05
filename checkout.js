@@ -158,8 +158,8 @@ function showSection(stepNum) {
   const paymentSection = document.getElementById('payment-section');
 
   btnBack.style.display = stepNum > 1 ? 'block' : 'none';
-  btnNext.style.display = stepNum < 5 ? 'block' : 'none';
-  paymentSection.style.display = stepNum === 5 ? 'block' : 'none';
+  btnNext.style.display = stepNum < 4 ? 'block' : 'none';
+  paymentSection.style.display = stepNum === 4 ? 'block' : 'none';
 }
 
 function populateSoftwareOptions(version) {
