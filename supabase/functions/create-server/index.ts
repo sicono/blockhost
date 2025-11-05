@@ -41,47 +41,47 @@ interface ServerConfig {
 
 const SOFTWARE_TO_EGG: Record<string, { egg_id: number; docker_image: string; startup: string }> = {
   'Vanilla': {
-    egg_id: 1,
+    egg_id: 14,
     docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
     startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
   },
   'Paper': {
-    egg_id: 3,
-    docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
-    startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
-  },
-  'Spigot': {
-    egg_id: 2,
-    docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
-    startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
-  },
-  'Fabric': {
-    egg_id: 4,
-    docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
-    startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
-  },
-  'Forge': {
     egg_id: 5,
     docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
     startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
   },
-  'Sponge': {
-    egg_id: 6,
+  'Spigot': {
+    egg_id: 8,
     docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
     startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
   },
-  'Archlight': {
+  'Fabric': {
+    egg_id: 13,
+    docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
+    startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
+  },
+  'Forge': {
     egg_id: 7,
     docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
     startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
   },
+  'Sponge': {
+    egg_id: 39,
+    docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
+    startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
+  },
+  'Archlight': {
+    egg_id: 41,
+    docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
+    startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}'
+  },
   'Pocketmine': {
-    egg_id: 8,
+    egg_id: 27,
     docker_image: 'ghcr.io/pterodactyl/yolks:php_8.1',
     startup: './bin/php7/bin/php ./PocketMine-MP.phar'
   },
   'Nukkit': {
-    egg_id: 9,
+    egg_id: 28,
     docker_image: 'ghcr.io/pterodactyl/yolks:java_17',
     startup: 'java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar nukkit.jar'
   }
@@ -116,6 +116,7 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
 
     if (orderError || !order) {
+      console.log('Order error:', orderError);
       return new Response(
         JSON.stringify({ error: 'Order not found or not paid' }),
         {
@@ -178,6 +179,8 @@ Deno.serve(async (req: Request) => {
       },
     };
 
+    console.log('Creating server with config:', JSON.stringify(serverConfig));
+
     const pterodactylResponse = await fetch(
       `${PTERODACTYL_URL}/api/application/servers`,
       {
@@ -207,15 +210,22 @@ Deno.serve(async (req: Request) => {
     }
 
     const serverData = await pterodactylResponse.json();
+    console.log('Server created:', JSON.stringify(serverData));
+
+    const updateData: any = {
+      pterodactyl_server_id: serverData.attributes.id,
+      pterodactyl_identifier: serverData.attributes.identifier,
+      status: 'active',
+      updated_at: new Date().toISOString(),
+    };
+
+    if (order.custom_ip) {
+      updateData.custom_ip = order.custom_ip;
+    }
 
     await supabase
       .from('orders')
-      .update({
-        pterodactyl_server_id: serverData.attributes.id,
-        pterodactyl_identifier: serverData.attributes.identifier,
-        status: 'active',
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', order_id);
 
     return new Response(
