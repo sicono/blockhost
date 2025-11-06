@@ -469,3 +469,21 @@ body::before{
 @media (max-width:560px){
   .plans-box{padding:14px;border-radius:10px}
 }
+
+               /* --- Productos únicos --- */
+.productos-unicos {
+  margin-top: 4rem;
+  text-align: center;
+}
+
+.productos-unicos h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-color, #fff);
+}
+
+.plan-grid.productos {
+  justify-content: center;
+  gap: 2rem;
+}
+
