@@ -288,16 +288,14 @@ body::before{
   position: fixed;
   bottom: 80px; /* justo encima del Discord */
   right: 20px;
-  background-color: #25D366; /* verde oficial de WhatsApp */
+  background-color: #25D366;
   color: white;
-  text-decoration: none;
-  border-radius: 50px;
-  padding: 8px 14px;
-  font-weight: 600;
-  font-size: 14px;
-  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.2s, background-color 0.2s;
   z-index: 1000;
@@ -310,12 +308,9 @@ body::before{
 
 .whatsapp-badge svg {
   fill: white;
+  width: 22px;
+  height: 22px;
 }
-
-.whatsapp-text {
-  font-family: 'Inter', sans-serif;
-}
-
 
 /* Header adjustments: larger logo/title/subtitle on desktop and tighter button widths */
 .brand h1{margin:0;font-size:18px;letter-spacing:0.4px}
