@@ -1,4 +1,4 @@
-// checkout.js — versión actualizada para 7 productos
+// checkout.js — versión final (Addons y Setups redirigen directamente)
 const sections = document.querySelectorAll(".form-section");
 const steps = document.querySelectorAll(".step");
 const btnNext = document.getElementById("btn-next");
@@ -11,7 +11,7 @@ const summaryEmail = document.getElementById("summary-email");
 
 let currentStep = 1;
 
-// Enlaces de Stripe para cada producto
+// Enlaces de Stripe
 const stripeLinks = {
   Mini:   "https://buy.stripe.com/14A5kD1cO0v38Lb2ng4wM04",
   Basico: "https://buy.stripe.com/9B6dR95t491z9Pf5zs4wM05",
@@ -22,15 +22,7 @@ const stripeLinks = {
   Setups: "https://buy.stripe.com/6oU6oH5t40v30eF7HA4wM0d"
 };
 
-// Función para limpiar y normalizar el nombre del plan
-function normalizePlanName(raw) {
-  if (!raw) return "Mini";
-  raw = raw.replace(/^Plan\s*/i, "").trim();
-  raw = raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
-}
-
-// Función para obtener plan desde URL
+// Obtener el plan desde la URL
 function getPlanFromURL() {
   const params = new URLSearchParams(window.location.search);
   const plan = params.get("plan");
@@ -42,141 +34,138 @@ function getPlanFromURL() {
 
 let selectedPlan = getPlanFromURL();
 
-// Función para actualizar título y specs del plan en resumen
-function updatePlanDisplay() {
+// Si el plan es Addons o Setups, redirigir directamente
+if (selectedPlan === "Addons" || selectedPlan === "Setups") {
+  window.location.href = stripeLinks[selectedPlan];
+} else {
+  // --- Flujo normal para planes mensuales ---
   const planTitleEl = document.getElementById("plan-title");
-  const specRam      = document.getElementById("spec-ram");
-  const specStorage  = document.getElementById("spec-storage");
-  const specPlayers  = document.getElementById("spec-players");
+  const specRam = document.getElementById("spec-ram");
+  const specStorage = document.getElementById("spec-storage");
+  const specPlayers = document.getElementById("spec-players");
 
-  // Datos para cada plan
   const planDataMap = {
-    Mini:    { ram: 4,  storage: 25,  players: "15-25",  unit: "mes" },
-    Basico:  { ram: 6,  storage: 50,  players: "25-35",  unit: "mes" },
-    Estandar:{ ram: 8,  storage: 75,  players: "35-50",  unit: "mes" },
-    Plus:    { ram:10,  storage:100,  players: "50-70",  unit: "mes" },
-    Pro:     { ram:15,  storage:150,  players: "70-100", unit: "mes" },
-    Addons:  { ram:"-", storage:"-", players:"-",       unit: "único" },
-    Setups:  { ram:"-", storage:"-", players:"-",       unit: "único" },
+    Mini:    { ram: 4,  storage: 25,  players: "15-25" },
+    Basico:  { ram: 6,  storage: 50,  players: "25-35" },
+    Estandar:{ ram: 8,  storage: 75,  players: "35-50" },
+    Plus:    { ram:10,  storage:100,  players: "50-70" },
+    Pro:     { ram:15,  storage:150,  players: "70-100" },
   };
 
-  const d = planDataMap[selectedPlan] || planDataMap.Mini;
-  planTitleEl.textContent    = `Plan ${selectedPlan}`;
-  specRam.textContent        = d.ram   === "-" ? "-" : `${d.ram} GB`;
-  specStorage.textContent    = d.storage === "-" ? "-" : `${d.storage} GB SSD`;
-  specPlayers.textContent    = d.players;
-}
+  function updatePlanDisplay() {
+    const d = planDataMap[selectedPlan] || planDataMap.Mini;
+    planTitleEl.textContent = `Plan ${selectedPlan}`;
+    specRam.textContent = `${d.ram} GB`;
+    specStorage.textContent = `${d.storage} GB SSD`;
+    specPlayers.textContent = d.players;
+  }
 
-// Funciones de navegación y validación
-function goToStep(step) {
-  if (step < 1 || step > sections.length) return;
-  sections.forEach(s => s.classList.remove("active"));
-  steps.forEach(st => st.classList.remove("active"));
-  sections[step-1].classList.add("active");
-  steps[step-1].classList.add("active");
+  function goToStep(step) {
+    if (step < 1 || step > sections.length) return;
+    sections.forEach(s => s.classList.remove("active"));
+    steps.forEach(st => st.classList.remove("active"));
+    sections[step - 1].classList.add("active");
+    steps[step - 1].classList.add("active");
+    currentStep = step;
+    btnBack.style.display = step > 1 ? "inline-block" : "none";
+    btnNext.textContent = step === sections.length ? "Pagar ahora" : "Siguiente →";
+  }
 
-  currentStep = step;
-  btnBack.style.display = step > 1 ? "inline-block" : "none";
-  btnNext.textContent = (step === sections.length) ? "Pagar ahora" : "Siguiente →";
-}
-
-function validateStep() {
-  const activeSection = sections[currentStep-1];
-  const requiredInputs = activeSection.querySelectorAll("input[required]");
-  for (const input of requiredInputs) {
-    if (
-      (input.type === "radio" && !activeSection.querySelector(`input[name="${input.name}"]:checked`)) ||
-      (input.type !== "radio" && !input.value.trim())
-    ) {
-      input.classList.add("error");
-      input.focus();
-      return false;
+  function validateStep() {
+    const activeSection = sections[currentStep - 1];
+    const requiredInputs = activeSection.querySelectorAll("input[required]");
+    for (const input of requiredInputs) {
+      if (
+        (input.type === "radio" && !activeSection.querySelector(`input[name="${input.name}"]:checked`)) ||
+        (input.type !== "radio" && !input.value.trim())
+      ) {
+        input.classList.add("error");
+        input.focus();
+        return false;
+      }
     }
+    return true;
   }
-  return true;
-}
 
-function updateSummary() {
-  const version  = document.querySelector('input[name="version"]:checked');
-  const software = document.querySelector('input[name="software"]:checked');
-  const region   = document.querySelector('input[name="region"]:checked');
-  const email    = document.getElementById("email");
+  function updateSummary() {
+    const version = document.querySelector('input[name="version"]:checked');
+    const software = document.querySelector('input[name="software"]:checked');
+    const region = document.querySelector('input[name="region"]:checked');
+    const email = document.getElementById("email");
 
-  summaryVersion.textContent  = version  ? version.value  : "-";
-  summarySoftware.textContent = software ? software.value : "-";
-  summaryRegion.textContent   = region   ? region.value   : "-";
-  summaryEmail.textContent    = email && email.value.trim() ? email.value.trim() : "-";
-}
-
-function redirectToStripe() {
-  const link = stripeLinks[selectedPlan] || stripeLinks.Mini;
-  window.location.href = link;
-}
-
-// Listeners para botones
-btnNext.addEventListener("click", () => {
-  if (!validateStep()) return;
-  updateSummary();
-  if (currentStep < sections.length) {
-    goToStep(currentStep + 1);
-  } else {
-    redirectToStripe();
+    summaryVersion.textContent = version ? version.value : "-";
+    summarySoftware.textContent = software ? software.value : "-";
+    summaryRegion.textContent = region ? region.value : "-";
+    summaryEmail.textContent = email && email.value.trim() ? email.value.trim() : "-";
   }
-});
 
-btnBack.addEventListener("click", () => {
-  if (currentStep > 1) goToStep(currentStep - 1);
-});
+  function redirectToStripe() {
+    const link = stripeLinks[selectedPlan] || stripeLinks.Mini;
+    window.location.href = link;
+  }
 
-// Lógica de software dinámico
-const softwareContainer = document.getElementById("software-options");
-const versionRadios     = document.querySelectorAll('input[name="version"]');
-
-const softwareByVersion = {
-  Java: [
-    { value:"Vanilla", label:"Vanilla", desc:"Minecraft puro" },
-    { value:"Paper",   label:"Paper",   desc:"Optimizado para rendimiento" },
-    { value:"Spigot",  label:"Spigot",  desc:"Compatible con plugins" },
-    { value:"Fabric",  label:"Fabric",  desc:"Modding ligero" },
-    { value:"Forge",   label:"Forge",   desc:"Mods complejos" },
-  ],
-  Bedrock: [
-    { value:"Vanilla", label:"Vanilla", desc:"Bedrock oficial" },
-    { value:"PocketMine",label:"PocketMine-MP",desc:"Servidor en PHP" },
-    { value:"Nukkit",   label:"Nukkit",   desc:"Servidor Java para Bedrock" },
-  ],
-};
-
-function populateSoftware(version) {
-  softwareContainer.innerHTML = "";
-  const list = softwareByVersion[version] || [];
-  list.forEach(sw => {
-    const label = document.createElement("label");
-    label.className = "option-card";
-    label.innerHTML = `
-      <input type="radio" name="software" value="${sw.value}" required>
-      <div class="option-content">
-        <span class="option-title">${sw.label}</span>
-        <span class="option-desc">${sw.desc}</span>
-      </div>`;
-    softwareContainer.appendChild(label);
+  btnNext.addEventListener("click", () => {
+    if (!validateStep()) return;
+    updateSummary();
+    if (currentStep < sections.length) {
+      goToStep(currentStep + 1);
+    } else {
+      redirectToStripe();
+    }
   });
-  softwareContainer.querySelectorAll('input[name="software"]')
-    .forEach(r => r.addEventListener("change", updateSummary));
-}
 
-// Listeners para cambios de versión / región / email
-versionRadios.forEach(r => r.addEventListener("change", e => {
-  populateSoftware(e.target.value);
+  btnBack.addEventListener("click", () => {
+    if (currentStep > 1) goToStep(currentStep - 1);
+  });
+
+  // Software dinámico
+  const softwareContainer = document.getElementById("software-options");
+  const versionRadios = document.querySelectorAll('input[name="version"]');
+
+  const softwareByVersion = {
+    Java: [
+      { value: "Vanilla", label: "Vanilla", desc: "Minecraft puro" },
+      { value: "Paper", label: "Paper", desc: "Optimizado para rendimiento" },
+      { value: "Spigot", label: "Spigot", desc: "Compatible con plugins" },
+      { value: "Fabric", label: "Fabric", desc: "Modding ligero" },
+      { value: "Forge", label: "Forge", desc: "Mods complejos" },
+    ],
+    Bedrock: [
+      { value: "Vanilla", label: "Vanilla", desc: "Bedrock oficial" },
+      { value: "PocketMine", label: "PocketMine-MP", desc: "Servidor en PHP" },
+      { value: "Nukkit", label: "Nukkit", desc: "Servidor Java para Bedrock" },
+    ],
+  };
+
+  function populateSoftware(version) {
+    softwareContainer.innerHTML = "";
+    const list = softwareByVersion[version] || [];
+    list.forEach(sw => {
+      const label = document.createElement("label");
+      label.className = "option-card";
+      label.innerHTML = `
+        <input type="radio" name="software" value="${sw.value}" required>
+        <div class="option-content">
+          <span class="option-title">${sw.label}</span>
+          <span class="option-desc">${sw.desc}</span>
+        </div>`;
+      softwareContainer.appendChild(label);
+    });
+    softwareContainer.querySelectorAll('input[name="software"]').forEach(r => {
+      r.addEventListener("change", updateSummary);
+    });
+  }
+
+  versionRadios.forEach(r => r.addEventListener("change", e => {
+    populateSoftware(e.target.value);
+    updateSummary();
+  }));
+  document.querySelectorAll('input[name="region"]').forEach(r => r.addEventListener("change", updateSummary));
+
+  const emailInput = document.getElementById("email");
+  if (emailInput) emailInput.addEventListener("input", updateSummary);
+
+  updatePlanDisplay();
+  goToStep(1);
   updateSummary();
-}));
-document.querySelectorAll('input[name="region"]')
-  .forEach(r => r.addEventListener("change", updateSummary));
-
-const emailInput = document.getElementById("email");
-if (emailInput) emailInput.addEventListener("input", updateSummary);
-
-// Inicialización
-updatePlanDisplay();
-goToStep(1);
-updateSummary();
+}
