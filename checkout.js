@@ -1,4 +1,4 @@
-// checkout.js — versión final con detección de plan correcta
+// checkout.js — versión actualizada para 7 productos
 const sections = document.querySelectorAll(".form-section");
 const steps = document.querySelectorAll(".step");
 const btnNext = document.getElementById("btn-next");
@@ -11,15 +11,18 @@ const summaryEmail = document.getElementById("summary-email");
 
 let currentStep = 1;
 
-// Enlaces Stripe según plan
+// Enlaces de Stripe para cada producto
 const stripeLinks = {
-  Mini: "https://buy.stripe.com/14A5kD1cO0v38Lb2ng4wM04",
+  Mini:   "https://buy.stripe.com/14A5kD1cO0v38Lb2ng4wM04",
   Basico: "https://buy.stripe.com/9B6dR95t491z9Pf5zs4wM05",
   Estandar: "https://buy.stripe.com/28E00j8Fggu1bXn0f84wM06",
-  Plus: "https://buy.stripe.com/00w6oHg7IelT3qR7HA4wM07",
+  Plus:   "https://buy.stripe.com/00w6oHg7IelT3qR7HA4wM07",
+  Pro:    "https://buy.stripe.com/eVq6oH4p06Tr4uV1jc4wM0c",
+  Addons: "https://buy.stripe.com/bJe8wP2gSelT2mN3rk4wM0b",
+  Setups: "https://buy.stripe.com/6oU6oH5t40v30eF7HA4wM0d"
 };
 
-// --- Funciones base ---
+// Función para limpiar y normalizar el nombre del plan
 function normalizePlanName(raw) {
   if (!raw) return "Mini";
   raw = raw.replace(/^Plan\s*/i, "").trim();
@@ -27,57 +30,62 @@ function normalizePlanName(raw) {
   return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
 }
 
+// Función para obtener plan desde URL
 function getPlanFromURL() {
   const params = new URLSearchParams(window.location.search);
   const plan = params.get("plan");
   if (!plan) return "Mini";
   const fixed = plan.charAt(0).toUpperCase() + plan.slice(1).toLowerCase();
-  return ["Mini", "Basico", "Estandar", "Plus"].includes(fixed)
-    ? fixed
-    : "Mini";
+  const valid = ["Mini", "Basico", "Estandar", "Plus", "Pro", "Addons", "Setups"];
+  return valid.includes(fixed) ? fixed : "Mini";
 }
 
 let selectedPlan = getPlanFromURL();
 
+// Función para actualizar título y specs del plan en resumen
 function updatePlanDisplay() {
-  const planTitle = document.getElementById("plan-title");
-  const specRam = document.getElementById("spec-ram");
-  const specStorage = document.getElementById("spec-storage");
-  const specPlayers = document.getElementById("spec-players");
+  const planTitleEl = document.getElementById("plan-title");
+  const specRam      = document.getElementById("spec-ram");
+  const specStorage  = document.getElementById("spec-storage");
+  const specPlayers  = document.getElementById("spec-players");
 
-  const plans = {
-    Mini: { ram: 4, storage: 25, players: "15-25" },
-    Basico: { ram: 6, storage: 50, players: "25-35" },
-    Estandar: { ram: 8, storage: 75, players: "35-50" },
-    Plus: { ram: 10, storage: 100, players: "50-70" },
+  // Datos para cada plan
+  const planDataMap = {
+    Mini:    { ram: 4,  storage: 25,  players: "15-25",  unit: "mes" },
+    Basico:  { ram: 6,  storage: 50,  players: "25-35",  unit: "mes" },
+    Estandar:{ ram: 8,  storage: 75,  players: "35-50",  unit: "mes" },
+    Plus:    { ram:10,  storage:100,  players: "50-70",  unit: "mes" },
+    Pro:     { ram:15,  storage:150,  players: "70-100", unit: "mes" },
+    Addons:  { ram:"-", storage:"-", players:"-",       unit: "único" },
+    Setups:  { ram:"-", storage:"-", players:"-",       unit: "único" },
   };
 
-  const planData = plans[selectedPlan] || plans.Mini;
-  planTitle.textContent = `Plan ${selectedPlan}`;
-  specRam.textContent = `${planData.ram}GB`;
-  specStorage.textContent = `${planData.storage} GB SSD`;
-  specPlayers.textContent = planData.players;
+  const d = planDataMap[selectedPlan] || planDataMap.Mini;
+  planTitleEl.textContent    = `Plan ${selectedPlan}`;
+  specRam.textContent        = d.ram   === "-" ? "-" : `${d.ram} GB`;
+  specStorage.textContent    = d.storage === "-" ? "-" : `${d.storage} GB SSD`;
+  specPlayers.textContent    = d.players;
 }
 
+// Funciones de navegación y validación
 function goToStep(step) {
   if (step < 1 || step > sections.length) return;
-  sections.forEach((s) => s.classList.remove("active"));
-  steps.forEach((st) => st.classList.remove("active"));
-  sections[step - 1].classList.add("active");
-  steps[step - 1].classList.add("active");
+  sections.forEach(s => s.classList.remove("active"));
+  steps.forEach(st => st.classList.remove("active"));
+  sections[step-1].classList.add("active");
+  steps[step-1].classList.add("active");
 
   currentStep = step;
   btnBack.style.display = step > 1 ? "inline-block" : "none";
-  btnNext.textContent = step === sections.length ? "Pagar ahora" : "Siguiente →";
+  btnNext.textContent = (step === sections.length) ? "Pagar ahora" : "Siguiente →";
 }
 
 function validateStep() {
-  const activeSection = sections[currentStep - 1];
+  const activeSection = sections[currentStep-1];
   const requiredInputs = activeSection.querySelectorAll("input[required]");
   for (const input of requiredInputs) {
     if (
-      (input.type === "radio" &&
-        !activeSection.querySelector(`input[name="${input.name}"]:checked`)) ||
+      (input.type === "radio" && !activeSection.querySelector(`input[name="${input.name}"]:checked`)) ||
       (input.type !== "radio" && !input.value.trim())
     ) {
       input.classList.add("error");
@@ -89,15 +97,15 @@ function validateStep() {
 }
 
 function updateSummary() {
-  const version = document.querySelector('input[name="version"]:checked');
+  const version  = document.querySelector('input[name="version"]:checked');
   const software = document.querySelector('input[name="software"]:checked');
-  const region = document.querySelector('input[name="region"]:checked');
-  const email = document.getElementById("email");
+  const region   = document.querySelector('input[name="region"]:checked');
+  const email    = document.getElementById("email");
 
-  summaryVersion.textContent = version ? version.value : "-";
+  summaryVersion.textContent  = version  ? version.value  : "-";
   summarySoftware.textContent = software ? software.value : "-";
-  summaryRegion.textContent = region ? region.value : "-";
-  summaryEmail.textContent = email && email.value.trim() ? email.value.trim() : "-";
+  summaryRegion.textContent   = region   ? region.value   : "-";
+  summaryEmail.textContent    = email && email.value.trim() ? email.value.trim() : "-";
 }
 
 function redirectToStripe() {
@@ -105,7 +113,7 @@ function redirectToStripe() {
   window.location.href = link;
 }
 
-// --- Botones de navegación ---
+// Listeners para botones
 btnNext.addEventListener("click", () => {
   if (!validateStep()) return;
   updateSummary();
@@ -120,29 +128,29 @@ btnBack.addEventListener("click", () => {
   if (currentStep > 1) goToStep(currentStep - 1);
 });
 
-// --- Software dinámico según versión ---
+// Lógica de software dinámico
 const softwareContainer = document.getElementById("software-options");
-const versionRadios = document.querySelectorAll('input[name="version"]');
+const versionRadios     = document.querySelectorAll('input[name="version"]');
 
 const softwareByVersion = {
   Java: [
-    { value: "Vanilla", label: "Vanilla", desc: "Minecraft puro" },
-    { value: "Paper", label: "Paper", desc: "Optimizado para rendimiento" },
-    { value: "Spigot", label: "Spigot", desc: "Compatible con plugins" },
-    { value: "Fabric", label: "Fabric", desc: "Modding ligero" },
-    { value: "Forge", label: "Forge", desc: "Mods complejos" },
+    { value:"Vanilla", label:"Vanilla", desc:"Minecraft puro" },
+    { value:"Paper",   label:"Paper",   desc:"Optimizado para rendimiento" },
+    { value:"Spigot",  label:"Spigot",  desc:"Compatible con plugins" },
+    { value:"Fabric",  label:"Fabric",  desc:"Modding ligero" },
+    { value:"Forge",   label:"Forge",   desc:"Mods complejos" },
   ],
   Bedrock: [
-    { value: "Vanilla", label: "Vanilla", desc: "Bedrock oficial" },
-    { value: "PocketMine", label: "PocketMine-MP", desc: "Servidor en PHP" },
-    { value: "Nukkit", label: "Nukkit", desc: "Servidor Java para Bedrock" },
+    { value:"Vanilla", label:"Vanilla", desc:"Bedrock oficial" },
+    { value:"PocketMine",label:"PocketMine-MP",desc:"Servidor en PHP" },
+    { value:"Nukkit",   label:"Nukkit",   desc:"Servidor Java para Bedrock" },
   ],
 };
 
 function populateSoftware(version) {
   softwareContainer.innerHTML = "";
   const list = softwareByVersion[version] || [];
-  list.forEach((sw) => {
+  list.forEach(sw => {
     const label = document.createElement("label");
     label.className = "option-card";
     label.innerHTML = `
@@ -150,30 +158,25 @@ function populateSoftware(version) {
       <div class="option-content">
         <span class="option-title">${sw.label}</span>
         <span class="option-desc">${sw.desc}</span>
-      </div>
-    `;
+      </div>`;
     softwareContainer.appendChild(label);
   });
-  softwareContainer
-    .querySelectorAll('input[name="software"]')
-    .forEach((r) => r.addEventListener("change", updateSummary));
+  softwareContainer.querySelectorAll('input[name="software"]')
+    .forEach(r => r.addEventListener("change", updateSummary));
 }
 
-// --- Listeners ---
-versionRadios.forEach((r) =>
-  r.addEventListener("change", (e) => {
-    populateSoftware(e.target.value);
-    updateSummary();
-  })
-);
-document
-  .querySelectorAll('input[name="region"]')
-  .forEach((r) => r.addEventListener("change", updateSummary));
+// Listeners para cambios de versión / región / email
+versionRadios.forEach(r => r.addEventListener("change", e => {
+  populateSoftware(e.target.value);
+  updateSummary();
+}));
+document.querySelectorAll('input[name="region"]')
+  .forEach(r => r.addEventListener("change", updateSummary));
 
 const emailInput = document.getElementById("email");
 if (emailInput) emailInput.addEventListener("input", updateSummary);
 
-// --- Inicialización ---
+// Inicialización
 updatePlanDisplay();
 goToStep(1);
 updateSummary();
