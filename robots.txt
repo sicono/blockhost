@@ -1,0 +1,3 @@
+Sitemap: https://blockhost.es/sitemap.xml
+User-agent: *
+Disallow:
