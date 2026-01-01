@@ -69,25 +69,10 @@ document.getElementById('startBtn')?.addEventListener('click', (ev) => {
   // close when a link inside sidebar is clicked (allow anchor handler to run first)
   sidebar.addEventListener('click', (e) => {
     const a = e.target.closest('a');
-    if (!a) return;
-    // If link opens new tab or is external, don't close the menu prematurely
-    const href = a.getAttribute('href') || '';
-    const target = a.getAttribute('target') || '';
-    // External / new-tab: just close visually but do not try to intercept navigation
-    if (target === '_blank' || href.startsWith('http')) {
-      // allow browser to handle it; close sidebar after short delay for UX
-      setTimeout(closeMenu, 220);
-      return;
+    if (a) {
+      // allow any anchor behavior then close
+      setTimeout(closeMenu, 250);
     }
-    // For same-page anchors (#id) allow smooth scroll handler to run, then close
-    if (href.startsWith('#')) {
-      // let scroll handler run; close after small delay so scroll fires
-      setTimeout(closeMenu, 260);
-      return;
-    }
-    // For internal navigation (relative paths or absolute on same origin), close immediately
-    // letting the browser navigate (closing immediately avoids interfering with navigation)
-    closeMenu();
   });
 
   // close on Escape key
@@ -169,11 +154,6 @@ document.getElementById('startBtn')?.addEventListener('click', (ev) => {
         const delay = Math.min(420, index * 90); // slightly larger stagger for mobile feel
         el.style.transitionDelay = delay + 'ms';
         el.classList.add('visible', 'pop');
-        // add the new "anim-shimmer" class so CSS shimmer/float plays when revealed
-        // add it after a tiny timeout to ensure transition ordering looks smooth
-        setTimeout(() => {
-          el.classList.add('anim-shimmer');
-        }, 80 + index * 30);
         obs.unobserve(el);
       }
     });
@@ -185,6 +165,48 @@ document.getElementById('startBtn')?.addEventListener('click', (ev) => {
   });
 
   features.forEach(f => observer.observe(f));
+})();
+
+/* NEW: Intersection observer to reveal .plan cards on mobile with a vertical rise animation (staggered) */
+(function(){
+  const plans = Array.from(document.querySelectorAll('.plan'));
+  if (!plans.length) return;
+
+  // On non-mobile viewports, reveal plans immediately
+  if (!window.matchMedia('(max-width: 767px)').matches) {
+    plans.forEach(p => p.classList.add('reveal-visible'));
+    return;
+  }
+
+  // set initial hidden state
+  plans.forEach(p => p.classList.add('reveal-hidden'));
+
+  if (!('IntersectionObserver' in window)) {
+    plans.forEach((p, i) => {
+      setTimeout(()=> p.classList.add('reveal-visible'), i * 80);
+    });
+    return;
+  }
+
+  const planObserver = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const idx = plans.indexOf(el);
+        const delay = Math.min(420, idx * 80);
+        el.style.transitionDelay = delay + 'ms';
+        el.classList.remove('reveal-hidden');
+        el.classList.add('reveal-visible');
+        obs.unobserve(el);
+      }
+    });
+  }, {
+    root: null,
+    rootMargin: '0px 0px -20% 0px',
+    threshold: 0.12
+  });
+
+  plans.forEach(p => planObserver.observe(p));
 })();
 
 /* --------------------------
@@ -202,7 +224,6 @@ document.getElementById('startBtn')?.addEventListener('click', (ev) => {
    - improved smooth anchor scrolling accounting for header
    - currency helper bootstrap (exposed on window.BlockHostCurrency)
 */
-
 window.addEventListener('gesturestart', (e)=> e.preventDefault(), {passive:false});
 window.addEventListener('gesturechange', (e)=> e.preventDefault(), {passive:false});
 document.addEventListener('dblclick', (e)=> {
@@ -296,5 +317,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   /* Removed Three.js particle/canvas block because the plans section and canvas were deleted.
      If you later re-add a canvas container, reintroduce the Three.js code safely. */
-});
-
+}

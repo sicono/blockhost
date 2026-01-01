@@ -1,68 +1,523 @@
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="precios.css">
-<link rel="stylesheet" href="overrides.css">
-<link rel="stylesheet" href="dropdown.css">
- <link rel="icon" href="/favicon-32x32.png" type="image/png">
-  <link rel="shortcut icon" href="/favicon-32x32.png" type="image/png"/>
-  <link rel="apple-touch-icon" href="/favicon-32x32.png" type="image/png"/>
-<!-- ...existing content... -->
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BlockHost — Precios</title>
+  <meta name="description" content="Planes y precios de BlockHost — servidores de Minecraft.">
+  <link rel="icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" />
+  <link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" />
+  <link rel="icon" sizes="192x192" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" type="image/png"/>
+  <link rel="shortcut icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" type="image/png"/>
+  <link rel="apple-touch-icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" type="image/png"/>
+  <link rel="icon" href="favicon-32x32.png" type="image/png">
+  <link rel="shortcut icon" href="favicon-32x32.png" type="image/png"/>
+  <link rel="apple-touch-icon" href="favicon-32x32.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 
-<header class="site-header"><div class="brand"><img src="/logo.png" alt="Secure Cube — BlockHost logo" class="logo"><div><h1>BlockHost</h1><p class="tag">Hosting profesional para servidores Minecraft</p></div></div>
-  <nav class="nav"><a class="btn primary" href="https://panel.blockhost.es/">Acceder al Panel</a>
-   <a class="btn highlight" href="registro.html">Registrarse</a>
-   <a class="btn highlight" href="https://billing.stripe.com/p/login/28E8wP2gS3Hf8Lb6Dw4wM00" target="_blank" rel="noopener">Portal de Clientes</a>
-    
-</header>
-</nav>
-  
+  <style>
+    /* Keep page background and header visuals but avoid adding a translucent card around plans */
+    html, body {
+      height: 100%;
+      background: url('https://blockhost.es/fondo2.png') top center / cover no-repeat fixed;
+    }
+    .site-header {
+      background: linear-gradient(135deg, #2d1b69 0%, #1a0f3d 100%);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      backdrop-filter: none;
+    }
+    /* .plans-card decoration removed to let individual plan cards sit directly on page background */
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">
+        <img src="https://blockhost.es/logo.png" alt="BlockHost logo" />
+        <span class="brand">BlockHost</span>
+      </a>
 
-<section id="planes" class="plans">
-  <div class="plans-box">
-    <div class="plans-header">
-      <h3>Nuestros Planes</h3>
-      <div class="currency-control">
-        <label>Moneda:</label>
-        <div id="currency-dropdown" class="currency-dropdown"></div>
+      <button id="menuToggle" class="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="sidebar" onclick="toggleMenu()">
+        <span class="line line1"></span>
+        <span class="line line2"></span>
+        <span class="line line3"></span>
+      </button>
+
+      <nav class="nav">
+        <a class="nav-btn gradient-btn" href="https://panel.blockhost.es/">Acceder al panel</a>
+        <a class="nav-btn gradient-outline" href="registrarse.html">Registrarse</a>
+        <a class="nav-btn gradient-ghost" href="/error404.html">Afiliados</a>
+        <a class="nav-btn discord-btn" href="https://discord.gg/NCm6kbHXpr" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-discord" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+</svg> Únete a nuestro Discord</a>
+        <a class="cta" href="index.html">Inicio</a>
+      </nav>
+    </div>
+  </header>
+
+  <aside id="sidebar" class="sidebar" aria-hidden="true" role="dialog" aria-label="Menú">
+    <div class="sidebar-inner">
+      <a class="sidebar-logo logo" href="/" style="text-decoration:none;">
+        <img src="https://blockhost.es/logo.png" alt="BlockHost logo" />
+        <span class="brand">BlockHost</span>
+      </a>
+
+      <a class="sidebar-link highlight" href="/">Inicio</a>
+      <a class="sidebar-link" href="/registrarse.html">Registrarse</a>
+      <a class="sidebar-link" href="/error404.html">Afiliados</a>
+      <a class="sidebar-link" href="/precios.html#planes">Planes</a>
+      <a class="sidebar-link" href="/#price-comparison" style="display:none;">Comparar</a>
+      <a class="sidebar-link" href="https://panel.blockhost.es/">Portal de Clientes</a>
+
+      <a class="sidebar-link discord-link" href="https://discord.gg/NCm6kbHXpr" target="_blank" rel="noopener"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-discord" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+</svg> Únete a nuestro Discord</a>
+
+      <a class="sidebar-cta" href="https://panel.blockhost.es/">Panel de Control</a>
+    </div>
+  </aside>
+
+  <main>
+    <!-- Translucent card that contains all "Planes y Precios" content -->
+    <section class="plans container" id="planes" style="background: transparent; margin-top: 2rem;">
+      <div class="plans-card" style="padding:2rem; border-radius:16px; box-shadow: none; color: #fff;">
+        <div style="background: transparent; padding:1.25rem; border-radius:12px; color:#fff;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+            <h1 class="plans-title" style="margin-bottom:0.25rem;">Planes y Precios</h1>
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <label for="currencySelect" style="font-weight:700; color:#fff;">Moneda</label>
+              <!-- Custom rounded vertical black dropdown -->
+              <div class="currency-dropdown" id="currencyDropdown" aria-haspopup="listbox" aria-expanded="false">
+                <button id="currencyToggle" class="currency-dropdown-toggle" aria-label="Seleccionar moneda" type="button">
+                  <span class="dd-label">Euros (EUR)</span>
+                  <span class="dd-arrow" aria-hidden="true"></span>
+                </button>
+                <ul class="currency-dropdown-list" role="listbox" tabindex="-1" aria-labelledby="currencyToggle">
+                  <li role="option" data-code="USD" class="currency-option" aria-selected="false">Dólares (USD)</li>
+                  <li role="option" data-code="PEN" class="currency-option">Perú — Soles (PEN)</li>
+                  <li role="option" data-code="MXN" class="currency-option">México — Pesos (MXN)</li>
+                  <li role="option" data-code="COP" class="currency-option">Colombia — Pesos (COP)</li>
+                  <li role="option" data-code="ARS" class="currency-option">Argentina — Pesos (ARS)</li>
+                  <li role="option" data-code="VES" class="currency-option">Venezuela — Bolívar (VES)</li>
+                  <li role="option" data-code="BOB" class="currency-option">Bolivia — Boliviano (BOB)</li>
+                  <li role="option" data-code="EUR" class="currency-option" aria-selected="true">Europa — Euros (EUR)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <p class="trusted-copy" style="margin-bottom:1.25rem; color:#fff;">Elige un plan según tu comunidad: facturación mensual, escalable y con soporte 24/7.</p>
+
+          <div class="plans-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:1.5rem; margin-top:0.5rem;">
+            <!-- MINI -->
+            <div class="plan plan--large" style="padding:1.75rem; background: rgba(255,255,255,0.02); border-radius:12px; /* border removed — controlled by CSS */ color:#fff; min-height:140px;">
+              <!-- icon first, then title, then features (as spec badges), then price, then CTA -->
+              <div style="display:flex; flex-direction:column; gap:0.6rem; align-items:flex-start;">
+                <!-- icon above title -->
+                <img src="bloque_tierra.png" alt="Bloque de tierra" style="width:64px; height:64px; object-fit:cover; border-radius:0; box-shadow:none;" />
+                <h3 class="creator-name plan-title" style="font-size:1.25rem; color:#fff; margin:0;">Mini</h3>
+
+                <!-- Spec badges row: SSD + RAM on first row, players badge below -->
+                <div class="spec-row" aria-hidden="false">
+                  <div class="spec-badge ssd" title="25 GB SSD">
+                    <span class="spec-icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-memory" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M1 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.586a1 1 0 0 0 .707-.293l.353-.353a.5.5 0 0 1 .708 0l.353.353a1 1 0 0 0 .707.293H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm.5 1h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m5 0h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m4.5.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zM2 10v2H1v-2zm2 0v2H3v-2zm2 0v2H5v-2zm3 0v2H8v-2zm2 0v2h-1v-2zm2 0v2h-1v-2zm2 0v2h-1v-2z"/>
+                      </svg>
+                    </span>
+                    <span>25 GB SSD</span>
+                  </div>
+                  <div class="spec-badge ram" title="4 GB RAM">
+                    <span class="spec-icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-motherboard-fill" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M5 7h3V4H5z"/>
+                        <path d="M1 2a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-2H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 9H1V8H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6H1V5H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 2zm11 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zm2 0a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zM3.5 10a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zM4 4h-.5a.5.5 0 0 0 0 1H4v1h-.5a.5.5 0 0 0 0 1H4a1 1 0 0 0 1 1v.5a.5.5 0 0 0 1 0V8h1v.5a.5.5 0 0 0 1 0V8a1 1 0 0 0 1-1h.5a.5.5 0 0 0 0-1H9V5h.5a.5.5 0 0 0 0-1H9a1 1 0 0 0-1-1v-.5a.5.5 0 0 0-1 0V3H6v-.5a.5.5 0 0 0-1 0V3a1 1 0 0 0-1 1m7 7.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5"/>
+                      </svg>
+                    </span>
+                    <span>4 GB RAM</span>
+                  </div>
+                </div>
+                <div class="spec-row" style="margin-top:8px;">
+                  <div class="spec-badge players" title="15-25 jugadores">
+                    <span class="spec-icon" aria-hidden="true">👥</span>
+                    <span>15–25 jugadores</span>
+                  </div>
+                </div>
+
+                <div style="margin-top:6px; font-weight:800; font-size:1.2rem; color:#fff;">
+                  <!-- keep number and currency adjacent; JS will fill currency symbol/text -->
+                  <span class="price-value" data-eur="3.50">3,50</span><span class="price-currency" style="margin-left:6px;">€</span>
+                  <div style="color:#fff; font-size:0.85rem;">/ mes</div>
+                </div>
+                <div style="margin-top:12px; width:100%;">
+                  <a class="btn btn-primary" href="https://blockhost.es/checkout.html?plan=Mini" style="width:100%;">Contratar</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- BÁSICO -->
+            <div class="plan" style="padding:1.75rem; background: rgba(255,255,255,0.02); border-radius:12px; border: 1px solid rgba(255,255,255,0.04); color:#fff; min-height:140px;">
+              <div style="display:flex; flex-direction:column; gap:0.6rem; align-items:flex-start;">
+                <img src="madera1.png" alt="Ícono plan Básico (madera)" style="width:64px; height:64px; object-fit:cover; border-radius:0; box-shadow:none;" />
+                <h3 class="creator-name" style="font-size:1.25rem; color:#fff; margin:0;">Básico</h3>
+
+                <div class="spec-row">
+                  <div class="spec-badge ssd">
+                    <span class="spec-icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-memory" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M1 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.586a1 1 0 0 0 .707-.293l.353-.353a.5.5 0 0 1 .708 0l.353.353a1 1 0 0 0 .707.293H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm.5 1h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m5 0h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m4.5.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zM2 10v2H1v-2zm2 0v2H3v-2zm2 0v2H5v-2zm3 0v2H8v-2zm2 0v2h-1v-2zm2 0v2h-1v-2zm2 0v2h-1v-2z"/>
+                      </svg>
+                    </span>
+                    <span>50 GB SSD</span>
+                  </div>
+                  <div class="spec-badge ram"><span class="spec-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-motherboard-fill" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <path d="M5 7h3V4H5z"/>
+                      <path d="M1 2a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-2H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 9H1V8H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6H1V5H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 2zm11 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zm2 0a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zM3.5 10a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zM4 4h-.5a.5.5 0 0 0 0 1H4v1h-.5a.5.5 0 0 0 0 1H4a1 1 0 0 0 1 1v.5a.5.5 0 0 0 1 0V8h1v.5a.5.5 0 0 0 1 0V8a1 1 0 0 0 1-1h.5a.5.5 0 0 0 0-1H9V5h.5a.5.5 0 0 0 0-1H9a1 1 0 0 0-1-1v-.5a.5.5 0 0 0-1 0V3H6v-.5a.5.5 0 0 0-1 0V3a1 1 0 0 0-1 1m7 7.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5"/>
+                    </svg>
+                  </span><span>6 GB RAM</span></div>
+                </div>
+                <div class="spec-row" style="margin-top:8px;">
+                  <div class="spec-badge players"><span class="spec-icon">👥</span><span>25–35 jugadores</span></div>
+                </div>
+
+                <div style="margin-top:6px; font-weight:800; font-size:1.2rem; color:#fff;">
+                  <span class="price-value" data-eur="5.50">5,50</span> <span class="price-currency">€</span>
+                  <div style="color:#fff; font-size:0.85rem;">/ mes</div>
+                </div>
+                <div style="margin-top:12px; width:100%;">
+                  <a class="btn btn-primary" href="https://blockhost.es/checkout.html?plan=Basico" style="width:100%;">Contratar</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- ESTÁNDAR -->
+            <div class="plan" style="padding:1.75rem; background: rgba(255,255,255,0.02); border-radius:12px; border: 1px solid rgba(255,255,255,0.04); color:#fff; min-height:140px;">
+              <div style="display:flex; flex-direction:column; gap:0.6rem; align-items:flex-start;">
+                <img src="bloque_hierro.png" alt="Ícono plan Estándar (hierro)" style="width:64px; height:64px; object-fit:cover; border-radius:0; box-shadow:none;" />
+                <h3 class="creator-name" style="font-size:1.25rem; color:#fff; margin:0;">Estándar</h3>
+
+                <div class="spec-row">
+                  <div class="spec-badge ssd">
+                    <span class="spec-icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-memory" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M1 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.586a1 1 0 0 0 .707-.293l.353-.353a.5.5 0 0 1 .708 0l.353.353a1 1 0 0 0 .707.293H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm.5 1h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m5 0h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m4.5.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zM2 10v2H1v-2zm2 0v2H3v-2zm2 0v2H5v-2zm3 0v2H8v-2zm2 0v2h-1v-2zm2 0v2h-1v-2zm2 0v2h-1v-2z"/>
+                      </svg>
+                    </span>
+                    <span>75 GB SSD</span>
+                  </div>
+                  <div class="spec-badge ram"><span class="spec-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-motherboard-fill" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <path d="M5 7h3V4H5z"/>
+                      <path d="M1 2a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-2H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 9H1V8H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6H1V5H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 2zm11 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zm2 0a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zM3.5 10a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zM4 4h-.5a.5.5 0 0 0 0 1H4v1h-.5a.5.5 0 0 0 0 1H4a1 1 0 0 0 1 1v.5a.5.5 0 0 0 1 0V8h1v.5a.5.5 0 0 0 1 0V8a1 1 0 0 0 1-1h.5a.5.5 0 0 0 0-1H9V5h.5a.5.5 0 0 0 0-1H9a1 1 0 0 0-1-1v-.5a.5.5 0 0 0-1 0V3H6v-.5a.5.5 0 0 0-1 0V3a1 1 0 0 0-1 1m7 7.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5"/>
+                    </svg>
+                  </span><span>8 GB RAM</span></div>
+                </div>
+                <div class="spec-row" style="margin-top:8px;">
+                  <div class="spec-badge players"><span class="spec-icon">👥</span><span>35–50 jugadores</span></div>
+                </div>
+
+                <div style="margin-top:6px; font-weight:800; font-size:1.2rem; color:#fff;">
+                  <span class="price-value" data-eur="7.50">7,50</span> <span class="price-currency">€</span>
+                  <div style="color:#fff; font-size:0.85rem;">/ mes</div>
+                </div>
+                <div style="margin-top:12px; width:100%;">
+                  <a class="btn btn-primary" href="https://blockhost.es/checkout.html?plan=Estandar" style="width:100%;">Contratar</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- PLUS -->
+            <div class="plan" style="padding:1.75rem; background: rgba(255,255,255,0.02); border-radius:12px; border: 1px solid rgba(255,255,255,0.04); color:#fff; min-height:140px;">
+              <div style="display:flex; flex-direction:column; gap:0.6rem; align-items:flex-start;">
+                <img src="bloque_diamante.png" alt="Ícono plan Plus (diamante)" style="width:64px; height:64px; object-fit:cover; border-radius:0; box-shadow:none;" />
+                <h3 class="creator-name" style="font-size:1.25rem; color:#fff; margin:0;">Plus</h3>
+
+                <div class="spec-row">
+                  <div class="spec-badge ssd">
+                    <span class="spec-icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-memory" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M1 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.586a1 1 0 0 0 .707-.293l.353-.353a.5.5 0 0 1 .708 0l.353.353a1 1 0 0 0 .707.293H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm.5 1h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m5 0h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m4.5.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zM2 10v2H1v-2zm2 0v2H3v-2zm2 0v2H5v-2zm3 0v2H8v-2zm2 0v2h-1v-2zm2 0v2h-1v-2zm2 0v2h-1v-2z"/>
+                      </svg>
+                    </span>
+                    <span>100 GB SSD</span>
+                  </div>
+                  <div class="spec-badge ram"><span class="spec-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-motherboard-fill" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <path d="M5 7h3V4H5z"/>
+                      <path d="M1 2a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-2H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 9H1V8H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6H1V5H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 2zm11 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zm2 0a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zM3.5 10a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zM4 4h-.5a.5.5 0 0 0 0 1H4v1h-.5a.5.5 0 0 0 0 1H4a1 1 0 0 0 1 1v.5a.5.5 0 0 0 1 0V8h1v.5a.5.5 0 0 0 1 0V8a1 1 0 0 0 1-1h.5a.5.5 0 0 0 0-1H9V5h.5a.5.5 0 0 0 0-1H9a1 1 0 0 0-1-1v-.5a.5.5 0 0 0-1 0V3H6v-.5a.5.5 0 0 0-1 0V3a1 1 0 0 0-1 1m7 7.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5"/>
+                    </svg>
+                  </span><span>10 GB RAM</span></div>
+                </div>
+                <div class="spec-row" style="margin-top:8px;">
+                  <div class="spec-badge players"><span class="spec-icon">👥</span><span>50–70 jugadores</span></div>
+                </div>
+
+                <div style="margin-top:6px; font-weight:800; font-size:1.2rem; color:#fff;">
+                  <span class="price-value" data-eur="9.50">9,50</span> <span class="price-currency">€</span>
+                  <div style="color:#fff; font-size:0.85rem;">/ mes</div>
+                </div>
+                <div style="margin-top:12px; width:100%;">
+                  <a class="btn btn-primary" href="https://blockhost.es/checkout.html?plan=Plus" style="width:100%;">Contratar</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- PRO -->
+            <div class="plan featured" style="padding:1.75rem; background: rgba(255,255,255,0.02); border-radius:12px; border: 1px solid rgba(255,255,255,0.04); color:#fff; min-height:140px;">
+              <div style="display:flex; flex-direction:column; gap:0.6rem; align-items:flex-start;">
+                <img src="bloque_obsidiana.png" alt="Ícono plan Pro (obsidiana)" style="width:64px; height:64px; object-fit:cover; border-radius:0; box-shadow:none;" />
+                <h3 class="creator-name" style="font-size:1.25rem; color:#fff; margin:0;">Pro</h3>
+
+                <div class="spec-row">
+                  <div class="spec-badge ssd">
+                    <span class="spec-icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-memory" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M1 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.586a1 1 0 0 0 .707-.293l.353-.353a.5.5 0 0 1 .708 0l.353.353a1 1 0 0 0 .707.293H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm.5 1h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m5 0h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5m4.5.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5zM2 10v2H1v-2zm2 0v2H3v-2zm2 0v2H5v-2zm3 0v2H8v-2zm2 0v2h-1v-2zm2 0v2h-1v-2zm2 0v2h-1v-2z"/>
+                      </svg>
+                    </span>
+                    <span>150 GB SSD</span>
+                  </div>
+                  <div class="spec-badge ram"><span class="spec-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-motherboard-fill" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <path d="M5 7h3V4H5z"/>
+                      <path d="M1 2a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-2H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 9H1V8H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6H1V5H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 2zm11 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zm2 0a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0zM3.5 10a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1zM4 4h-.5a.5.5 0 0 0 0 1H4v1h-.5a.5.5 0 0 0 0 1H4a1 1 0 0 0 1 1v.5a.5.5 0 0 0 1 0V8h1v.5a.5.5 0 0 0 1 0V8a1 1 0 0 0 1-1h.5a.5.5 0 0 0 0-1H9V5h.5a.5.5 0 0 0 0-1H9a1 1 0 0 0-1-1v-.5a.5.5 0 0 0-1 0V3H6v-.5a.5.5 0 0 0-1 0V3a1 1 0 0 0-1 1m7 7.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5"/>
+                    </svg>
+                  </span><span>15 GB RAM</span></div>
+                </div>
+                <div class="spec-row" style="margin-top:8px;">
+                  <div class="spec-badge players"><span class="spec-icon">👥</span><span>70–90 jugadores</span></div>
+                </div>
+
+                <div style="margin-top:6px; font-weight:800; font-size:1.2rem; color:#fff;">
+                  <span class="price-value" data-eur="14.50">14,50</span> <span class="price-currency">€</span>
+                  <div style="color:#fff; font-size:0.85rem;">/ mes</div>
+                </div>
+                <div style="margin-top:12px; width:100%;">
+                  <a class="btn btn-primary" href="https://blockhost.es/checkout.html?plan=Pro" style="width:100%;">Contratar</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- ADDONS (único) -->
+            <div class="plan" style="padding:1.75rem; background: rgba(255,255,255,0.02); border-radius:12px; border: 1px solid rgba(255,255,255,0.04); color:#fff; min-height:140px;">
+              <div style="display:flex; flex-direction:column; gap:0.6rem; align-items:flex-start;">
+                <img src="bloque_tierra.png" alt="Ícono Addons" style="width:64px; height:64px; object-fit:cover; border-radius:0; box-shadow:none;" />
+                <h3 class="creator-name" style="font-size:1.25rem; color:#fff; margin:0;">Addons</h3>
+
+                <div class="spec-row">
+                  <div class="spec-badge ssd"><span class="spec-icon">🧩</span><span>Addon personalizado</span></div>
+                </div>
+                <div class="spec-row" style="margin-top:8px;">
+                  <div class="spec-badge players"><span class="spec-icon">👥</span><span>Soporte incluido</span></div>
+                </div>
+
+                <div style="margin-top:6px; font-weight:800; font-size:1.2rem; color:#fff;">
+                  <span class="price-value" data-eur="6.00">6,00</span> <span class="price-currency">€</span>
+                  <div style="color:#fff; font-size:0.85rem;">/ único</div>
+                </div>
+                <div style="margin-top:12px; width:100%;">
+                  <a class="btn btn-primary" href="https://buy.stripe.com/bJe8wP2gSelT2mN3rk4wM0b" style="width:100%;">Comprar</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- SETUPS (único) -->
+            <div class="plan" style="padding:1.75rem; background: rgba(255,255,255,0.02); border-radius:12px; border: 1px solid rgba(255,255,255,0.04); color:#fff; min-height:140px;">
+              <div style="display:flex; flex-direction:column; gap:0.6rem; align-items:flex-start;">
+                <img src="bloque_tierra.png" alt="Ícono Setups" style="width:64px; height:64px; object-fit:cover; border-radius:0; box-shadow:none;" />
+                <h3 class="creator-name" style="font-size:1.25rem; color:#fff; margin:0;">Setups</h3>
+
+                <div class="spec-row">
+                  <div class="spec-badge ssd"><span class="spec-icon">⚙️</span><span>Setup personalizado</span></div>
+                </div>
+                <div class="spec-row" style="margin-top:8px;">
+                  <div class="spec-badge players"><span class="spec-icon">👥</span><span>Evento dedicado</span></div>
+                </div>
+
+                <div style="margin-top:6px; font-weight:800; font-size:1.2rem; color:#fff;">
+                  <span class="price-value" data-eur="35.00">35,00</span> <span class="price-currency">€</span>
+                  <div style="color:#fff; font-size:0.85rem;">/ único</div>
+                </div>
+                <div style="margin-top:12px; width:100%;">
+                  <a class="btn btn-primary" href="https://buy.stripe.com/6oU6oH5t40v30eF7HA4wM0d" style="width:100%;">Comprar</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comparativa eliminada por solicitud -->
+          <p style="margin-top:1rem; color:#fff;">Facturación mensual. Precios mostrados sin IVA. ¿Necesitas un plan a medida? <a href="mailto:support@blockhost.es" style="color:#fff; text-decoration:underline;">Contáctanos</a>.</p>
+        </div>
+      </div>
+    </section>
+    <script>
+      (function(){
+        // Fixed example rates (update later or fetch live rates)
+        // Base currency is now EUR; factors convert EUR -> target currency
+        const rates = {
+          EUR: { currency: 'EUR', locale: 'de-DE', factor: 1 },
+          USD: { currency: 'USD', locale: 'en-US', factor: 1.08 },
+          PEN: { currency: 'PEN', locale: 'es-PE', factor: 3.8 },
+          MXN: { currency: 'MXN', locale: 'es-MX', factor: 18.5 },
+          COP: { currency: 'COP', locale: 'es-CO', factor: 4066 },
+          ARS: { currency: 'ARS', locale: 'es-AR', factor: 350 },
+          VES: { currency: 'VES', locale: 'es-VE', factor: 25 },
+          BOB: { currency: 'BOB', locale: 'es-BO', factor: 6.9 }
+        };
+
+        // New custom dropdown elements
+        const currencyToggle = document.getElementById('currencyToggle');
+        const dropdown = document.getElementById('currencyDropdown');
+        const list = dropdown.querySelector('.currency-dropdown-list');
+        const options = Array.from(dropdown.querySelectorAll('.currency-option'));
+        const priceEls = Array.from(document.querySelectorAll('.price-value'));
+        const currencyLabels = Array.from(document.querySelectorAll('.price-currency'));
+
+        function safeFormatParts(code, locale, amount) {
+          try {
+            // Use currency formatting when available and then split into parts to get "number" vs "currency"
+            const fmt = new Intl.NumberFormat(locale, { style: 'currency', currency: code, minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const parts = fmt.formatToParts(amount);
+            // Build numeric part (integer + decimal) and currency symbol part separately
+            const numberParts = parts.filter(p => p.type === 'integer' || p.type === 'group' || p.type === 'decimal' || p.type === 'fraction');
+            const currencyPart = parts.find(p => p.type === 'currency');
+            const numberStr = numberParts.map(p => p.value).join('');
+            const currencyStr = currencyPart ? currencyPart.value : code;
+            // Decide placement (if currency appears before number). We'll preserve currency label separately.
+            // Return { numberStr, currencyStr, currencyFirst }
+            const currencyIndex = parts.findIndex(p => p.type === 'currency');
+            const numberIndex = parts.findIndex(p => ['integer','group','decimal','fraction'].includes(p.type));
+            return {
+              numberStr,
+              currencyStr,
+              currencyFirst: currencyIndex >= 0 && currencyIndex < numberIndex
+            };
+          } catch (e) {
+            // fallback
+            return {
+              numberStr: amount.toFixed(2),
+              currencyStr: code,
+              currencyFirst: false
+            };
+          }
+        }
+
+        function updatePrices(toCode){
+          const r = rates[toCode] || rates.EUR;
+          priceEls.forEach(el => {
+            // read EUR base from data-eur attribute
+            const eur = parseFloat(el.getAttribute('data-eur'));
+            const converted = eur * r.factor;
+            const parts = safeFormatParts(r.currency, r.locale, converted);
+            // write numeric part (no trailing space)
+            el.textContent = parts.numberStr;
+            // find the sibling .price-currency in the same container (keeps original markup)
+            const parent = el.parentElement;
+            const currencySpan = parent.querySelector('.price-currency');
+            if (currencySpan) {
+              currencySpan.textContent = parts.currencyStr;
+            }
+          });
+
+          // leave shorter labels like "/ mes" unchanged (they are in markup)
+        }
+
+        // dropdown interaction handlers
+        function closeDropdown() {
+          dropdown.setAttribute('aria-expanded','false');
+          dropdown.classList.remove('open');
+          list.style.maxHeight = '0px';
+          list.style.opacity = '0';
+        }
+        function openDropdown() {
+          dropdown.setAttribute('aria-expanded','true');
+          dropdown.classList.add('open');
+          // ensure maxHeight matches scrollHeight for smooth reveal
+          list.style.maxHeight = list.scrollHeight + 'px';
+          list.style.opacity = '1';
+        }
+
+        // pick initial based on default option (EUR)
+        let selectedCode = 'EUR';
+        updatePrices(selectedCode);
+
+        currencyToggle.addEventListener('click', (e) => {
+          const expanded = dropdown.getAttribute('aria-expanded') === 'true';
+          if (expanded) closeDropdown(); else openDropdown();
+        });
+
+        // keyboard support
+        currencyToggle.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openDropdown();
+            options[0].focus();
+          }
+        });
+
+        options.forEach(opt => {
+          opt.addEventListener('click', (ev) => {
+            selectedCode = opt.dataset.code;
+            // update toggle label reliably
+            const label = currencyToggle.querySelector('.dd-label');
+            if (label) label.textContent = opt.textContent;
+            // mark selected
+            options.forEach(o => o.setAttribute('aria-selected','false'));
+            opt.setAttribute('aria-selected','true');
+            updatePrices(selectedCode);
+            closeDropdown();
+          });
+          opt.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+              ev.preventDefault();
+              opt.click();
+            } else if (ev.key === 'ArrowDown') {
+              ev.preventDefault();
+              const next = options[options.indexOf(opt)+1];
+              if (next) next.focus();
+            } else if (ev.key === 'ArrowUp') {
+              ev.preventDefault();
+              const prev = options[options.indexOf(opt)-1];
+              if (prev) prev.focus();
+              else currencyToggle.focus();
+            } else if (ev.key === 'Escape') {
+              closeDropdown();
+              currencyToggle.focus();
+            }
+          });
+        });
+
+        // close when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!dropdown.contains(e.target)) closeDropdown();
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeDropdown();
+        });
+      })();
+    </script>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div> BlockHost — Servidores de Minecraft</div>
+      <div class="footer-links">
+        <a href="https://blockhost.es/politicas.html">Términos</a>
+        <a href="https://blockhost.es/politicas.html">Privacidad</a>
       </div>
     </div>
-    <div class="plans-message"><p>Nosotros ofrecemos distintos planes a un precio competente. Elige entre planes para jugar con amigos, eventos o grandes networks. Precios accesibles, interfaz amigable y soporte dedicado. Revisa nuestros planes y comienza ahora.</p></div>
-    <div id="canvas-wrap" aria-hidden="true" class="plans-canvas"></div>
-    <div class="plan-grid" style="margin-top:18px; z-index:2; position:relative;">
-      <div class="card"><div class="ribbon">Mini</div><div class="price"><span class="amount" data-eur="3.5">3,50 €</span> / mes</div><p>10 GB SSD • 5-10 jugadores • 4GB RAM</p><a class="btn primary" href="checkout.html?plan=Mini">Contratar</a></div>
-      <div class="card"><div class="ribbon">Básico</div><div class="price"><span class="amount" data-eur="5.5">5,50 €</span> / mes</div><p>30 GB SSD • 15-20 jugadores • 6GB RAM</p><a class="btn primary" href="checkout.html?plan=Basico">Contratar</a></div>
-      <div class="card"><div class="ribbon">Estándar</div><div class="price"><span class="amount" data-eur="7.5">7,50 €</span> / mes</div><p>50 GB SSD • 25-30 jugadores • 8GB RAM</p><a class="btn primary" href="checkout.html?plan=Estandar">Contratar</a></div>
-      <div class="card"><div class="ribbon">Plus</div><div class="price"><span class="amount" data-eur="9.5">9,50 €</span> / mes</div><p>65 GB SSD • 35-50 jugadores • 10GB RAM</p><a class="btn primary" href="checkout.html?plan=Plus">Contratar</a></div>
-     <div class="card"><div class="ribbon">Pro</div><div class="price"><span class="amount" data-eur="14.5">14,50 €</span> / mes</div><p>75 GB SSD • 60-70 jugadores • 15GB RAM</p><a class="btn primary" href="checkout.html?plan=Pro">Contratar</a></div>
-     <div class="card"><div class="ribbon">Addons</div><div class="price"><span class="amount" data-eur="6">6,00 €</span> / único</div><p>Creamos tu Addon para minecraft Bedrock a tu gusto.</p><a class="btn primary" href="https://buy.stripe.com/bJe8wP2gSelT2mN3rk4wM0b">Comprar</a></div>
-      <div class="card"><div class="ribbon">Setups</div><div class="price"><span class="amount" data-eur="35">35,00 €</span> / único</div><p>Creamos tu Setup a tu gusto para tu evento.</p><a class="btn primary" href="https://buy.stripe.com/6oU6oH5t40v30eF7HA4wM0d">Comprar</a></div>
-    </div>
-    <div class="plans-footer" style="text-align:center;margin-top:20px;z-index:2;position:relative;"><a class="btn primary" href="https://blockhost.es">Volver</a></div>
-  </div>
-</section>
+  </footer>
 
+  <!-- Floating quick actions -->
+  <div class="floating-actions" aria-hidden="false">
+    <a href="#" class="btn-tidio" id="fabTidioPrices" aria-label="Abrir chat">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v10a4 4 0 0 1-4 4H9l-5 4V4z" fill="currentColor"/></svg>
+    </a><span class="fab-label">Chat en vivo</span>
 
-<section id="politicas" class="policies-section">
-  <div class="policies-inner">
-    <h3>Políticas y privacidad</h3>
-    <p>En BlockHost respetamos tu privacidad. Recopilamos datos mínimos necesarios para proveer nuestros servicios, usamos cookies para mejorar la experiencia y estadísticas anónimas. No compartimos datos con terceros salvo por requerimiento legal o proveedores necesarios para el servicio.</p>
-    <a class="btn translucent small" href="politicas.html">Ver Detalles</a>
-  </div>
-</section>
-
-<footer class="site-footer">
-  <div class="footer-inner">
-    <span class="copy">© 2025 BlockHost — Hecho para servidores Minecraft</span>
-    <a class="btn translucent discord-btn" href="https://discord.gg/blockhost">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-        <defs><linearGradient id="dgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7289da"/><stop offset="100%" stop-color="#5865F2"/></linearGradient></defs>
-        <path fill="url(#dgrad)" d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
-      </svg>
-      Únete a nuestro Discord
-    </a>
-  </div>
-</footer>
-
-<!-- ...existing content... -->
-<script src="precios.js" type="module"></script>
-<script type="module" src="currency-dropdown.js"></script>
-<!-- ...existing content... -->
+    <a href="https://wa.me/34615545027" class="btn-whatsapp" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 

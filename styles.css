@@ -1,459 +1,1907 @@
-:root{
-  --bg:#07060a;
-  --panel:#0f0e12;
-  --muted:#9aa0ab;
-  --accent-start:#3a2b6f; /* deep purple, subtle */
-  --accent-end:#0f0e12;
-  --glass: rgba(255,255,255,0.03);
-  --primary:#7b5cff;
-  --radius:10px;
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* ...existing styles... */
-html,body{height:100%}
-body{
-  margin:0;
-  background: transparent;
-  position: relative;
-  z-index: 0;
-  color:#e6e9ee;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
+:root {
+  --primary: #7c3aed;
+  --primary-light: #a78bfa;
+  --primary-dark: #5b21b6;
+  --accent: #fbbf24;
+  --text: #1f2937;
+  --text-light: #6b7280;
+  --bg: #ffffff;
+  --border: #e5e7eb;
 }
 
-/* add background pseudo-layer */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  z-index:-1;
-  background:linear-gradient(180deg,var(--accent-start), var(--accent-end));
-  pointer-events:none;
-  will-change:transform;
+html {
+  scroll-behavior: smooth;
 }
 
-/* ensure header and main sit above the background and are properly centered */
-.site-header, main, .plans, .site-footer{
-  position:relative;
-  z-index:1;
-}
-
-/* Header */
-.site-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:20px 36px;
-  backdrop-filter: blur(6px);
-  background: transparent; /* changed to let body gradient show through */
-}
-.brand{display:flex;gap:14px;align-items:center}
-.logo{width:56px;height:56px;border-radius:4px;object-fit:cover;background:transparent;border:1px solid rgba(255,255,255,0.06);padding:4px}
-.brand h1{margin:0;font-size:18px;letter-spacing:0.4px}
-.tag{margin:0;font-size:12px;color:var(--muted)}
-
-/* Buttons */
-.btn{
-  display:inline-flex;
-  gap:8px;
-  align-items:center;
-  padding:10px 14px;
-  border-radius:8px;
-  font-weight:600;
-  color:var(--bg);
-  background:linear-gradient(90deg,var(--primary), #5f4bff);
-  border:none;
-  cursor:pointer;
-  text-decoration:none;
-  transition:transform .14s ease, box-shadow .14s ease;
-  box-shadow:0 6px 18px rgba(27,20,80,0.28);
-}
-.btn:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(27,20,80,0.36)}
-.btn.ghost{background:transparent;color:var(--muted);box-shadow:none;border:1px solid rgba(123,92,255,0.05)}
-.btn.outline{background:transparent;color:var(--primary);border:1px solid rgba(123,92,255,0.18);backdrop-filter:blur(4px)}
-.btn.small{padding:8px 10px;font-size:13px;border-radius:8px}
-
-/* make register button more eye-catching */
-.btn.highlight{
-    background: linear-gradient(90deg, #ff6b6b 0%, #ff4d94 50%, #ff6b6b 100%);
-    color: #fff;
-    box-shadow: 0 12px 36px rgba(255,77,148,0.18), 0 4px 10px rgba(255,107,107,0.08);
-    border: 1px solid rgba(255,255,255,0.06);
-    transform: none;
-    padding: 10px 16px;
-    font-weight:700;
-}
-/* subtle hover for highlight */
-.btn.highlight:hover{
-    transform: translateY(-4px);
-    box-shadow: 0 18px 48px rgba(255,77,148,0.22), 0 6px 18px rgba(255,107,107,0.10);
-}
-
-/* ensure header translucent variant looks correct in nav */
-.nav .btn.translucent{
-    background: rgba(0,0,0,0.54);
-    color: #ffffff;
-    border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.36);
-}
-
-/* Hero */
-.hero{
-  display:flex;
-  gap:40px;
-  align-items:center;
-  justify-content:space-between;
-  padding:64px 64px; /* increased vertical padding for more space */
-  min-height:60vh; /* ensure hero is taller so background has vertical room */
-  flex:1;
-  background:
-    linear-gradient(90deg, rgba(10,9,12,0.65) 0%, rgba(10,9,12,0.25) 40%),
-    url('/fondo.png') left center / cover no-repeat;
-}
-.hero-inner{max-width:640px}
-.hero h2{font-size:42px;margin:0 0 12px 0;line-height:1.02}
-.lead{color:var(--muted);margin:0 0 20px 0}
-.cta-row{display:flex;gap:12px;margin-bottom:18px}
-.features{display:flex;gap:12px;list-style:none;padding:0;margin:12px 0 0 0;color:var(--muted);font-size:13px}
-
-/* Visual area */
-.visual{width:480px;display:flex;flex-direction:column;gap:18px;align-items:center}
-#canvas-wrap{width:100%;height:auto;border-radius:0;overflow:visible;background:transparent;box-shadow:none;padding:0;margin:0} /* make canvas container transparent and soften shadow */
-.mockup{width:100%;background:linear-gradient(180deg, rgba(15,14,18,0.12), rgba(123,92,255,0.02));border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,0.28)} /* use translucent panel so body gradient is visible */
-.mock-header{font-weight:700;color:var(--muted);font-size:13px;margin-bottom:8px}
-.mock-body{display:flex;justify-content:space-between;align-items:center}
-.chip{background:var(--glass);padding:8px 10px;border-radius:8px;color:var(--muted);font-size:13px;display:inline-block;margin-bottom:6px}
-
-/* Plans */
-.plans{
-  padding:56px 64px; /* more vertical spacing */
-  min-height:56vh; /* ensure plans section has vertical space for background */
-  background:
-    linear-gradient(90deg, rgba(7,6,10,0.82) 0%, rgba(7,6,10,0.55) 30%, rgba(7,6,10,0.25) 60%, rgba(7,6,10,0.06) 100%),
-    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(123,92,255,0.01));
-  position:relative;
-  overflow:hidden;
-  border-radius:12px;
-  display:flex;              /* ensure content + canvas stack nicely */
-  flex-direction:column;
-  padding-bottom:36px; /* keep breathing room but allow canvas to visually reach the edge */
-}
-.plans h3{font-size:28px;margin-bottom:12px;text-align:center}
-/* Desktop: aumentar tamaño del título */
-@media (min-width:900px){
-  .plans h3{font-size:36px}
-}
-.plans-message{max-width:980px;margin:12px auto 0 auto;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(15,14,18,0.06), rgba(123,92,255,0.01));color:var(--muted);line-height:1.6}
-.plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:18px}
-.card{background:linear-gradient(180deg, rgba(15,14,18,0.08), rgba(123,92,255,0.02));padding:18px;border-radius:12px;border:1px solid rgba(123,92,255,0.03)} /* make plan cards translucent */
-.price{font-weight:700;margin:8px 0 12px 0}
-.popular{outline:2px solid rgba(123,92,255,0.12);transform:translateY(-6px)}
-.ribbon{background:linear-gradient(90deg,var(--primary),#5f4bff);display:inline-block;padding:4px 8px;border-radius:8px;color:var(--bg);font-weight:700;font-size:12px;margin-bottom:8px}
-
-/* Footer */
-.site-footer{padding:20px 64px;color:var(--muted);font-size:13px;border-top:1px solid rgba(123,92,255,0.02)}
-
-/* Responsive */
-@media (max-width:900px){
-  .hero{flex-direction:column;padding:28px;align-items:center;text-align:center}
-  .hero-inner{max-width:100%;width:100%}
-  /* add breathing room and make hero content stack earlier on smaller widths */
-  .hero{gap:24px;padding:26px 20px}
-  .visual{width:100%;order:2}
-  .site-header{padding:14px 20px}
-  .plans{padding:28px 20px}
-}
-
-/* Mobile-specific fixes */
-@media (hover: none), (pointer: coarse) {
-  /* Disable hover lift on touch devices to avoid accidental shifts */
-  .btn:hover{transform:none;box-shadow:0 6px 18px rgba(27,20,80,0.28)}
-}
-
-/* Header stacks on very small screens */
-@media (max-width:560px){
-  .site-header{flex-direction:column;align-items:center;gap:8px;padding:14px;text-align:center}
-  .nav{width:100%;display:flex;gap:8px;justify-content:center;flex-wrap:wrap} /* allow buttons to wrap */
-  .brand{width:auto;justify-content:center;align-items:center}
-  .hero{padding:24px 16px;gap:22px;align-items:center;text-align:center;min-height:60vh} /* more vertical space */
-  .hero h2{font-size:22px;margin:0 auto}
-  #canvas-wrap{height:320px;border-radius:12px} /* taller canvas so animation is visible */
-  .mockup{padding:10px}
-  .visual{width:100%;order:2}
-  .plan-grid{grid-template-columns:1fr;gap:12px}
-  .popular{transform:none;outline:2px solid rgba(123,92,255,0.10)}
-  .hero-inner{padding:0 6px}
-  .plans{padding:24px 16px;min-height:70vh} /* ensure plans section shows full text */
-  .plans-message{padding:18px;font-size:15px;line-height:1.6;max-width:100%;box-sizing:border-box}
-  .btn{max-width:100%;white-space:normal;padding:10px 12px} /* let buttons wrap and not be cut off */
-  .plans-canvas{height:360px;margin-top:18px} /* ensure canvas visible and comfortable */
-  .cookie-banner{left:14px;right:14px;bottom:14px;width:auto}
-  .policies-section{padding:20px}
-}
-
-/* Ensure canvas container resizes smoothly */
-#canvas-wrap{min-height:120px;display:block}
-
-/* Cookie banner */
-.cookie-banner{
-  position:fixed;
-  right:20px;
-  bottom:20px;
-  z-index:9999;
-  width:340px;
-  max-width:calc(100% - 40px);
-  border-radius:12px;
-  background:linear-gradient(180deg, rgba(15,14,18,0.9), rgba(10,9,12,0.92));
-  box-shadow:0 12px 40px rgba(2,2,10,0.6);
-  border:1px solid rgba(123,92,255,0.06);
-  transform:translateY(12px);
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .26s ease, transform .26s ease;
-  padding:14px;
-}
-.cookie-banner.show{opacity:1;transform:translateY(0);pointer-events:auto}
-.cookie-content p{margin:8px 0 12px 0;color:var(--muted);font-size:13px}
-.cookie-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center}
-/* mobile tweak */
-@media (max-width:560px){
-  .cookie-banner{left:14px;right:14px;bottom:14px;width:auto}
-  .policies-section{padding:20px}
-}
-
-/* policies section */
-.policies-section{
-  padding:28px 64px;
-  border-top:1px solid rgba(123,92,255,0.03);
-  background:linear-gradient(180deg, transparent, rgba(123,92,255,0.01));
-}
-.policies-inner{max-width:900px;margin:0 auto;text-align:left}
-.policies-inner h3{margin:0 0 8px 0;font-size:20px}
-.policies-inner p{color:var(--muted);margin:0 0 12px 0;line-height:1.5}
-
-/* Auth modal */
-.auth-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10000;pointer-events:none;opacity:0;transition:opacity .18s ease}
-.auth-modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
-.auth-backdrop{position:fixed;inset:0;background:rgba(5,4,8,0.6)}
-.auth-panel{position:relative;width:420px;max-width:calc(100% - 32px);background:linear-gradient(180deg, rgba(15,14,18,0.96), rgba(10,9,12,0.98));padding:18px;border-radius:12px;box-shadow:0 18px 50px rgba(2,2,10,0.6);border:1px solid rgba(123,92,255,0.04)}
-.auth-close{position:absolute;right:10px;top:8px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer}
-.auth-tabs{display:flex;gap:8px;margin:8px 0 12px}
-.auth-tabs .tab{background:transparent;border:1px solid rgba(123,92,255,0.03);padding:8px 12px;border-radius:8px;color:var(--muted);cursor:pointer}
-.auth-tabs .tab.active{background:linear-gradient(90deg,var(--primary),#5f4bff);color:var(--bg);border:none}
-.auth-form{display:block}
-.auth-form.hidden{display:none}
-.auth-form label{display:block;font-size:13px;color:var(--muted);margin:8px 0}
-.auth-form input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:inherit}
-.auth-actions{display:flex;justify-content:flex-end;margin-top:12px}
-
-/* mobile tweak */
-@media (max-width:560px){.auth-panel{padding:14px}}
-
-/* Discord floating badge */
-.discord-badge{
-  position:fixed;
-  right:16px;
-  bottom:16px;
-  z-index:10001;
-  display:inline-flex;
-  gap:10px;
-  align-items:center;
-  background:linear-gradient(180deg, rgba(15,14,18,0.96), rgba(10,9,12,0.96));
-  color:var(--muted);
-  padding:10px 12px;
-  border-radius:999px;
-  box-shadow:0 10px 30px rgba(2,2,10,0.5);
-  text-decoration:none;
-  border:1px solid rgba(123,92,255,0.06);
-  transition:transform .14s ease, box-shadow .14s ease, opacity .14s ease;
-  backdrop-filter: blur(6px);
-}
-.discord-badge:hover{ transform:scale(1.02); box-shadow:0 14px 40px rgba(2,2,10,0.6) }
-.discord-host-logo{width:28px;height:28px;border-radius:6px;object-fit:cover;border:1px solid rgba(255,255,255,0.04)}
-.discord-content{display:inline-flex;align-items:center;gap:8px}
-.discord-content svg{color:#7289da}
-.discord-text{font-weight:700;color:var(--muted);font-size:14px;white-space:nowrap}
-/* mobile: compact the badge */
-@media (max-width:560px){
-  .discord-badge{right:12px;bottom:12px;padding:8px 10px}
-  .discord-text{display:none}
-  .discord-host-logo{width:24px;height:24px}
-}
-
-.whatsapp-badge {
-  position: fixed;
-  bottom: 80px; /* justo encima del Discord */
-  right: 20px;
-  background-color: #25D366;
+body {
+  padding-top: 88px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  background: linear-gradient(180deg, #12041f 0%, #2a0f3f 35%, #3b1160 70%);
   color: white;
-  width: 48px;
-  height: 48px;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  color: inherit;
+}
+
+/* HEADER */
+.site-header {
+  background: linear-gradient(135deg, #2d1b69 0%, #1a0f3d 100%);
+  color: white;
+  padding: 1rem 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* lowered so sidebar can appear above it when opened */
+  z-index: 900;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: white;
+}
+
+/* Make the logo icon larger and the brand text use a professional font (Poppins) with stronger weight */
+.logo img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+/* Brand text next to the logo: professional appearance */
+.logo .brand,
+.logo span {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem; /* slightly larger and more prominent */
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+/* Apply the new bold, attractive font to all button-like elements */
+.nav-btn, .cta, .mobile-btn, .btn {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.nav {
+  display: none;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-btn, .cta {
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+}
+
+.gradient-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+}
+
+.gradient-outline {
+  border: 2px solid var(--primary-light);
+  color: white;
+}
+
+.gradient-outline:hover {
+  background: rgba(124, 58, 237, 0.1);
+  transform: translateY(-2px);
+}
+
+.gradient-ghost {
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.gradient-ghost:hover {
+  border-color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cta {
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
+}
+
+/* HAMBURGER */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  transition: transform 0.35s cubic-bezier(.2,.9,.3,1), opacity 0.35s cubic-bezier(.2,.9,.3,1);
+  will-change: transform, opacity;
+  z-index: 1001;
+
+  /* Prevent the mobile blue tap/highlight and make focus visuals explicit */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.hamburger span {
+  width: 24px;
+  height: 2.5px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* ensure no default focus ring or outline appears when pressing / tapping */
+.hamburger:focus,
+.hamburger:focus-visible,
+#menuToggle:focus,
+#menuToggle:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* transform when open */
+.hamburger.open .line1 {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger.open .line2 {
+  opacity: 0;
+}
+
+.hamburger.open .line3 {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* New: hide the whole hamburger smoothly when menu is open,
+   but keep the line transforms for a quick cross animation first.
+   Keep pointer-events enabled so the toggle remains clickable to close the menu. */
+.hamburger.open,
+.hamburger.hidden {
+  opacity: 0;
+  transform: scale(0.85);
+  /* keep pointer events so user can tap the hamburger again to close sidebar */
+  pointer-events: auto;
+}
+
+/* SIDEBAR (updated to match requested separated layout: left slide, 80% width leaving space on right) */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 80%;
+  max-width: 420px;
+  height: 100%;
+  background: linear-gradient(180deg, #0b0224 0%, #1a052d 40%, #0f0120 100%);
+  padding: 30px 20px;
+  /* ensure sidebar is above the header when active */
+  z-index: 1005;
+  transition: transform 0.32s cubic-bezier(.2,.9,.3,1), left 0.32s cubic-bezier(.2,.9,.3,1);
+  transform: translateX(-100%);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 8px 0 30px rgba(0,0,0,0.6);
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* Active state uses .active to match your example */
+.sidebar.active {
+  left: 0;
+  transform: translateX(0);
+  /* keep highest stacking when visible */
+  z-index: 1005;
+}
+
+/* Ensure links and buttons are flush left like the example */
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 12px 0;
+  font-size: 20px;
+  color: #e6e6e6;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  text-decoration: none;
+  font-weight: 700;
+  text-align: left;
+  width: 100%;
+  padding-right: 10%;
+  /* Match title font: Poppins with a strong weight */
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* Make CTA buttons block-level, left aligned and like sample */
+.sidebar-cta {
+  display: block;
+  /* changed to purple -> cyan gradient per request */
+  background: linear-gradient(90deg, #7c3aed 0%, #06b6d4 100%);
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-top: 14px;
+  text-align: left;
+  font-weight: 800;
+  text-decoration: none;
+  width: calc(100% - 4px);
+  /* Use same title font for CTAs as well */
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  letter-spacing: -0.01em;
+  border: 2px solid rgba(255,255,255,0.04);
+  box-shadow: 0 10px 30px rgba(7,190,210,0.12);
+  background-clip: padding-box, border-box;
+  background-image:
+    linear-gradient(90deg, #7c3aed 0%, #06b6d4 100%),
+    linear-gradient(90deg, rgba(124,58,237,0.9), rgba(6,182,212,0.9));
+}
+
+/* Ensure header spacing doesn't overlap content when sidebar open */
+html.sidebar-open, body.sidebar-open {
+  overflow: hidden;
+}
+
+/* Remove previous mobile menu rules that conflicted */
+.mobile-menu,
+.mobile-menu-inner,
+.mobile-btn {
+  display: none !important;
+}
+
+/* Keep existing responsive rules but ensure hamburger shown on small screens */
+@media (min-width: 768px) {
+  .hamburger { display: none; }
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #2d1b69 0%, #1a0f3d 100%);
+  color: white;
+  padding: 4rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://blockhost.es/fondo.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  z-index: 0;
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, var(--accent) 0%, #f59e0b 100%);
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  width: fit-content;
+  /* animation */
+  box-shadow: 0 0 0 rgba(251, 191, 36, 0.0);
+  animation: pulse-glow 2.2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* slightly larger icon and subtle motion */
+.hero-label-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  flex-shrink: 0;
+  transform-origin: center;
+  animation: icon-bounce 2.2s ease-in-out infinite;
+  color: #000;
+}
+
+/* gentle glowing pulse */
+@keyframes pulse-glow {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.0);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 10px 30px rgba(251, 191, 36, 0.12);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.0);
+  }
+}
+
+/* subtle icon vertical movement to draw attention */
+@keyframes icon-bounce {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(-2px); }
+  50%  { transform: translateY(0); }
+  75%  { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0;
+  /* Usar Poppins (misma fuente que se usaba antes para botones) */
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 500px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 10px 30px rgba(92, 33, 148, 0.22);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(124, 58, 237, 0.4);
+}
+
+.btn-ghost {
+  border: 2px solid white;
+  color: white;
+  background: transparent;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+.btn-icon {
+  display: inline-block;
+  vertical-align: -0.125em;
+  margin-right: 0.6rem;
+  width: 20px;
+  height: 20px;
+  opacity: 0.95;
+}
+
+.bullets {
+  list-style: none;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.bullets li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+}
+
+.bullet-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--accent) 0%, #f59e0b 100%);
   border-radius: 50%;
+  color: #000;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.hero-right {
+  display: none !important;
+}
+
+.hero-bg {
+  background-image: url('https://blockhost.es/fondo.png');
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  min-height: 300px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* PLANS */
+.plans {
+  padding: 3rem 0;
+  background: #050608;
+  border-radius: 12px;
+  margin: 2rem auto;
+  color: white;
+}
+
+/* Force plan cards to use a near-black solid background instead of semi-transparent gradients */
+.plans-grid .plan,
+.plan {
+  /* solid near-black background for maximum contrast */
+  background: rgba(0,0,0,0.94) !important;
+  /* keep subtle border and shadow for separation */
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  color: #f9fafb;
+}
+
+/* Mobile-specific reveal animation: initial hidden state and visible state when scrolled into view */
+@media (max-width: 767px) {
+  .plan.reveal-hidden {
+    opacity: 0;
+    transform: translateY(22px);
+    will-change: opacity, transform;
+  }
+  .plan.reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: transform 520ms cubic-bezier(.16,1,.3,1), opacity 420ms ease;
+  }
+}
+
+/* Mobile-specific override to ensure cards remain black on small screens */
+@media (max-width: 767px) {
+  .plan {
+    background: rgba(0,0,0,0.96) !important;
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.5);
+  }
+}
+
+.plans-title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+  /* Use same font and heavy weight as logo title */
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-align: left;
+}
+
+.trusted-copy {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 2rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.plans-carousel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.carousel-arrow {
+  background: #111827;
+  color: #fbbf24;
+  border: 1px solid #374151;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: transform 0.2s, background-color 0.2s;
-  z-index: 1000;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
-.whatsapp-badge:hover {
-  background-color: #1ebe5d;
-  transform: scale(1.05);
+.carousel-arrow:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
 }
 
-.whatsapp-badge svg {
-  fill: white;
-  width: 22px;
-  height: 22px;
+.carousel-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
-/* Header adjustments: larger logo/title/subtitle on desktop and tighter button widths */
-.brand h1{margin:0;font-size:18px;letter-spacing:0.4px}
-.tag{margin:0;font-size:12px;color:var(--muted)}
-
-/* Increase sizes on wider screens */
-@media (min-width:900px){
-  .brand h1{font-size:22px}
-  .tag{font-size:13px}
-  .logo{width:72px;height:72px}
-  .hero h2{font-size:48px}
-  .lead{font-size:16px}
+.plan-viewport {
+  flex: 1;
+  overflow: hidden;
 }
 
-/* Constrain button widths and reduce very wide appearance */
-.btn{max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:10px 12px}
-.btn.primary{padding:10px 14px}
-
-/* Make the "Acerca de" button more prominent (ghost variant) */
-.nav .btn.ghost{border:1px solid rgba(123,92,255,0.12);color:var(--primary);background:linear-gradient(90deg, rgba(123,92,255,0.06), rgba(123,92,255,0.02))}
-
-/* Plans section now has a decorative background image (fondo.png) with left fog gradient and overlay to keep text readable */
-.plans{
-  padding:56px 64px; /* more vertical spacing */
-  min-height:56vh; /* ensure plans section has vertical space for background */
-  background:
-    linear-gradient(90deg, rgba(7,6,10,0.82) 0%, rgba(7,6,10,0.55) 30%, rgba(7,6,10,0.25) 60%, rgba(7,6,10,0.06) 100%),
-    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(123,92,255,0.01));
-  position:relative;
-  overflow:hidden;
-  border-radius:12px;
-  display:flex;              /* ensure content + canvas stack nicely */
-  flex-direction:column;
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  transition: transform 0.4s ease;
 }
 
-/* new: make the plans canvas sit behind the plans content (low layer) */
-.plans-canvas{
-  position:absolute;
-  inset:0;
-  z-index:1; /* low layer */
-  pointer-events:none;
-  border-radius:0;
-  overflow:hidden;
-  background:transparent;
-}
-/* ensure plans content (title, message) sits above the canvas */
-.plans h3, .plans-message{ position:relative; z-index:2; }
-
-/* subtle left fog gradient overlay (soft fog at start/left) */
-.plans::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
-  width:34%;
-  pointer-events:none;
-  background:linear-gradient(90deg, rgba(10,9,12,0.85), rgba(10,9,12,0.45) 40%, rgba(10,9,12,0.05) 100%);
-  mix-blend-mode:normal;
-  opacity:0.95;
-  transform:translateZ(0);
-}
-
-/* Make sure the plans text sits above overlays */
-.plans h3, .plans-message{position:relative;z-index:2}
-
-/* Slight animation for hero elements to feel alive */
-@keyframes floatUp {
-  0%{ transform: translateY(0); opacity:0.98;}
-  50%{ transform: translateY(-6px); }
-  100%{ transform: translateY(0); opacity:1;}
-}
-.hero-inner{animation:floatUp 6s ease-in-out infinite}
-
-/* visual canvas subtle bob */
-.visual{animation:floatUp 8s ease-in-out infinite; animation-delay:0.4s}
-
-/* ensure plans message background is readable on mobile */
-@media (max-width:900px){
-  .hero{flex-direction:column;padding:36px 20px;min-height:50vh}
-  .plans{
-    background-image: linear-gradient(180deg, rgba(7,6,10,0.92), rgba(7,6,10,0.9)), url('/fondo.png');
-    background-position: center top;
-    background-size: cover;
-    padding:36px 20px;
-    border-radius:10px;
-    min-height:50vh;
-  }
-  .plans::before{width:48%;opacity:0.98}
-  #canvas-wrap{height:280px;border-radius:12px} /* scale canvas on smaller screens */
-  .brand h1{font-size:20px}
-  .logo{width:56px;height:56px}
-  .hero h2{font-size:28px}
-  .lead{font-size:14px}
-}
-
-/* tighten cookie banner on small screens and reduce width of buttons overall */
-@media (max-width:560px){
-  .btn{max-width:160px;padding:8px 10px;font-size:14px}
-  .plans h3{font-size:20px}
-  .plans-message{font-size:15px;padding:14px}
-}
-
-/* ensure text in plans card remains clear above background image */
-.plans-message.card{
-  background: linear-gradient(180deg, rgba(3,3,6,0.72), rgba(3,3,6,0.6));
-  border:1px solid rgba(255,255,255,0.04);
-}
-
-/* Make hero lead and feature items white for better contrast */
-.lead{color:#ffffff}
-.features{color:#ffffff}
-
-/* Translucent black button for "Sobre Nosotros" with white text */
-.btn.translucent{
-  background: rgba(0,0,0,0.48);
-  color: #ffffff;
+/* Creator-style cards */
+.plan {
+  /* Dark purple gradient for plan cards */
+  background: linear-gradient(180deg, rgba(92,33,148,0.95) 0%, rgba(46,14,85,0.88) 100%);
+  padding: 2rem; /* increase padding for bigger cards */
+  border-radius: 14px;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* border removed to eliminate the surrounding box */
   border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.4);
-}
-.btn.translucent:hover{ transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,0.5) }
-
-/* make plans canvas extend slightly under the next section so pixels appear flush to the lower edge */
-.plans-canvas::after{
-  content:"";
-  position:absolute;
-  left:0;right:0;
-  bottom:-36px; /* extend visual area slightly under the plans section */
-  height:36px;
-  pointer-events:none;
-  background:transparent;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  color: #f9fafb;
+  min-height: 140px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
 }
 
-/* Title: use Space Mono for a distinct professional look and slightly larger weight on desktop */
-.plans h3{
-  font-family: "Press Start 2P", "Space Mono", monospace;
-  font-weight:700;
-  letter-spacing:0.6px;
-  font-size:30px;
-  color:#ffffff;
-  margin-bottom:14px;
+/* keep a subtle hover lift but without a heavy framed box */
+.plan:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.55);
 }
-/* Desktop increase */
-@media (min-width:900px){
-  .plans h3{ font-size:40px; letter-spacing:0.8px; }
+
+/* keep featured variant styling but remove framed border */
+.plan.featured {
+  border-color: rgba(251,191,36,0.10);
+  box-shadow: 0 18px 40px rgba(251, 191, 36, 0.10);
+  transform: translateY(-4px);
+}
+
+/* Larger Mini card modifier: more padding, taller and (on desktop) span two columns */
+.plan--large {
+  padding: 2.5rem;
+  min-height: 220px;
+  border-radius: 16px;
+}
+
+/* Slight visual divider between cards (subtle) */
+.plans-grid .plan + .plan {
+  margin-top: 0;
+}
+
+/* Ensure on desktop the large plan stands out as in screenshot */
+@media (min-width: 768px) {
+  .plan--large {
+    grid-column: span 2;
+  }
+
+  .plans-grid {
+    gap: 1.6rem;
+  }
+}
+
+/* Remove old plan-specific styling no longer needed */
+.price,
+.plan ul,
+.plan ul li,
+.check-icon {
+  display: none;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+/* FEATURES */
+.feature {
+  text-align: center;
+  padding: 2rem;
+  border-radius: 12px;
+  /* Tarjetas ligeramente translúcidas para destacar sobre el fondo oscuro */
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.3s ease;
+  /* START: hidden initial state so JS/CSS reveal plays */
+  opacity: 0;
+  transform: translateY(18px);
+  will-change: opacity, transform;
+  /* END: hidden initial state */
+  position: relative; /* required for shimmer overlay */
+  overflow: hidden;   /* clip shimmer */
+}
+
+/* Visible state applied by JS when element enters viewport */
+.feature.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition-duration: 420ms;
+  transition-timing-function: cubic-bezier(.16,1,.3,1);
+}
+
+/* Optional: small pop when fully visible (subtle) */
+.feature.visible.pop {
+  /* slightly snappier scale pop to emphasize */
+  transform: translateY(0) scale(1.01);
+  transition-duration: 520ms;
+}
+
+/* SHIMMER + FLOAT: cool animation for feature cards when they appear */
+.feature.anim-shimmer {
+  /* gentle floating motion */
+  animation: float 3800ms ease-in-out infinite;
+  box-shadow: 0 12px 36px rgba(63,26,102,0.18);
+  transform-origin: center;
+}
+
+/* shimmer overlay (runs once on reveal) */
+.feature::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%);
+  transform: skewX(-18deg);
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* when class is present play a single shimmer pass */
+.feature.anim-shimmer::before {
+  opacity: 1;
+  animation: shimmer-slide 1000ms cubic-bezier(.2,.9,.3,1);
+}
+
+/* subtle hover emphasis while preserving chill animation */
+.feature.anim-shimmer:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 22px 46px rgba(63,26,102,0.24);
+}
+
+/* keyframes for shimmer and float */
+@keyframes shimmer-slide {
+  0% { left: -120%; opacity: 0; }
+  10% { opacity: 1; }
+  100% { left: 140%; opacity: 0; }
+}
+
+/* keep float keyframe already defined lower, but ensure it's present if reduced-motion isn't requested */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .feature.anim-shimmer,
+  .feature::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Provide a fallback CSS-only stagger for environments where JS runs later:
+   use nth-child to slightly offset transition-delay — this is secondary to JS staggering */
+.features-grid .feature:nth-child(1) { transition-delay: 0ms; }
+.features-grid .feature:nth-child(2) { transition-delay: 80ms; }
+.features-grid .feature:nth-child(3) { transition-delay: 140ms; }
+.features-grid .feature:nth-child(4) { transition-delay: 200ms; }
+.features-grid .feature:nth-child(5) { transition-delay: 260ms; }
+.features-grid .feature:nth-child(6) { transition-delay: 320ms; }
+
+.feature:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  /* make icons larger and white */
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Ensure any inline SVGs inside .feature-icon render white and scale */
+.feature-icon svg,
+.feature-icon path {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.feature h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.feature p {
+  color: rgba(255,255,255,0.85);
+  margin: 0;
+}
+
+/* SUPPORT */
+.support {
+  padding: 3rem 0;
+  text-align: center;
+  background: linear-gradient(135deg, #2d1b69 0%, #1a0f3d 100%);
+  color: white;
+  border-radius: 12px;
+  margin: 2rem auto;
+}
+
+.support h2 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin-bottom: 1rem;
+}
+
+.support p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+/* FOOTER */
+.site-footer {
+  background: linear-gradient(180deg, #100217 0%, #220730 100%);
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-links a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--primary-light);
+}
+
+/* SERVICES heading: use same title style (Poppins, heavy) */
+.services h2,
+#que-ofrecemos h2 {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.5rem,4vw,2.25rem);
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+/* RESPONSIVE */
+@media (min-width: 768px) {
+  .nav {
+    display: flex;
+  }
+
+  .hamburger {
+    display: none;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero-right {
+    display: block;
+  }
+
+  .plan-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .carousel-arrow {
+    display: flex;
+  }
+
+  /* Desktop plan layout fixes: center the grid, constrain max width, and normalize card widths */
+  .plans-grid {
+    gap: 1.6rem;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    align-items: start;
+  }
+
+  .plan {
+    width: auto; /* let grid control width on desktop */
+    min-height: 180px;
+  }
+
+  .plan--large {
+    grid-column: span 2;
+    min-height: 220px;
+  }
+
+  /* Ensure price column keeps right alignment on desktop */
+  .plan .plan-row { align-items: flex-start; }
+  .plan .plan-price { text-align: right; min-width: 140px; }
+
+  /* Ensure plan title + currency use Poppins heavy on desktop as well */
+  .plan .plan-title,
+  .plan .creator-name,
+  .price-value,
+  .price-currency {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+}
+
+@media (max-width: 767px) {
+  .carousel-arrow {
+    display: none !important;
+  }
+
+  .plan-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plan.featured {
+    transform: scale(1);
+  }
+
+  .plans-carousel {
+    flex-direction: column;
+  }
+
+  /* NEW: make all plan cards use the "Mini" layout on mobile:
+     - left-aligned content with title above icon (like Mini)
+     - consistent icon sizing and spacing
+     - price and CTA centered / full-width as needed
+  */
+  .plans-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .plan {
+    padding: 1.8rem 1.6rem;
+    border-radius: 14px;
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start; /* left align like Mini */
+    text-align: left; /* left text as in Mini */
+  }
+
+  /* Adjust transparency on small screens so background reads well over hero/background */
+  .plan {
+    /* slightly darker purple gradient on mobile for better contrast */
+    background: linear-gradient(180deg, rgba(70,24,120,0.96) 0%, rgba(32,10,68,0.92) 100%);
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.5);
+  }
+
+  /* Ensure the large Mini card remains visually larger but follows same left-aligned layout */
+  .plan--large {
+    padding: 2.2rem;
+    min-height: 200px;
+  }
+
+  /* Title above icon for all cards on mobile (matching Mini)
+  -- REMOVED: we want icons above titles on all viewports, so undo the forced order that put title above icon on mobile.
+  The original rule that used order:-1 is removed. Instead ensure vertical layout for plan meta and consistent font usage for titles and prices.
+*/
+  .plan .plan-meta {
+    display: flex;
+    flex-direction: column; /* ensure column layout: icon above title */
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  /* Apply Poppins heavy font to plan titles and to price (number + currency) so they match the Plans heading */
+  .plan .plan-title,
+  .plan .creator-name,
+  .price-value,
+  .price-currency {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+
+  /* Ensure price number and currency sit directly together without extra gap */
+  .price-value,
+  .price-currency {
+    display: inline-block;
+    vertical-align: baseline;
+  }
+
+  /* make the plan icon bigger and left aligned (under title) -> adjust so icon sits above title */
+  .plan .plan-meta img {
+    order: 0;
+    margin: 0.35rem 0 0 0;
+    width: 64px;
+    height: 64px;
+  }
+
+  /* keep specs left aligned and allow wrapping */
+  .plan .creator-role {
+    text-align: left;
+    font-size: 0.98rem;
+    -webkit-line-clamp: 3;
+    margin-top: 8px;
+  }
+
+  /* Stack price and CTA centrally but keep card content left-read flow */
+  .plan .plan-row {
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .plan .plan-price {
+    margin-left: 0;
+    min-width: 0;
+    text-align: left;
+    display: block;
+  }
+
+  .plan .price-value {
+    font-size: 1.9rem;
+  }
+
+  /* make CTA full width and more prominent on mobile */
+  .plan .btn {
+    display: block; /* ensure the CTA is visible as a block-level button on mobile */
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    margin-top: 0.8rem;
+    z-index: 5; /* keep button above overlapping visuals/overlays */
+  }
+
+  /* remove translucent wrapper on mobile too - keep spacing but no overlay */
+  .plans-card {
+    padding: 1.2rem;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  /* ensure currency dropdown remains usable and centered */
+  .currency-dropdown {
+    width: 160px;
+    margin-left: 0;
+  }
+
+  /* ---- ADDED RULES: make plan cards wider on mobile viewport ---- */
+  /* expand the plans-card full-bleed so cards appear nearly full width of the screen */
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .plans-card {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    padding-left: 1rem; /* keep inner padding comfortable */
+    padding-right: 1rem;
+    width: 100vw;
+    box-sizing: border-box;
+  }
+  /* let the grid take the extra width and make each .plan span nearly full viewport */
+  .plans-grid {
+    width: 100vw;
+    margin-left: calc(-1 * ( (100vw - 100%) / 2 ));
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    box-sizing: border-box;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .plan {
+    width: calc(100vw - 32px); /* nearly full width with comfortable side gutters */
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  /* increase visual scale slightly so wider cards feel prominent */
+  .plan--large { padding-left: 2.4rem; padding-right: 2.4rem; }
+
+  /* Ensure badges and content wrap nicely when increased width */
+  .spec-row { gap: 0.5rem; }
+  .spec-badge { padding: 9px 12px; }
+  .spec-badge .spec-icon { width: 24px; height: 24px; font-size: 12px; }
+}
+
+/* Currency select (black menu) */
+.currency-select {
+  background: #000;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 0.48rem 0.8rem;
+  border-radius: 10px;
+  font-weight: 700;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+  min-width: 160px;
+  text-align: left;
+  cursor: pointer;
+  z-index: 1002; /* sit above other elements like header/backdrop */
+}
+
+/* add a custom arrow using a pseudo-element (works when applied to a wrapper) */
+.currency-select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.currency-select-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(255,255,255,0.85);
+  border-bottom: 2px solid rgba(255,255,255,0.85);
+  transform-origin: center;
+  transform: translateY(-50%) rotate(45deg);
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+/* ensure the dropdown list is visually distinct on mobile/desktop */
+.currency-select:focus {
+  outline: 2px solid rgba(124,58,237,0.35);
+  outline-offset: 2px;
+}
+
+/* small responsive tweak so the wrapper doesn't break layout */
+@media (max-width: 480px) {
+  .currency-select {
+    min-width: 120px;
+    font-size: 0.95rem;
+  }
+}
+
+/* ---------------------------
+   Custom rounded vertical dropdown
+   --------------------------- */
+.currency-dropdown {
+  position: relative;
+  display: inline-block;
+  min-width: 180px;
+  z-index: 800; /* lowered so the header/sidebar appear above the dropdown */
+}
+
+.currency-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 12px;
+  border-radius: 999px; /* fully rounded pill */
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  text-align: left;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+}
+
+/* add a little breathing room beneath the toggle so the list can't visually touch it */
+.currency-dropdown-toggle {
+  /* ensure layout stability and a tiny extra gap */
+  margin-bottom: 4px;
+}
+
+.currency-dropdown-toggle:focus {
+  outline: 2px solid rgba(124,58,237,0.28);
+  outline-offset: 2px;
+}
+
+.currency-dropdown .dd-arrow {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  transform: rotate(45deg);
+  border-right: 2px solid rgba(255,255,255,0.85);
+  border-bottom: 2px solid rgba(255,255,255,0.85);
+  margin-left: 8px;
+}
+
+/* The vertical list: rounded black card */
+.currency-dropdown-list {
+  position: absolute;
+  /* increase the top offset so the list doesn't visually overlap the rounded toggle */
+  top: calc(100% + 12px); /* reduced slightly but keep a stable gap */
+  right: 0;
+  left: 0;
+  background: #000;
+  border-radius: 14px;
+  padding: 8px 6px; /* slightly increase padding for breathing space */
+  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.04);
+  list-style: none;
+  margin: 0;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 220ms cubic-bezier(.2,.9,.3,1), transform 160ms ease, opacity 180ms ease;
+  transform-origin: top center;
+  transform: translateY(0);
+  opacity: 0;
+  /* disable pointer events while closed so it can't be interacted with or accidentally hovered */
+  pointer-events: none;
+  z-index: 800; /* match lowered dropdown stacking so header/sidebar stay above */
+}
+
+/* open state */
+.currency-dropdown.open .currency-dropdown-list {
+  max-height: 420px; /* enough for 8 items; script sets exact height when opened */
+  transform: translateY(0);
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* each option */
+.currency-option {
+  display: block;
+  padding: 10px 14px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  border-radius: 10px;
+  margin: 6px 4px;
+}
+
+.currency-option[aria-selected="true"] {
+  background: linear-gradient(90deg, rgba(124,58,237,0.18), rgba(167,139,250,0.08));
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+.currency-option:hover,
+.currency-option:focus {
+  background: rgba(255,255,255,0.04);
+  outline: none;
+}
+
+/* Make sure the dropdown looks good on very small screens */
+@media (max-width: 420px) {
+  .currency-dropdown { min-width: 140px; }
+  .currency-dropdown-toggle { padding: 8px 10px; font-size: 0.95rem; }
+  .currency-option { padding: 8px 10px; font-size: 0.95rem; }
+}
+
+/* Plan card small visual tweaks to match screenshot: icon without border, text inset, stronger purple CTA */
+.plan img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: none; /* ensure no shadow or framed box around the icon */
+  border: none;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Make the heading and meta text align left with a consistent 25px indent from the icon */
+.plan > div {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+/* NEW: better structured internal layout for plan cards:
+   - .plan-row holds the left (icon + text) and right (price) areas
+   - .plan-meta groups title + specs and constrains text to avoid overflow
+*/
+.plan .plan-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.plan .plan-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  min-width: 0; /* allow text to shrink */
+  flex: 1 1 auto;
+}
+
+/* Adjusted: place title and icon on the same row, with icon to the right of the title */
+.plan .plan-meta {
+  display: flex;
+  flex-direction: row; /* changed from column to row */
+  gap: 0
+}
+
+/* ===========================
+   Spec badges styled as rounded gradient rectangles (non-interactive)
+   =========================== */
+.spec-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Make badges visually prominent but not interactive: rounded rectangles with dark purple gradient */
+.spec-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 10px 14px;
+  border-radius: 12px; /* rounded rectangle (not a pill) */
+  background: linear-gradient(180deg, #3f1a66 0%, #2a0f4a 100%); /* darker purple gradient */
+  color: #fff;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 22px rgba(63,26,102,0.18);
+  border: 1px solid rgba(255,255,255,0.04);
+  white-space: nowrap;
+
+  /* Accessibility & mobile stability */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  /* not interactive: use default cursor so it doesn't feel like a button */
+  cursor: default;
+  transition: background 180ms ease, box-shadow 180ms ease;
+  will-change: background, box-shadow;
+  outline: none;
+}
+
+/* remove movement on active/pressed state (keeps visual stability) */
+.spec-badge:active,
+.spec-badge[aria-pressed="true"] {
+  transform: none !important;
+  transition: none !important;
+  box-shadow: 0 8px 22px rgba(63,26,102,0.18);
+}
+
+/* subtle visual affordance on hover/focus but no pointer or scale */
+.spec-badge:hover,
+.spec-badge:focus {
+  background: linear-gradient(180deg, #51307f 0%, #35154f 100%);
+  box-shadow: 0 12px 30px rgba(63,26,102,0.22);
+  transform: none;
+}
+
+/* keyboard focus visible but does not shift layout */
+.spec-badge:focus {
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+}
+
+/* icon inside badge */
+.spec-badge .spec-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Slightly larger badges on mobile for tap friendliness */
+@media (max-width: 767px) {
+  .spec-badge {
+    padding: 12px 16px;
+    font-size: 1rem;
+  }
+}
+
+/* 🔮 BOTÓN ESTILO ZEPHY — COMPLETO */
+.zephy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+
+    /* 📌 GRADIENTE INTERNO DEL BOTÓN (EL QUE ME PEDISTE) */
+    background: linear-gradient(90deg, #ff4fcb, #d24bff, #635bff);
+
+    /* 📌 BORDE GRADIENTE */
+    border: 3px solid transparent;
+    border-radius: 20px;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    background-image:
+        linear-gradient(90deg, #ff4fcb, #d24bff, #635bff),   /* fondo interno */
+        linear-gradient(90deg, #ff8aff, #b27dff, #6f63ff);   /* borde externo */
+
+    text-decoration: none;
+    transition: 0.25s ease;
+    box-shadow: 0 8px 28px rgba(99,91,255,0.12);
+    cursor: pointer;
+}
+
+/* make the main discord button use the zephy style (reduced vertical padding for sleeker look) */
+.discord-btn,
+.discord-btn:link,
+.discord-btn:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  /* reduced vertical padding to make the button shorter while keeping horizontal space */
+  padding: 10px 24px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(90deg, #ff4fcb, #d24bff, #635bff);
+  border: 3px solid transparent;
+  border-radius: 20px;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  background-image:
+      linear-gradient(90deg, #ff4fcb, #d24bff, #635bff),
+      linear-gradient(90deg, #ff8aff, #b27dff, #6f63ff);
+  text-decoration: none;
+  transition: 0.25s ease;
+  box-shadow: 0 8px 28px rgba(99,91,255,0.12);
+  cursor: pointer;
+}
+
+/* 🔮 Hover (applied for both zephy-btn and discord-btn) */
+.zephy-btn:hover,
+.discord-btn:hover {
+    transform: scale(1.06);
+    filter: brightness(1.12);
+}
+
+/* 🔮 Icon sizing — make Discord icon slightly larger for better legibility in the rectangular buttons */
+.zephy-btn .icon,
+.discord-btn .icon,
+.zephy-btn svg,
+.discord-btn svg {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Sidebar variant: keep a rounded pill but tuned for sidebar layout */
+.sidebar-link.discord-link {
+  background: linear-gradient(90deg, #ff4fcb, #d24bff, #635bff);
+  color: #fff;
+  /* slightly reduced vertical padding for a slimmer sidebar button */
+  padding: 8px 10px;
+  border-radius: 14px;
+  font-weight: 800;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* keep a bit more gap so larger icon doesn't crowd text */
+  border: 2px solid rgba(255,255,255,0.06);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  box-shadow: 0 8px 26px rgba(99,91,255,0.12);
+  -webkit-font-smoothing: antialiased;
+}
+.sidebar-link.discord-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(99,91,255,0.18);
+}
+
+/* Optional small external affordance removed to keep Zephy clean (if you want it, re-add) */
+
+/* Floating quick actions (Tidio, WhatsApp, Discord) */
+.floating-actions {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1200;
+  pointer-events: auto;
+}
+.floating-actions a {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  font-weight: 800;
+}
+.floating-actions a:active { transform: scale(0.96); }
+.floating-actions .btn-tidio { background: linear-gradient(135deg,#7c3aed,#5b21b6); }
+.floating-actions .btn-whatsapp { background: linear-gradient(90deg,#25D366,#128C7E); }
+.floating-actions .btn-discord { background: linear-gradient(90deg,#5865F2,#7c3aed); }
+.floating-actions .fab-label {
+  position: absolute;
+  right: 72px;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transform-origin: right center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+.floating-actions a:hover + .fab-label,
+.floating-actions a:focus + .fab-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* Slightly lift on hover for affordance */
+.floating-actions a:hover { transform: translateY(-4px); }
+
+/* Make sure floating actions hide on very small screens if needed */
+@media (max-width: 360px) {
+  .floating-actions { right: 10px; bottom: 12px; gap: 8px; }
+  .floating-actions a { width: 48px; height: 48px; }
+}
+
+/* ===========================
+   Locations section styles
+   =========================== */
+.locations {
+  margin-top: 2rem;
+  color: #fff;
+}
+
+.locations-grid {
+  margin-top: 0.75rem;
+}
+
+/* card */
+.location-card {
+  background: linear-gradient(180deg, rgba(10,8,16,0.95), rgba(20,8,36,0.95));
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 12px 12px 12px 10px; /* reduce horizontal padding so content sits more to the left */
+  border-radius: 12px;
+  display: flex;
+  gap: 10px; /* tighten gap so image and text are closer but not overlapping */
+  align-items: flex-start;
+  min-height: 140px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  transform: translateY(18px) scale(0.995);
+  opacity: 0;
+  transition: transform 520ms cubic-bezier(.16,1,.3,1), opacity 420ms ease, box-shadow 280ms ease;
+  will-change: transform, opacity;
+}
+
+/* ensure the text block can flow to the left without extra inner padding */
+.location-card .location-body {
+  padding-left: 0;
+  min-width: 0; /* allow proper shrinking */
+}
+
+/* make actions align naturally on the left so latency pill sits next to content */
+.location-card .location-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 6px;
+  justify-content: flex-start;
+}
+
+.location-card.visible {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* visual / icon - adjusted for tighter layout */
+.location-visual img {
+  width: 64px;              /* slightly smaller so text has more horizontal room */
+  height: 64px;
+  object-fit: contain;      /* preserve flag aspect; avoid cropping long svgs */
+  border-radius: 8px;
+  display: block;
+  flex-shrink: 0;
+  margin-right: 6px;        /* small visual gap to the left-aligned text */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.38);
+}
+
+/* body */
+.location-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.location-body h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  margin: 0;
+  color: #fff;
+}
+
+.location-meta {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.95rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+/* actions row */
+.location-actions {
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  margin-top: 6px;
+}
+
+/* latency pill (pinned to top-left corner of the card) */
+.latency-pill {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 8;
+  background: linear-gradient(90deg, rgba(124,58,237,0.12), rgba(167,139,250,0.08));
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 800;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 8px 18px rgba(124,58,237,0.12);
+  border: 1px solid rgba(255,255,255,0.03);
+  display: inline-block;
+}
+
+/* make room at the top of the card so the pill doesn't overlap important content */
+.location-card {
+  padding-top: 12px;
+  padding-bottom: 44px; /* room for bottom-left latency pill */
+}
+
+/* small responsive tweaks */
+@media (max-width: 767px) {
+  .location-card {
+    flex-direction: row;
+    padding: 16px;
+    gap: 12px;
+    min-height: 160px;
+  }
+  .location-visual img { width: 84px; height: 84px; }
+  .location-body h3 { font-size: 1.05rem; }
+}
+
+/* Accessibility focus visible */
+.location-card:focus {
+  outline: 3px solid rgba(124,58,237,0.18);
+  outline-offset: 4px;
+}
+
+/* Minor visual bug fixes: ensure spec-badge doesn't use pointer cursor and reduce over-contrasting shadow */
+.spec-badge { cursor: default; box-shadow: 0 6px 18px rgba(63,26,102,0.14); }
+
+/* Ensure .plan img keeps consistent sizes and no overflow */
+.plan img { width: 56px; height: 56px; }
+
+/* ---------------------------
+   Additional animations (applied conservatively so hamburger/menu isn't affected)
+   --------------------------- */
+
+/* Utility animation classes */
+.anim-fadeInUp { animation: fadeInUp 560ms cubic-bezier(.16,1,.3,1) both; }
+.anim-fadeInDown { animation: fadeInDown 560ms cubic-bezier(.16,1,.3,1) both; }
+.anim-fadeInLeft { animation: fadeInLeft 560ms cubic-bezier(.16,1,.3,1) both; }
+.anim-fadeInRight { animation: fadeInRight 560ms cubic-bezier(.16,1,.3,1) both; }
+.anim-slideInRight { animation: slideInRight 420ms cubic-bezier(.2,.9,.3,1) both; }
+.anim-bounceInLeft { animation: bounceInLeft 720ms cubic-bezier(.2,.9,.3,1) both; }
+.anim-bounceInUp { animation: bounceInUp 720ms cubic-bezier(.2,.9,.3,1) both; }
+.anim-tada { animation: tada 820ms both; }
+.anim-headShake { animation: headShake 820ms both; }
+.anim-float { animation: float 3200ms ease-in-out infinite; }
+.anim-grow { animation: grow 520ms ease forwards; }
+
+/* Stagger helpers for groups */
+.stagger > * { opacity: 0; transform: translateY(12px); }
+.stagger.animate > * {
+  opacity: 1;
+  transform: translateY(0);
+  transition: transform 520ms cubic-bezier(.16,1,.3,1), opacity 420ms ease;
+}
+.stagger.animate > *:nth-child(1){ transition-delay: 60ms; }
+.stagger.animate > *:nth-child(2){ transition-delay: 120ms; }
+.stagger.animate > *:nth-child(3){ transition-delay: 180ms; }
+.stagger.animate > *:nth-child(4){ transition-delay: 240ms; }
+.stagger.animate > *:nth-child(5){ transition-delay: 300ms; }
+
+/* Apply subtle float to hero label icon without touching hamburger */
+.hero-label-icon.anim-float { animation-delay: 400ms; }
+
+/* Intro for hero content: left column fades up, right visuals slide in from right */
+.hero-left.anim-fadeInUp { animation-delay: 180ms; }
+.hero-right.anim-slideInRight { animation-delay: 260ms; }
+
+/* Features: use fadeInLeft when showing */
+.feature.visible.anim-fadeInLeft { animation-delay: 80ms; }
+
+/* Locations cards: give bounce-in-up reveal */
+.location-card.visible.anim-bounceInUp { animation-delay: 60ms; }
+
+/* Price comparison and plans: fadeInRight for the table */
+.price-comparison .compare-table.anim-fadeInRight { animation-delay: 120ms; }
+.plans-grid.anim-stagger { /* group helper */ }
+
+/* Floating actions: gentle head shake on hover for attention (non-invasive) */
+.floating-actions a:hover { animation: headShake 820ms; }
+
+/* Keep animations respectful for reduced-motion users */
+@media (prefers-reduced-motion: reduce) {
+  .anim-fadeInUp, .anim-fadeInDown, .anim-fadeInLeft, .anim-fadeInRight,
+  .anim-slideInRight, .anim-bounceInLeft, .anim-bounceInUp, .anim-tada,
+  .anim-headShake, .anim-float, .anim-grow, .stagger > *, .stagger.animate > * {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Keyframes (user provided set) */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes bounceInLeft {
+    0% { opacity: 0; transform: translateX(-2000px); }
+    60% { opacity: 1; transform: translateX(30px); }
+    80% { transform: translateX(-10px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes bounceInUp {
+    0% { opacity: 0; transform: translateY(2000px); }
+    60% { opacity: 1; transform: translateY(-30px); }
+    80% { transform: translateY(10px); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes tada {
+    0% { transform: scale(1); }
+    10%, 20% { transform: scale(0.9) rotate(-3deg); }
+    30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+    40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes headShake {
+    0% { transform: translateX(0); }
+    6.5% { transform: translateX(-6px) rotateY(-9deg); }
+    18.5% { transform: translateX(5px) rotateY(7deg); }
+    31.5% { transform: translateX(-3px) rotateY(-5deg); }
+    43.5% { transform: translateX(2px) rotateY(3deg); }
+    50% { transform: translateX(0); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+@keyframes grow {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+}
+
+/* Small visual consistency: ensure .btn-primary alignment inside .location-actions */
+.location-actions .btn-primary { padding: 8px 12px; font-size: 0.95rem; }
+
+/* Cookie banner */
+.cookie-banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 18px;
+  z-index: 1300;
+  background: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(10,8,16,0.95));
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 10px 12px;
+  border-radius: 12px;
+  box-shadow: 0 12px 38px rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  color: #fff;
+  font-weight: 700;
+  font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+.cookie-banner[hidden] { display: none; }
+
+.cookie-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.cookie-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5));
+}
+
+.cookie-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.cookie-text .cookie-desc {
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.9rem;
+}
+
+.cookie-actions {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-shrink: 0;
+}
+
+.cookie-accept { padding: 8px 12px; border-radius: 10px; }
+.cookie-manage, .cookie-decline { padding: 8px 10px; border-radius: 10px; background: transparent; border: 1px solid rgba(255,255,255,0.06); color: #fff; font-weight:700; }
+
+/* Responsive: make banner compact on very small screens */
+@media (max-width: 420px) {
+  .cookie-banner { left: 10px; right: 10px; bottom: 12px; padding: 10px; }
+  .cookie-text .cookie-desc { font-size: 0.82rem; }
+  .cookie-icon { width:34px; height:34px; }
+  .cookie-actions { gap:6px; }
 }

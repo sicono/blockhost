@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sobre BlockHost</title>
+  <meta name="description" content="Sobre BlockHost — por qué empezamos y quiénes somos: Krummi y Miguel." />
+  <link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" />
+  <link rel="icon" sizes="192x192" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" type="image/png"/>
+  <link rel="shortcut icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" type="image/png"/>
+  <link rel="apple-touch-icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" type="image/png"/>
+  <link rel="icon" href="favicon-32x32.png" type="image/png">
+  <link rel="shortcut icon" href="favicon-32x32.png" type="image/png"/>
+  <link rel="apple-touch-icon" href="favicon-32x32.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .about-hero { padding: 3rem 0; }
+    .about-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.04);
+      padding: 1.5rem;
+      border-radius: 12px;
+      color: #fff;
+    }
+    .founders {
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap:1rem;
+      margin-top:1rem;
+      align-items:start;
+    }
+    .founder {
+      background: linear-gradient(180deg, rgba(10,8,16,0.95), rgba(20,8,36,0.95));
+      border-radius: 12px;
+      padding:12px;
+      text-align:center;
+      min-height:180px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-start;
+    }
+    .founder .avatar {
+      width:96px;
+      height:96px;
+      border-radius:12px;
+      object-fit:cover;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .founder h4 { margin:0; font-family:'Poppins',sans-serif; font-weight:800; }
+    .founder p { color:rgba(255,255,255,0.9); font-size:0.95rem; }
+    .render-box {
+      border: 2px dashed rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.01);
+      min-height: 180px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      flex-direction:column;
+    }
+    .render-box img { width:120px; height:120px; object-fit:cover; border-radius:8px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">
+        <img src="https://blockhost.es/logo.png" alt="BlockHost logo" />
+        <span class="brand">BlockHost</span>
+      </a>
+
+      <button id="menuToggle" class="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="sidebar" onclick="toggleMenu()">
+        <span class="line line1"></span>
+        <span class="line line2"></span>
+        <span class="line line3"></span>
+      </button>
+
+      <nav class="nav">
+        <a class="nav-btn gradient-btn" href="https://panel.blockhost.es/">Acceder al panel</a>
+        <a class="nav-btn gradient-outline" href="registrarse.html">Registrarse</a>
+        <a class="nav-btn gradient-ghost" href="afiliados.html">Afiliados</a>
+        <a class="nav-btn discord-btn" href="https://discord.gg/NCm6kbHXpr" target="_blank" rel="noopener">Únete a nuestro Discord</a>
+      </nav>
+    </div>
+  </header>
+
+  <aside id="sidebar" class="sidebar" aria-hidden="true" role="dialog" aria-label="Menú">
+    <div class="sidebar-inner">
+      <a class="sidebar-logo logo" href="/" style="text-decoration:none;">
+        <img src="https://blockhost.es/logo.png" alt="BlockHost logo" />
+        <span class="brand">BlockHost</span>
+      </a>
+
+      <a class="sidebar-link" href="/">Inicio</a>
+      <a class="sidebar-link" href="/registrarse.html">Registrarse</a>
+      <a class="sidebar-link" href="/error404.html">Afiliados</a>
+      <a class="sidebar-link" href="/precios.html#planes">Planes</a>
+      <a class="sidebar-link discord-link" href="https://discord.gg/NCm6kbHXpr" target="_blank" rel="noopener">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-discord" viewBox="0 0 16 16" aria-hidden="true" focusable="false" style="vertical-align:middle; margin-right:8px;">
+          <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+        </svg>
+        Únete a nuestro Discord
+      </a>
+
+      <a class="sidebar-cta" href="https://panel.blockhost.es/">Panel de Control</a>
+    </div>
+  </aside>
+
+  <main class="about-hero">
+    <div class="container">
+      <div class="about-card">
+        <h1 class="plans-title">Sobre BlockHost</h1>
+        <p style="color:rgba(255,255,255,0.88); margin-top:0.6rem;">
+          Empezamos BlockHost porque estábamos hartos de pagar mucho por hosting mientras jugábamos y administrábamos servidores. Nos preguntamos: "¿y si ofrecemos a todos un hosting súper barato y de calidad?" — así nació BlockHost. Queremos que cualquier comunidad pueda tener servidores rápidos, soporte real y precios justos.
+        </p>
+
+        <h2 style="margin-top:1rem; color:#fff;">Nuestra historia</h2>
+        <p style="color:rgba(255,255,255,0.85);">
+          La idea surgió entre Krummi y Miguel durante varias conversaciones sobre costes, rendimiento y lo frustrante que es encontrar precios razonables sin sacrificar calidad. Probamos infraestructuras, optimizamos paneles y automatizamos backups para ofrecer un producto accesible y fiable.
+        </p>
+
+        <div class="founders" aria-hidden="false">
+          <div class="founder">
+            <img class="avatar" src="skinlunark.png" alt="Krummi — avatar" />
+            <h4>Krummi</h4>
+            <p>Co-fundador — infraestructura y redes. Le apasiona optimizar costes sin perder rendimiento.</p>
+          </div>
+
+          <div class="founder">
+            <img class="avatar" src="siconoskin.png" alt="Miguel — avatar" />
+            <h4>Miguel</h4>
+            <p>Co-fundador — producto y soporte. Enfocado en experiencia de usuario, seguridad VPS y atención 24/7.</p>
+          </div>
+
+
+        </div>
+
+        <h3 style="margin-top:1rem; color:#fff;">Qué nos mueve</h3>
+        <ul style="color:rgba(255,255,255,0.88); margin-top:0.5rem; list-style:disc; padding-left:1.25rem;">
+          <li>Precios justos: hosting accesible para comunidades pequeñas y grandes.</li>
+          <li>Rendimiento: NVMe, CPUs modernas y redes con buen peering.</li>
+          <li>Soporte humano 24/7: asistencia real, no solo respuestas automáticas.</li>
+          <li>Transparencia: políticas claras y panel fácil de usar.</li>
+        </ul>
+
+        <div style="margin-top:1rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+          <a class="btn btn-primary" href="precios.html#planes">Ver planes</a>
+          <a class="btn btn-ghost" href="mailto:support@blockhost.es">Contactar</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div> BlockHost — Servidores de Minecraft</div>
+      <div class="footer-links">
+        <a href="https://blockhost.es/politicas.html">Términos</a>
+        <a href="https://blockhost.es/politicas.html">Privacidad</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script type="module" src="/js/init.js"></script>
+  <script type="module" src="/js/tb-stub.js"></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BlockHost — Eventos</title>
+  <meta name="description" content="Calendario de eventos y torneos de la comunidad BlockHost." />
+  <link rel="icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" />
+  <link rel="icon" sizes="192x192" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" type="image/png"/>
+  <link rel="shortcut icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" type="image/png"/>
+  <link rel="apple-touch-icon" href="https://static.wixstatic.com/media/c545ec_444696d9408a4dbdba1391c5e1f320a8%7Emv2.png" type="image/png"/>
+  <link rel="icon" href="favicon-32x32.png" type="image/png">
+  <link rel="shortcut icon" href="favicon-32x32.png" type="image/png"/>
+  <link rel="apple-touch-icon" href="favicon-32x32.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+
+  <style>
+    /* Simple event list styling */
+    .events-main { padding: 3rem 0; }
+    .events-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .events-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:1rem; margin-top:1rem; }
+    .event-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.05);
+      padding:1rem;
+      border-radius:12px;
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      gap:0.6rem;
+      min-height:160px;
+    }
+    .event-top { display:flex; gap:0.75rem; align-items:center; }
+    .event-thumb { width:72px; height:72px; border-radius:8px; object-fit:cover; background:#0f0f14; flex-shrink:0; }
+    .event-title { font-weight:800; font-family:'Poppins',sans-serif; font-size:1.05rem; }
+    .event-meta { color:rgba(255,255,255,0.85); font-size:0.95rem; }
+    .event-actions { margin-top:auto; display:flex; gap:0.5rem; }
+    .event-tag { background:rgba(124,58,237,0.12); color:#fff; padding:6px 8px; border-radius:10px; font-weight:700; font-family:'Poppins',sans-serif; font-size:0.85rem; }
+    .no-events { color:rgba(255,255,255,0.9); padding:1rem; background:transparent; border-radius:10px; }
+    @media (max-width:767px) {
+      .events-main { padding: 2rem 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">
+        <img src="https://blockhost.es/logo.png" alt="BlockHost logo" />
+        <span class="brand">BlockHost</span>
+      </a>
+
+      <button id="menuToggle" class="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="sidebar" onclick="toggleMenu()">
+        <span class="line line1"></span>
+        <span class="line line2"></span>
+        <span class="line line3"></span>
+      </button>
+
+      <nav class="nav">
+        <a class="nav-btn gradient-btn" href="https://panel.blockhost.es/">Acceder al panel</a>
+        <a class="nav-btn gradient-outline" href="registrarse.html">Registrarse</a>
+        <a class="nav-btn gradient-ghost" href="afiliados.html">Afiliados</a>
+        <a class="nav-btn discord-btn" href="https://discord.gg/NCm6kbHXpr" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-discord" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+</svg> Únete a nuestro Discord</a>
+        <a class="cta" href="/">Inicio</a>
+      </nav>
+    </div>
+  </header>
+
+  <aside id="sidebar" class="sidebar" aria-hidden="true" role="dialog" aria-label="Menú">
+    <div class="sidebar-inner">
+      <a class="sidebar-logo logo" href="/" style="text-decoration:none;">
+        <img src="https://blockhost.es/logo.png" alt="BlockHost logo" />
+        <span class="brand">BlockHost</span>
+      </a>
+
+      <a class="sidebar-link highlight" href="/">Inicio</a>
+      <a class="sidebar-link" href="/registrarse.html">Registrarse</a>
+      <a class="sidebar-link" href="/error404.html">Afiliados</a>
+      <a class="sidebar-link" href="/precios.html#planes">Planes</a>
+
+      <a class="sidebar-link discord-link" href="https://discord.gg/NCm6kbHXpr" target="_blank" rel="noopener">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-discord" viewBox="0 0 16 16" aria-hidden="true" focusable="false" style="vertical-align:middle; margin-right:8px;">
+          <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+        </svg>
+        Únete a nuestro Discord
+      </a>
+
+      <a class="sidebar-cta" href="https://panel.blockhost.es/">Panel de Control</a>
+    </div>
+  </aside>
+
+  <main class="events-main">
+    <div class="container">
+      <div class="events-header">
+        <div>
+          <h1 class="plans-title">Eventos</h1>
+          <p style="color:rgba(255,255,255,0.9); margin-top:0.5rem;">Calendario de torneos, actividades y eventos especiales organizados por la comunidad BlockHost.</p>
+        </div>
+        <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+          <a class="btn btn-primary" href="registrarse.html">Apúntate como organizador</a>
+          <a class="btn btn-ghost" href="mailto:support@blockhost.es">Proponer evento</a>
+        </div>
+      </div>
+
+      <!-- Events grid -->
+      <section aria-labelledby="upcoming-events">
+        <h2 id="upcoming-events" class="services h2" style="display:none;">Próximos eventos</h2>
+
+        <div class="events-grid" id="eventsGrid">
+          <!-- Replaced examples with a single event -->
+          <article class="event-card" role="article" aria-label="Instancia Squid Craft Games 4">
+            <div class="event-top">
+              <img class="event-thumb" src="SquidCraft.jpg" alt="Squid Craft logo" aria-hidden="true" />
+              <div>
+                <div class="event-title">Instancia Squid Craft Games 4</div>
+                <div class="event-meta">Próxima · Fecha por confirmar · Mini-juegos · Premios y clasificación</div>
+              </div>
+            </div>
+            <div class="event-meta">Únete a la instancia competitiva de Squid Craft; partidas rápidas y torneo por rondas — plazas limitadas.</div>
+            <div class="event-actions">
+              <span class="event-tag">Evento</span>
+              <a class="btn btn-primary" href="registrarse.html" style="padding:8px 12px; font-size:0.95rem;">Apuntarme</a>
+            </div>
+          </article>
+        </div>
+
+        <!-- Small calendar / archive link -->
+        <div style="margin-top:1rem; display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+          <a class="btn" style="background:transparent; border:1px solid rgba(255,255,255,0.06); color:#fff;" href="mailto:support@blockhost.es">Contactar organización</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div> BlockHost — Servidores de Minecraft</div>
+      <div class="footer-links">
+        <a href="https://blockhost.es/politicas.html">Términos</a>
+        <a href="https://blockhost.es/politicas.html">Privacidad</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating quick actions -->
+  <div class="floating-actions" aria-hidden="false">
+    <a href="#" class="btn-tidio" id="fabTidioEvents" aria-label="Abrir chat">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v10a4 4 0 0 1-4 4H9l-5 4V4z" fill="currentColor"/></svg>
+    </a><span class="fab-label">Chat en vivo</span>
+
+    <a href="https://wa.me/34615545027" class="btn-whatsapp" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+      </svg>
+    </a><span class="fab-label">WhatsApp</span>
+
+    <a href="https://discord.gg/NCm6kbHXpr" class="btn-discord" target="_blank" rel="noopener" aria-label="Discord">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-discord" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+</svg>
+    </a><span class="fab-label">Únete a Discord</span>
+  </div>
+
+  <script>
+    document.getElementById('fabTidioEvents')?.addEventListener('click', function(e){
+      e.preventDefault(); try { if (window.tidioChatApi && window.tidioChatApi.open) window.tidioChatApi.open(); } catch(e){ console.warn(e); }
+    });
+  </script>
+
+  <script src="script.js"></script>
+  <script type="module" src="/js/init.js"></script>
+  <script type="module" src="/js/tb-stub.js"></script>
+</body>
+</html>
