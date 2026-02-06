@@ -73,7 +73,8 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
 
   function validateStep() {
     const activeSection = sections[currentStep - 1];
-    const requiredInputs = activeSection.querySelectorAll("input[required]");
+    const requiredInputs = activeSection.querySelectorAll("input[required], select[required], textarea[required]");
+
     for (const input of requiredInputs) {
       if (
         (input.type === "radio" && !activeSection.querySelector(`input[name="${input.name}"]:checked`)) ||
@@ -99,20 +100,56 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
     summaryEmail.textContent = email && email.value.trim() ? email.value.trim() : "-";
   }
 
-  function redirectToStripe() {
-    const link = stripeLinks[selectedPlan] || stripeLinks.Mini;
-    window.location.href = link;
+ async function redirectToStripe() {
+  const version = document.querySelector('input[name="version"]:checked')?.value;
+  const software = document.querySelector('input[name="software"]:checked')?.value;
+  const region = document.querySelector('input[name="region"]:checked')?.value;
+  const email = document.getElementById("email")?.value?.trim();
+
+  const billing = document.getElementById("billing")?.value || "monthly";
+  const backups = document.getElementById("addon-backups")?.checked ? "1" : "0";
+
+  // Backups solo mensual (según tu caso)
+  if (backups === "1" && billing !== "monthly") {
+    alert("Los backups solo están disponibles en facturación mensual.");
+    return;
   }
 
-  btnNext.addEventListener("click", () => {
-    if (!validateStep()) return;
-    updateSummary();
-    if (currentStep < sections.length) {
-      goToStep(currentStep + 1);
-    } else {
-      redirectToStripe();
-    }
+  const res = await fetch("https://pagosblockhost.miguelangelruizbarroso915.workers.dev/create-checkout-session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      plan: selectedPlan,
+      version,
+      software,
+      region,
+      email,
+      billing,
+      backups
+    })
   });
+
+  const data = await res.json();
+  if (!res.ok) {
+    alert("Error iniciando el pago: " + (data?.error || "desconocido"));
+    return;
+  }
+
+  window.location.href = data.url;
+}
+
+
+  btnNext.addEventListener("click", async () => {
+  if (!validateStep()) return;
+  updateSummary();
+
+  if (currentStep < sections.length) {
+    goToStep(currentStep + 1);
+  } else {
+    await redirectToStripe();
+  }
+});
+
 
   btnBack.addEventListener("click", () => {
     if (currentStep > 1) goToStep(currentStep - 1);
