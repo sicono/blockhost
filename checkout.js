@@ -303,6 +303,11 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
       { value: "Spigot", label: "Spigot", desc: "Compatible con plugins" },
       { value: "Fabric", label: "Fabric", desc: "Modding ligero" },
       { value: "Forge", label: "Forge", desc: "Mods complejos" },
+      { value: "Bungeecord", label: "BungeeCord", desc: "Proxy para conectar servidores" },
+      { value: "Arclight", label: "Arclight", desc: "Mods + plugins (híbrido)" },
+      { value: "Mohist", label: "Mohist", desc: "Mods + plugins (híbrido)" },
+      { value: "SpongeForge", label: "SpongeForge", desc: "Sponge sobre Forge" },
+      { value: "SpongeVanilla", label: "SpongeVanilla", desc: "Sponge sobre Vanilla" },
     ],
     Bedrock: [
       { value: "Vanilla", label: "Vanilla", desc: "Bedrock oficial" },
