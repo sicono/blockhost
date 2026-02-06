@@ -1,184 +1,174 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Checkout — BlockHost</title>
-
-<link rel="icon" href="favicon-32x32.png">
-<link rel="stylesheet" href="checkout.css">
-<link rel="stylesheet" href="overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Checkout — BlockHost</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="stylesheet" href="checkout.css">
+  <link rel="stylesheet" href="overrides.css">
 </head>
-
 <body>
+  <header class="site-header">
+    <div class="brand">
+      <img src="/logo.png" alt="BlockHost logo" class="logo">
+      <div>
+        <h1>BlockHost</h1>
+        <p class="tag">Hosting profesional para servidores Minecraft</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <a class="btn translucent" href="/">Inicio</a>
+      <a class="btn translucent" href="precios.html">Precios</a>
+    </nav>
+  </header>
 
-<header class="site-header">
-<div class="brand">
-<img src="/logo.png" class="logo">
-<div>
-<h1>BlockHost</h1>
-<p class="tag">Hosting profesional para servidores Minecraft</p>
-</div>
-</div>
+  <main class="checkout-container">
+    <div class="checkout-wrapper">
+      <div class="checkout-form">
+        <h2>Configurar tu Servidor</h2>
+        <p class="subtitle">Personaliza tu servidor Minecraft</p>
 
-<nav class="nav">
-<a class="btn translucent" href="/">Inicio</a>
-<a class="btn translucent" href="precios.html">Precios</a>
-</nav>
-</header>
+        <div class="step-indicator">
+          <div class="step active" data-step="1">
+            <span class="step-number">1</span>
+            <span class="step-label">Versión</span>
+          </div>
+          <div class="step" data-step="2">
+            <span class="step-number">2</span>
+            <span class="step-label">Software</span>
+          </div>
+          <div class="step" data-step="3">
+            <span class="step-number">3</span>
+            <span class="step-label">Región</span>
+          </div>
+          <div class="step" data-step="4">
+            <span class="step-number">4</span>
+            <span class="step-label">Cuenta</span>
+          </div>
+        </div>
 
-<main class="checkout-container">
-<div class="checkout-wrapper">
+        <form id="checkout-form" novalidate>
+          <div class="form-section active" data-section="1">
+            <label class="form-label">Versión de Minecraft</label>
+            <div class="option-group">
+              <label class="option-card">
+                <input type="radio" name="version" value="Java" required>
+                <div class="option-content">
+                  <span class="option-title">Java Edition</span>
+                  <span class="option-desc">PC, Mac, Linux</span>
+                </div>
+              </label>
+              <label class="option-card">
+                <input type="radio" name="version" value="Bedrock" required>
+                <div class="option-content">
+                  <span class="option-title">Bedrock Edition</span>
+                  <span class="option-desc">Mobile, Console, Windows 10</span>
+                </div>
+              </label>
+            </div>
+          </div>
 
-<!-- ================= LEFT FORM ================= -->
+          <div class="form-section" data-section="2">
+            <label class="form-label">Software / Núcleo</label>
+            <div class="option-group vertical" id="software-options"></div>
+          </div>
 
-<div class="checkout-form">
+          <div class="form-section" data-section="3">
+            <label class="form-label">Región del Servidor</label>
+            <div class="option-group">
+              <label class="option-card">
+                <input type="radio" name="region" value="Canada" required>
+                <div class="option-content">
+                  <span class="option-title">🇨🇦 Canadá</span>
+                  <span class="option-desc">Baja latencia para América</span>
+                </div>
+              </label>
+              
+            </div>
+          </div>
 
-<h2>Configurar tu Servidor</h2>
-<p class="subtitle">Personaliza tu servidor Minecraft</p>
+          <div class="form-section" data-section="4">
+            <label class="form-label" for="billing" style="margin-top:12px;">Facturación</label>
+  <select id="billing" name="billing" class="form-input" required>
+  <option value="monthly">Mensual</option>
+  <option value="3m">Cada 3 meses</option>
+  <option value="6m">Cada 6 meses</option>
+  <option value="year">Anual</option>
+  </select>
 
-<div class="step-indicator">
+  <label style="display:flex; gap:10px; align-items:center; margin-top:12px;">
+  <input type="checkbox" id="addon-backups" />
+  Añadir Backups (mensual)
+  </label>
 
-<div class="step active"><span>1</span>Versión</div>
-<div class="step"><span>2</span>Software</div>
-<div class="step"><span>3</span>Región</div>
-<div class="step"><span>4</span>Cuenta</div>
+            <label class="form-label" for="email">Correo Electrónico</label>
+            <input type="email" id="email" name="email" class="form-input" placeholder="tu@email.com" required>
+            <p class="form-hint">Tu servidor será asignado a esta cuenta. Si no tienes cuenta, créala primero.</p>
+            <div class="account-links">
+              <a href="registro.html" class="link">Crear cuenta</a>
+            </div>
+          </div>
 
-</div>
+          <div class="form-actions">
+            <button type="button" class="btn secondary" id="btn-back" style="display: none;">← Atrás</button>
+            <button type="button" class="btn primary" id="btn-next">Siguiente →</button>
+          </div>
+        </form>
 
-<form id="checkout-form">
+        <!-- ✅ Botón restaurado de Stripe -->
+        <div id="payment-section" style="display: none; text-align: center; margin-top: 20px;">
+          <a id="stripe-button" class="btn primary" href="#" target="_blank" rel="noopener noreferrer">
+            💳 Pagar ahora con Stripe
+          </a>
+        </div>
+      </div>
 
-<!-- VERSION -->
-<div class="form-section active">
+      <div class="checkout-summary">
+        <h3>Resumen del Pedido</h3>
 
-<label class="form-label">Versión</label>
+        <div class="summary-section">
+          <h4 id="plan-title">Plan Mini</h4>
+          <div class="summary-specs">
+            <div class="spec-item"><span class="spec-label">RAM:</span><span class="spec-value" id="spec-ram">4GB</span></div>
+            <div class="spec-item"><span class="spec-label">Almacenamiento:</span><span class="spec-value" id="spec-storage">25 GB SSD</span></div>
+            <div class="spec-item"><span class="spec-label">Jugadores:</span><span class="spec-value" id="spec-players">15-25</span></div>
+          </div>
+        </div>
 
-<label class="option-card">
-<input type="radio" name="version" value="Java" required>
-Java Edition
-</label>
+        <div class="summary-section">
+          <h4>Configuración</h4>
+          <div class="config-item"><span class="config-label">Versión:</span><span class="config-value" id="summary-version">-</span></div>
+          <div class="config-item"><span class="config-label">Software:</span><span class="config-value" id="summary-software">-</span></div>
+          <div class="config-item"><span class="config-label">Región:</span><span class="config-value" id="summary-region">-</span></div>
+          <div class="config-item"><span class="config-label">Email:</span><span class="config-value" id="summary-email">-</span></div>
+        </div>
 
-<label class="option-card">
-<input type="radio" name="version" value="Bedrock" required>
-Bedrock Edition
-</label>
+        <div class="summary-total">
+          <div class="total-row"><span class="total-label">Subtotal:</span><span class="total-value" id="price-subtotal">3,50 €</span></div>
+          <div class="total-row"><span class="total-label">IVA (21%):</span><span class="total-value" id="price-tax">0,74 €</span></div>
+          <div class="total-row total-final"><span class="total-label">Total mensual:</span><span class="total-value" id="price-total">4,24 €</span></div>
+        </div>
 
-</div>
+        <div class="summary-footer">
+          <p>✓ Sin compromiso de permanencia</p>
+          <p>✓ Cancela cuando quieras</p>
+          <p>✓ Soporte 24/7</p>
+        </div>
+      </div>
+    </div>
+  </main>
 
-<!-- SOFTWARE -->
-<div class="form-section">
-<label class="form-label">Software</label>
-<div id="software-options"></div>
-</div>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="copy">© 2025 BlockHost — Hecho para servidores Minecraft</span>
+      <a class="btn translucent discord-btn" href="https://discord.gg/blockhost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><defs><linearGradient id="dgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7289da"/><stop offset="100%" stop-color="#5865F2"/></linearGradient></defs><path fill="url(#dgrad)" d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011..."/></svg>
+        Únete a nuestro Discord
+      </a>
+    </div>
+  </footer>
 
-<!-- REGION -->
-<div class="form-section">
-<label class="form-label">Región</label>
-
-<label class="option-card">
-<input type="radio" name="region" value="Canada" required>
-🇨🇦 Canadá
-</label>
-
-</div>
-
-<!-- ACCOUNT -->
-<div class="form-section">
-
-<label class="form-label">Facturación</label>
-
-<select id="billing" required>
-<option value="monthly">Mensual</option>
-<option value="3m">Cada 3 meses</option>
-<option value="6m">Cada 6 meses</option>
-<option value="year">Anual</option>
-</select>
-
-<label class="addon-row">
-<input type="checkbox" id="addon-backups">
-Añadir Backups (mensual)
-</label>
-
-<label class="form-label">Correo</label>
-
-<input type="email" id="email" placeholder="tu@email.com" required>
-
-<p class="form-hint">
-Tu servidor se asignará a esta cuenta.
-</p>
-
-</div>
-
-<div class="form-actions">
-
-<button type="button" id="btn-back">← Atrás</button>
-<button type="button" id="btn-next">Pagar ahora</button>
-
-</div>
-
-</form>
-
-</div>
-
-<!-- ================= RIGHT SUMMARY ================= -->
-
-<div class="checkout-summary">
-
-<h3>Resumen del Pedido</h3>
-
-<div class="summary-section">
-
-<h4 id="plan-title">Plan Mini</h4>
-
-<div class="spec-item">RAM: <span id="spec-ram">4GB</span></div>
-<div class="spec-item">SSD: <span id="spec-storage">25GB</span></div>
-<div class="spec-item">Jugadores: <span id="spec-players">15-25</span></div>
-
-</div>
-
-<div class="summary-section">
-
-<h4>Configuración</h4>
-
-<div>Versión: <span id="summary-version">-</span></div>
-<div>Software: <span id="summary-software">-</span></div>
-<div>Región: <span id="summary-region">-</span></div>
-<div>Email: <span id="summary-email">-</span></div>
-<div>Facturación: <span id="summary-billing">-</span></div>
-<div>Backups: <span id="summary-backups">-</span></div>
-
-</div>
-
-<div class="summary-total">
-
-<div>Subtotal: <span id="price-subtotal">0€</span></div>
-<div>IVA: <span id="price-tax">0€</span></div>
-
-<div class="total-final">
-<span id="total-label">Total:</span>
-<span id="price-total">0€</span>
-</div>
-
-</div>
-
-<div class="summary-footer">
-
-✓ Sin permanencia  
-✓ Cancelación libre  
-✓ Soporte 24/7  
-
-</div>
-
-</div>
-
-</div>
-</main>
-
-<footer class="site-footer">
-© BlockHost 2025
-</footer>
-
-<script type="module" src="checkout.js"></script>
-
+  <script type="module" src="checkout.js"></script>
 </body>
 </html>
