@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="checkout.css">
   <link rel="stylesheet" href="overrides.css">
 </head>
+
 <body>
   <header class="site-header">
     <div class="brand">
@@ -49,6 +50,7 @@
         </div>
 
         <form id="checkout-form" novalidate>
+          <!-- STEP 1 -->
           <div class="form-section active" data-section="1">
             <label class="form-label">Versión de Minecraft</label>
             <div class="option-group">
@@ -59,6 +61,7 @@
                   <span class="option-desc">PC, Mac, Linux</span>
                 </div>
               </label>
+
               <label class="option-card">
                 <input type="radio" name="version" value="Bedrock" required>
                 <div class="option-content">
@@ -69,83 +72,111 @@
             </div>
           </div>
 
+          <!-- STEP 2 -->
           <div class="form-section" data-section="2">
             <label class="form-label">Software / Núcleo</label>
             <div class="option-group vertical" id="software-options"></div>
           </div>
 
+          <!-- STEP 3 -->
           <div class="form-section" data-section="3">
             <label class="form-label">Región del Servidor</label>
             <div class="option-group">
               <label class="option-card">
-                <input type="radio" name="region" value="Canada" required>
+                <input type="radio" name="region" value="Canada" required checked>
                 <div class="option-content">
                   <span class="option-title">🇨🇦 Canadá</span>
                   <span class="option-desc">Baja latencia para América</span>
                 </div>
               </label>
-              
             </div>
+            <p class="form-hint" style="margin-top:12px;">
+              Actualmente solo disponible en Canadá.
+            </p>
           </div>
 
+          <!-- STEP 4 -->
           <div class="form-section" data-section="4">
             <label class="form-label" for="billing" style="margin-top:12px;">Facturación</label>
-  <select id="billing" name="billing" class="form-input" required>
-  <option value="monthly">Mensual</option>
-  <option value="3m">Cada 3 meses</option>
-  <option value="6m">Cada 6 meses</option>
-  <option value="year">Anual</option>
-  </select>
+            <select id="billing" name="billing" class="form-input" required>
+              <option value="monthly">Mensual</option>
+              <option value="3m">Cada 3 meses</option>
+              <option value="6m">Cada 6 meses</option>
+              <option value="year">Anual</option>
+            </select>
 
-  <label style="display:flex; gap:10px; align-items:center; margin-top:12px;">
-  <input type="checkbox" id="addon-backups" />
-  Añadir Backups (mensual)
-  </label>
+            <label style="display:flex; gap:10px; align-items:center; margin-top:12px;">
+              <input type="checkbox" id="addon-backups">
+              Añadir Backups (mensual)
+            </label>
 
-            <label class="form-label" for="servername">
-  Nombre del servidor
-</label>
+            <!-- SERVER NAME -->
+            <label class="form-label" for="servername" style="margin-top:18px;">
+              Nombre del servidor
+            </label>
 
-<div style="display:flex;align-items:center;gap:6px;">
-  <input 
-    type="text" 
-    id="servername" 
-    name="servername" 
-    class="form-input" 
-    placeholder="miservidor"
-    pattern="[a-zA-Z0-9-]+"
-    required
-  >
-  <span>.blockhost.es</span>
-</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input
+                type="text"
+                id="servername"
+                name="servername"
+                class="form-input"
+                placeholder="miservidor"
+                required
+                minlength="3"
+                maxlength="32"
+                autocomplete="off"
+                inputmode="text"
+                pattern="^[a-z0-9](?:[a-z0-9-]{1,30}[a-z0-9])?$"
+                title="Usa 3-32 caracteres. Solo a-z, 0-9 y guiones. No puede empezar o acabar con guión."
+                style="flex:1;"
+              >
+              <span style="white-space:nowrap; opacity:.9;">.blockhost.es</span>
+            </div>
 
-<p class="form-hint">
-  Solo letras, números y guiones.
-</p>
+            <p class="form-hint">
+              3–32 caracteres. Solo letras minúsculas, números y guiones. No puede empezar/terminar en guión.
+            </p>
 
+            <!-- EMAIL -->
+            <label class="form-label" for="email" style="margin-top:18px;">
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="tu@email.com"
+              required
+              autocomplete="email"
+              maxlength="120"
+            >
+            <p class="form-hint">
+              Tu servidor será asignado a esta cuenta. Si no tienes cuenta, créala primero.
+            </p>
 
-            <label class="form-label" for="email">Correo Electrónico</label>
-            <input type="email" id="email" name="email" class="form-input" placeholder="tu@email.com" required>
-            <p class="form-hint">Tu servidor será asignado a esta cuenta. Si no tienes cuenta, créala primero.</p>
             <div class="account-links">
               <a href="registrarse.html" class="link">Crear cuenta</a>
             </div>
           </div>
 
           <div class="form-actions">
-            <button type="button" class="btn secondary" id="btn-back" style="display: none;">← Atrás</button>
+            <button type="button" class="btn secondary" id="btn-back" style="display:none;">← Atrás</button>
             <button type="button" class="btn primary" id="btn-next">Siguiente →</button>
           </div>
         </form>
 
-        <!-- ✅ Botón restaurado de Stripe -->
-        <div id="payment-section" style="display: none; text-align: center; margin-top: 20px;">
+        <!-- (lo de payment-section lo puedes borrar si ya rediriges con session.url)
+             lo dejo por si luego lo reutilizas -->
+        <div id="payment-section" style="display:none; text-align:center; margin-top:20px;">
           <a id="stripe-button" class="btn primary" href="#" target="_blank" rel="noopener noreferrer">
             💳 Pagar ahora con Stripe
           </a>
         </div>
       </div>
 
+      <!-- RESUMEN -->
       <div class="checkout-summary">
         <h3>Resumen del Pedido</h3>
 
@@ -162,14 +193,17 @@
           <h4>Configuración</h4>
           <div class="config-item"><span class="config-label">Versión:</span><span class="config-value" id="summary-version">-</span></div>
           <div class="config-item"><span class="config-label">Software:</span><span class="config-value" id="summary-software">-</span></div>
-          <div class="config-item"><span class="config-label">Región:</span><span class="config-value" id="summary-region">-</span></div>
+          <div class="config-item"><span class="config-label">Región:</span><span class="config-value" id="summary-region">Canada</span></div>
+          <div class="config-item"><span class="config-label">Dominio:</span><span class="config-value" id="summary-domain">-</span></div>
           <div class="config-item"><span class="config-label">Email:</span><span class="config-value" id="summary-email">-</span></div>
+          <div class="config-item"><span class="config-label">Facturación:</span><span class="config-value" id="summary-billing">Mensual</span></div>
+          <div class="config-item"><span class="config-label">Backups:</span><span class="config-value" id="summary-backups">No</span></div>
         </div>
 
         <div class="summary-total">
-          <div class="total-row"><span class="total-label">Subtotal:</span><span class="total-value" id="price-subtotal">3,50 €</span></div>
-          <div class="total-row"><span class="total-label">IVA (21%):</span><span class="total-value" id="price-tax">0,74 €</span></div>
-          <div class="total-row total-final"><span class="total-label">Total mensual:</span><span class="total-value" id="price-total">4,24 €</span></div>
+          <div class="total-row"><span class="total-label">Subtotal:</span><span class="total-value" id="price-subtotal">—</span></div>
+          <div class="total-row"><span class="total-label">IVA (21%):</span><span class="total-value" id="price-tax">—</span></div>
+          <div class="total-row total-final"><span class="total-label" id="price-total-label">Total:</span><span class="total-value" id="price-total">—</span></div>
         </div>
 
         <div class="summary-footer">
@@ -178,6 +212,7 @@
           <p>✓ Soporte 24/7</p>
         </div>
       </div>
+
     </div>
   </main>
 
