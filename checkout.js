@@ -9,18 +9,36 @@ const summarySoftware = document.getElementById("summary-software");
 const summaryRegion = document.getElementById("summary-region");
 const summaryEmail = document.getElementById("summary-email");
 
+// NUEVO (para resumen)
+const summaryBilling = document.getElementById("summary-billing");
+const summaryBackups = document.getElementById("summary-backups");
+
+const priceSubtotalEl = document.getElementById("price-subtotal");
+const priceTaxEl = document.getElementById("price-tax");
+const priceTotalEl = document.getElementById("price-total");
+const totalLabelEl = document.getElementById("total-label");
+
 let currentStep = 1;
 
-// Enlaces de Stripe
+// Enlaces de Stripe (solo para Addons/Setups)
 const stripeLinks = {
-  Mini:   "https://buy.stripe.com/14A5kD1cO0v38Lb2ng4wM04",
-  Basico: "https://buy.stripe.com/9B6dR95t491z9Pf5zs4wM05",
-  Estandar: "https://buy.stripe.com/28E00j8Fggu1bXn0f84wM06",
-  Plus:   "https://buy.stripe.com/00w6oHg7IelT3qR7HA4wM07",
-  Pro:    "https://buy.stripe.com/eVq6oH4p06Tr4uV1jc4wM0c",
   Addons: "https://buy.stripe.com/bJe8wP2gSelT2mN3rk4wM0b",
-  Setups: "https://buy.stripe.com/6oU6oH5t40v30eF7HA4wM0d"
+  Setups: "https://buy.stripe.com/6oU6oH5t40v30eF7HA4wM0d",
 };
+
+// Precios base (EUR / mes) para pintar el resumen
+const planPrices = {
+  Mini: 3.50,
+  Basico: 5.50,
+  Estandar: 7.50,
+  Plus: 9.50,
+  Pro: 14.50,
+};
+
+// ✅ CAMBIA ESTE PRECIO al real de backups mensual
+const BACKUPS_MONTHLY_PRICE = 1.00;
+
+const TAX_RATE = 0.21;
 
 // Obtener el plan desde la URL
 function getPlanFromURL() {
@@ -38,18 +56,18 @@ let selectedPlan = getPlanFromURL();
 if (selectedPlan === "Addons" || selectedPlan === "Setups") {
   window.location.href = stripeLinks[selectedPlan];
 } else {
-  // --- Flujo normal para planes mensuales ---
+  // --- Flujo normal ---
   const planTitleEl = document.getElementById("plan-title");
   const specRam = document.getElementById("spec-ram");
   const specStorage = document.getElementById("spec-storage");
   const specPlayers = document.getElementById("spec-players");
 
   const planDataMap = {
-    Mini:    { ram: 4,  storage: 25,  players: "15-25" },
-    Basico:  { ram: 6,  storage: 50,  players: "25-35" },
-    Estandar:{ ram: 8,  storage: 75,  players: "35-50" },
-    Plus:    { ram:10,  storage:100,  players: "50-70" },
-    Pro:     { ram:15,  storage:150,  players: "70-100" },
+    Mini: { ram: 4, storage: 25, players: "15-25" },
+    Basico: { ram: 6, storage: 50, players: "25-35" },
+    Estandar: { ram: 8, storage: 75, players: "35-50" },
+    Plus: { ram: 10, storage: 100, players: "50-70" },
+    Pro: { ram: 15, storage: 150, players: "70-100" },
   };
 
   function updatePlanDisplay() {
@@ -62,8 +80,8 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
 
   function goToStep(step) {
     if (step < 1 || step > sections.length) return;
-    sections.forEach(s => s.classList.remove("active"));
-    steps.forEach(st => st.classList.remove("active"));
+    sections.forEach((s) => s.classList.remove("active"));
+    steps.forEach((st) => st.classList.remove("active"));
     sections[step - 1].classList.add("active");
     steps[step - 1].classList.add("active");
     currentStep = step;
@@ -73,11 +91,14 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
 
   function validateStep() {
     const activeSection = sections[currentStep - 1];
-    const requiredInputs = activeSection.querySelectorAll("input[required], select[required], textarea[required]");
+    const requiredInputs = activeSection.querySelectorAll(
+      "input[required], select[required], textarea[required]"
+    );
 
     for (const input of requiredInputs) {
       if (
-        (input.type === "radio" && !activeSection.querySelector(`input[name="${input.name}"]:checked`)) ||
+        (input.type === "radio" &&
+          !activeSection.querySelector(`input[name="${input.name}"]:checked`)) ||
         (input.type !== "radio" && !input.value.trim())
       ) {
         input.classList.add("error");
@@ -88,68 +109,129 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
     return true;
   }
 
+  function formatEUR(n) {
+    return n.toFixed(2).replace(".", ",") + " €";
+  }
+
+  function billingLabel(billing) {
+    if (billing === "3m") return "Cada 3 meses";
+    if (billing === "6m") return "Cada 6 meses";
+    if (billing === "year") return "Anual";
+    return "Mensual";
+  }
+
+  function billingMultiplier(billing) {
+    if (billing === "3m") return 3;
+    if (billing === "6m") return 6;
+    if (billing === "year") return 12;
+    return 1;
+  }
+
+  function syncBackupsAvailability() {
+    const billing = document.getElementById("billing")?.value || "monthly";
+    const backupsCheck = document.getElementById("addon-backups");
+    if (!backupsCheck) return;
+
+    const allowed = billing === "monthly";
+    backupsCheck.disabled = !allowed;
+    if (!allowed) backupsCheck.checked = false;
+  }
+
   function updateSummary() {
     const version = document.querySelector('input[name="version"]:checked');
     const software = document.querySelector('input[name="software"]:checked');
     const region = document.querySelector('input[name="region"]:checked');
     const email = document.getElementById("email");
 
+    const billing = document.getElementById("billing")?.value || "monthly";
+    const backups = document.getElementById("addon-backups")?.checked;
+
     summaryVersion.textContent = version ? version.value : "-";
     summarySoftware.textContent = software ? software.value : "-";
     summaryRegion.textContent = region ? region.value : "-";
     summaryEmail.textContent = email && email.value.trim() ? email.value.trim() : "-";
+
+    // Solo si existen en el HTML
+    if (summaryBilling) summaryBilling.textContent = billingLabel(billing);
+    if (summaryBackups) summaryBackups.textContent = backups ? "Sí (mensual)" : "No";
+
+    // Totales del resumen
+    const baseMonthly = planPrices[selectedPlan] ?? planPrices.Mini;
+    const mult = billingMultiplier(billing);
+
+    let subtotal = baseMonthly * mult;
+
+    // Backups solo mensual
+    if (backups && billing === "monthly") subtotal += BACKUPS_MONTHLY_PRICE;
+
+    const tax = subtotal * TAX_RATE;
+    const total = subtotal + tax;
+
+    if (priceSubtotalEl) priceSubtotalEl.textContent = formatEUR(subtotal);
+    if (priceTaxEl) priceTaxEl.textContent = formatEUR(tax);
+    if (priceTotalEl) priceTotalEl.textContent = formatEUR(total);
+
+    if (totalLabelEl) {
+      totalLabelEl.textContent = `Total ${billingLabel(billing).toLowerCase()}:`;
+    }
   }
 
- async function redirectToStripe() {
-  const version = document.querySelector('input[name="version"]:checked')?.value;
-  const software = document.querySelector('input[name="software"]:checked')?.value;
-  const region = document.querySelector('input[name="region"]:checked')?.value;
-  const email = document.getElementById("email")?.value?.trim();
+  async function redirectToStripe() {
+    const version = document.querySelector('input[name="version"]:checked')?.value;
+    const software = document.querySelector('input[name="software"]:checked')?.value;
+    const region = document.querySelector('input[name="region"]:checked')?.value;
+    const email = document.getElementById("email")?.value?.trim();
 
-  const billing = document.getElementById("billing")?.value || "monthly";
-  const backups = document.getElementById("addon-backups")?.checked ? "1" : "0";
+    const billing = document.getElementById("billing")?.value || "monthly";
+    const backups = document.getElementById("addon-backups")?.checked ? "1" : "0";
 
-  // Backups solo mensual (según tu caso)
-  if (backups === "1" && billing !== "monthly") {
-    alert("Los backups solo están disponibles en facturación mensual.");
-    return;
+    if (backups === "1" && billing !== "monthly") {
+      alert("Los backups solo están disponibles en facturación mensual.");
+      return;
+    }
+
+    const res = await fetch(
+      "https://pagosblockhost.miguelangelruizbarroso915.workers.dev/create-checkout-session",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: selectedPlan,
+          version,
+          software,
+          region,
+          email,
+          billing,
+          backups,
+        }),
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert("Error iniciando el pago: " + (data?.error || "desconocido"));
+      return;
+    }
+    if (!data?.url) {
+      alert("Stripe no devolvió una URL de pago.");
+      return;
+    }
+
+    window.location.href = data.url;
   }
-
-  const res = await fetch("https://pagosblockhost.miguelangelruizbarroso915.workers.dev/create-checkout-session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      plan: selectedPlan,
-      version,
-      software,
-      region,
-      email,
-      billing,
-      backups
-    })
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    alert("Error iniciando el pago: " + (data?.error || "desconocido"));
-    return;
-  }
-
-  window.location.href = data.url;
-}
-
 
   btnNext.addEventListener("click", async () => {
-  if (!validateStep()) return;
-  updateSummary();
+    if (!validateStep()) return;
 
-  if (currentStep < sections.length) {
-    goToStep(currentStep + 1);
-  } else {
-    await redirectToStripe();
-  }
-});
+    syncBackupsAvailability();
+    updateSummary();
 
+    if (currentStep < sections.length) {
+      goToStep(currentStep + 1);
+    } else {
+      await redirectToStripe();
+    }
+  });
 
   btnBack.addEventListener("click", () => {
     if (currentStep > 1) goToStep(currentStep - 1);
@@ -177,7 +259,7 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
   function populateSoftware(version) {
     softwareContainer.innerHTML = "";
     const list = softwareByVersion[version] || [];
-    list.forEach(sw => {
+    list.forEach((sw) => {
       const label = document.createElement("label");
       label.className = "option-card";
       label.innerHTML = `
@@ -188,21 +270,38 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
         </div>`;
       softwareContainer.appendChild(label);
     });
-    softwareContainer.querySelectorAll('input[name="software"]').forEach(r => {
-      r.addEventListener("change", updateSummary);
-    });
+
+    softwareContainer
+      .querySelectorAll('input[name="software"]')
+      .forEach((r) => r.addEventListener("change", updateSummary));
   }
 
-  versionRadios.forEach(r => r.addEventListener("change", e => {
-    populateSoftware(e.target.value);
-    updateSummary();
-  }));
-  document.querySelectorAll('input[name="region"]').forEach(r => r.addEventListener("change", updateSummary));
+  versionRadios.forEach((r) =>
+    r.addEventListener("change", (e) => {
+      populateSoftware(e.target.value);
+      updateSummary();
+    })
+  );
+
+  document
+    .querySelectorAll('input[name="region"]')
+    .forEach((r) => r.addEventListener("change", updateSummary));
 
   const emailInput = document.getElementById("email");
   if (emailInput) emailInput.addEventListener("input", updateSummary);
 
+  const billingSelect = document.getElementById("billing");
+  if (billingSelect)
+    billingSelect.addEventListener("change", () => {
+      syncBackupsAvailability();
+      updateSummary();
+    });
+
+  const backupsCheck = document.getElementById("addon-backups");
+  if (backupsCheck) backupsCheck.addEventListener("change", updateSummary);
+
   updatePlanDisplay();
   goToStep(1);
+  syncBackupsAvailability();
   updateSummary();
 }
