@@ -1,4 +1,4 @@
-// checkout.js — versión final (Addons y Setups redirigen directamente)
+// checkout.js — versión final (email + ip + servername + backups mensual)
 const sections = document.querySelectorAll(".form-section");
 const steps = document.querySelectorAll(".step");
 const btnNext = document.getElementById("btn-next");
@@ -8,6 +8,8 @@ const summaryVersion = document.getElementById("summary-version");
 const summarySoftware = document.getElementById("summary-software");
 const summaryRegion = document.getElementById("summary-region");
 const summaryEmail = document.getElementById("summary-email");
+const summaryDomain = document.getElementById("summary-domain");
+const summaryIp = document.getElementById("summary-ip");
 
 // NUEVO (para resumen)
 const summaryBilling = document.getElementById("summary-billing");
@@ -28,17 +30,39 @@ const stripeLinks = {
 
 // Precios base (EUR / mes) para pintar el resumen
 const planPrices = {
-  Mini: 3.50,
-  Basico: 5.50,
-  Estandar: 7.50,
-  Plus: 9.50,
-  Pro: 14.50,
+  Mini: 3.5,
+  Basico: 5.5,
+  Estandar: 7.5,
+  Plus: 9.5,
+  Pro: 14.5,
 };
 
 // ✅ CAMBIA ESTE PRECIO al real de backups mensual
-const BACKUPS_MONTHLY_PRICE = 1.00;
+const BACKUPS_MONTHLY_PRICE = 1.0;
 
 const TAX_RATE = 0.21;
+
+// -------------------------
+// Helpers validación
+// -------------------------
+function isValidEmailClient(email) {
+  if (typeof email !== "string") return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+// IPv4 simple + IPv6 razonable (práctico)
+function isValidIP(ip) {
+  if (typeof ip !== "string") return false;
+  const v = ip.trim();
+
+  const ipv4 =
+    /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
+
+  const ipv6 =
+    /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(([0-9a-fA-F]{1,4}:){1,7}:)|(:{2}([0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2})|(([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3})|(([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4})|(([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5})|([0-9a-fA-F]{1,4}:)((:[0-9a-fA-F]{1,4}){1,6}))$/;
+
+  return ipv4.test(v) || ipv6.test(v);
+}
 
 // Obtener el plan desde la URL
 function getPlanFromURL() {
@@ -83,7 +107,7 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
     sections.forEach((s) => s.classList.remove("active"));
     steps.forEach((st) => st.classList.remove("active"));
     sections[step - 1].classList.add("active");
-    steps[step - 1].classList.add("active");
+    steps[step - 1].classList.add("active"));
     currentStep = step;
     btnBack.style.display = step > 1 ? "inline-block" : "none";
     btnNext.textContent = step === sections.length ? "Pagar ahora" : "Siguiente →";
@@ -91,21 +115,55 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
 
   function validateStep() {
     const activeSection = sections[currentStep - 1];
+
+    // Radios requeridos
+    const requiredRadios = activeSection.querySelectorAll('input[type="radio"][required]');
+    for (const r of requiredRadios) {
+      const checked = activeSection.querySelector(`input[name="${r.name}"]:checked`);
+      if (!checked) {
+        r.classList.add("error");
+        r.focus();
+        return false;
+      }
+    }
+
+    // Inputs/select/textarea requeridos
     const requiredInputs = activeSection.querySelectorAll(
-      "input[required], select[required], textarea[required]"
+      'input[required]:not([type="radio"]), select[required], textarea[required]'
     );
 
     for (const input of requiredInputs) {
-      if (
-        (input.type === "radio" &&
-          !activeSection.querySelector(`input[name="${input.name}"]:checked`)) ||
-        (input.type !== "radio" && !input.value.trim())
-      ) {
+      input.classList.remove("error");
+
+      if (!input.value || !input.value.trim()) {
+        input.classList.add("error");
+        input.focus();
+        return false;
+      }
+      if (typeof input.checkValidity === "function" && !input.checkValidity()) {
         input.classList.add("error");
         input.focus();
         return false;
       }
     }
+
+    // Validación extra específica (solo en step 4)
+    if (currentStep === 4) {
+      const email = document.getElementById("email")?.value?.trim();
+      const ip = document.getElementById("ip")?.value?.trim();
+
+      if (!isValidEmailClient(email)) {
+        alert("Correo inválido. Revisa el formato.");
+        document.getElementById("email")?.focus();
+        return false;
+      }
+      if (!isValidIP(ip)) {
+        alert("IP inválida. Introduce una IPv4 o IPv6 válida.");
+        document.getElementById("ip")?.focus();
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -141,7 +199,9 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
     const version = document.querySelector('input[name="version"]:checked');
     const software = document.querySelector('input[name="software"]:checked');
     const region = document.querySelector('input[name="region"]:checked');
-    const email = document.getElementById("email");
+    const emailEl = document.getElementById("email");
+    const servernameEl = document.getElementById("servername");
+    const ipEl = document.getElementById("ip");
 
     const billing = document.getElementById("billing")?.value || "monthly";
     const backups = document.getElementById("addon-backups")?.checked;
@@ -149,7 +209,14 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
     summaryVersion.textContent = version ? version.value : "-";
     summarySoftware.textContent = software ? software.value : "-";
     summaryRegion.textContent = region ? region.value : "-";
-    summaryEmail.textContent = email && email.value.trim() ? email.value.trim() : "-";
+    summaryEmail.textContent = emailEl && emailEl.value.trim() ? emailEl.value.trim() : "-";
+
+    if (summaryDomain) {
+      const s = servernameEl && servernameEl.value.trim() ? servernameEl.value.trim() : "-";
+      summaryDomain.textContent = s === "-" ? "-" : `${s}.blockhost.es`;
+    }
+
+    if (summaryIp) summaryIp.textContent = ipEl && ipEl.value.trim() ? ipEl.value.trim() : "-";
 
     // Solo si existen en el HTML
     if (summaryBilling) summaryBilling.textContent = billingLabel(billing);
@@ -180,13 +247,25 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
     const version = document.querySelector('input[name="version"]:checked')?.value;
     const software = document.querySelector('input[name="software"]:checked')?.value;
     const region = document.querySelector('input[name="region"]:checked')?.value;
+
     const email = document.getElementById("email")?.value?.trim();
+    const servername = document.getElementById("servername")?.value?.trim();
+    const ip = document.getElementById("ip")?.value?.trim();
 
     const billing = document.getElementById("billing")?.value || "monthly";
     const backups = document.getElementById("addon-backups")?.checked ? "1" : "0";
 
     if (backups === "1" && billing !== "monthly") {
       alert("Los backups solo están disponibles en facturación mensual.");
+      return;
+    }
+
+    if (!isValidEmailClient(email)) {
+      alert("Correo inválido. Revisa el formato.");
+      return;
+    }
+    if (!isValidIP(ip)) {
+      alert("IP inválida. Introduce una IPv4 o IPv6 válida.");
       return;
     }
 
@@ -201,6 +280,8 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
           software,
           region,
           email,
+          servername, // ✅ NUEVO
+          ip,         // ✅ NUEVO
           billing,
           backups,
         }),
@@ -289,6 +370,12 @@ if (selectedPlan === "Addons" || selectedPlan === "Setups") {
 
   const emailInput = document.getElementById("email");
   if (emailInput) emailInput.addEventListener("input", updateSummary);
+
+  const servernameInput = document.getElementById("servername");
+  if (servernameInput) servernameInput.addEventListener("input", updateSummary);
+
+  const ipInput = document.getElementById("ip");
+  if (ipInput) ipInput.addEventListener("input", updateSummary);
 
   const billingSelect = document.getElementById("billing");
   if (billingSelect)
